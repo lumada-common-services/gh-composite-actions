@@ -1,0 +1,165 @@
+name: "Merge Composite Action Build and SQ Analysis"
+description: "Composite Action Template For Develop branch"
+inputs:  
+
+  SUCCESS_MESSAGE: 
+      description: "Artifacts sucessfully published to artifactory."
+      required: true
+      default: "Artifacts sucessfully published to artifactory."
+
+  FAILURE_MESSAGE: 
+      description: "Artifacts not published to artifactory. Please check logs for more information."
+      required: true
+      default: "Artifacts not published to artifactory. Please check logs for more information."
+
+  SLACK_TOKEN: 
+      description: "Slack Token"
+      required: true
+      
+  SLACK_CHANNEL: 
+      description: "data-flow-studio-notifications"
+      required: true
+      default: "data-flow-studio-notifications"
+  
+  SONAR_HOST_URL: 
+      description: "Sonar Host URL"
+      required: true
+      
+  SONAR_TOKEN: 
+      description: "Sonar Token"
+      required: true
+      
+
+  ARTIFACTORY_API_KEY:
+      description: "Artifactory API Key"
+      required: true
+     
+  ARTIFACTORY_USER: 
+      description: "Artifactory User"
+      required: true
+
+  DOCKER_REPOSITORY_URL: 
+      description: "Docker Repo URL"
+      required: true
+      default: "tapestry-docker-dev-wal.repo.wal.eng.hitachivantara.com"
+
+  HELM_REGISTRY_HOST:
+      description: "HELM Registry Host"
+      required: true
+      default: "https://repo.wal.eng.hitachivantara.com/artifactory/tapestry-helm-dev-wal"
+
+  BUILD_NUMBER: 
+      description: "Build Number"
+      required: true
+      default: "${{ github.run_number }}"
+
+  MAVEN_SETTINGS: 
+      description: "Maven Settings"
+      required: true
+      default: ".github/settings.xml"
+
+  HELM_VERSION: 
+      description: "HELM Version"
+      required: true
+      default: "v3.1.2"
+
+  MINIMUM_UPGRADE_SOURCE_VERSION: 
+      description: "Minimum Upgrade Source Version"
+      required: true
+      default: "1.1.0"
+
+  MINIMUM_ROLLBACK_TARGET_VERSION: 
+      description: "Minimum Rollback Target Version"
+      required: true
+      default: "1.1.0"
+
+  WN_PROVIDER_MIN_UPGRADE_SOURCE_VERSION: 
+      description: "WN Provider Min Upgrade Source Version"
+      required: true
+      default: "1.1.0"
+
+  WN_PROVIDER_MIN_ROLLBACK_TARGET_VERSION: 
+      description: "WN Provider Min Rollback Target Version"
+      required: true
+      default: "1.1.0 "
+
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: Discover current branch
+      run: |
+        REF=$( echo "${{ github.ref }}" ) # gets the branch or tag ref that triggered the workflow (something like 'refs/heads/branch-name')
+        REF=$( echo ${REF^^} ) # sets it to uppercase
+        REF=$( echo ${REF##*/} ) # removes the 'refs/heads/' reference
+        REF=$( echo ${REF//[_]/-} ) # replaces any '_' for a '-'
+
+        echo "CURRENT_BRANCH=$REF" >> $GITHUB_ENV
+      shell: bash
+
+    # Setup helm
+    - name: Setup Helm
+      uses: azure/setup-helm@v1
+      with:
+        version: ${{inputs.HELM_VERSION}}
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Java version
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+
+    # Update version (add build number)
+    - name: Update versions
+      run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion}-${CURRENT_BRANCH}-${{inputs.BUILD_NUMBER}} -s ${{ inputs.MAVEN_SETTINGS }}
+      shell: bash
+      
+    # Build Code
+    - name: Install and Verify
+      run: mvn clean install -DskipTests -B -e -Daudit -amd -s ${{inputs.MAVEN_SETTINGS}} -Ddocker.repository.url=${{inputs.DOCKER_REPOSITORY_URL}} -Dquarkus.container-image.push=true -Dquarkus.container-image.username=${{inputs.ARTIFACTORY_USER}} -Dquarkus.container-image.password=${{inputs.ARTIFACTORY_API_KEY}} -Dminimum.upgrade.source.version=${{inputs.MINIMUM_UPGRADE_SOURCE_VERSION}} -Dminimum.rollback.target.version=${{inputs.MINIMUM_ROLLBACK_TARGET_VERSION}} -Dwn.provider.min.upgrade.source.version=${{inputs.WN_PROVIDER_MIN_UPGRADE_SOURCE_VERSION}} -Dwn.provider.min.rollback.target.version=${{inputs.WN_PROVIDER_MIN_ROLLBACK_TARGET_VERSION}}
+      shell: bash
+      
+    #Sonarqube Analysis      
+    - name: Maven SonarQube Check      
+      run: mvn sonar:sonar -s ${{inputs.MAVEN_SETTINGS}} -Dsonar.host.url=${{ inputs.SONAR_HOST_URL }} -Dsonar.login=${{ inputs.SONAR_TOKEN }} -Dsonar.projectVersion=${{ github.run_number }}     
+      shell: bash
+
+    # Publish to Artifactory
+    - name: Publish Docker Images
+      run: mvn docker:build docker:push -B -s ${{inputs.MAVEN_SETTINGS}} -Ddocker.username=${{inputs.ARTIFACTORY_USER}} -Ddocker.password=${{inputs.ARTIFACTORY_API_KEY}} -Ddocker.repository.url=${{inputs.DOCKER_REPOSITORY_URL}}
+      shell: bash
+
+    # Publish Helm Chart
+    - name: Publish Helm Charts
+      run: mvn helm:package helm:upload -B -s ${{inputs.MAVEN_SETTINGS}} -Dhelm.repository.url=${{inputs.HELM_REGISTRY_HOST}} -Dhelm.username=${{inputs.ARTIFACTORY_USER}} -Dhelm.password=${{inputs.ARTIFACTORY_API_KEY}}
+      shell: bash
+
+    # on sucess
+    - name: Slack notification on success
+      if: success()
+      uses: hbfernandes/slack-action@1.0
+      env:
+        SLACK_TOKEN: ${{ inputs.SLACK_TOKEN }}
+      with:
+        args: |
+          {
+            "channel": "${{inputs.SLACK_CHANNEL}}",
+            "text": "[${{inputs.CURRENT_BRANCH}}] ${{inputs.SUCCESS_MESSAGE}}"
+          }
+    # On failure
+    - name: Slack notification on failure
+      if: failure ()
+      uses: hbfernandes/slack-action@1.0
+      env:
+        SLACK_TOKEN: ${{ inputs.SLACK_TOKEN }}
+      with:
+        args: |
+          {
+            "channel": "${{inputs.SLACK_CHANNEL}}",
+            "text": "[${{inputs.CURRENT_BRANCH}}] ${{inputs.FAILURE_MESSAGE}}"
+          }  
+    
