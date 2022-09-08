@@ -53,10 +53,6 @@ inputs:
       required: true
       default: "${{ github.run_number }}"
 
-  MAVEN_SETTINGS: 
-      description: "Maven Settings"
-      required: true
-      default: ".github/settings.xml"
 
   HELM_VERSION: 
       description: "HELM Version"
@@ -113,53 +109,15 @@ runs:
         distribution: 'adopt'
         java-version: '11'
 
-    # Update version (add build number)
-    - name: Update versions
-      run: mvn build-helper:parse-version versions:set -DnewVersion=\${parsedVersion.majorVersion}.\${parsedVersion.minorVersion}.\${parsedVersion.incrementalVersion}-${CURRENT_BRANCH}-${{inputs.BUILD_NUMBER}} -s ${{ inputs.MAVEN_SETTINGS }}
-      shell: bash
-      
     # Build Code
-    - name: Install and Verify
-      run: mvn clean install -DskipTests -B -e -Daudit -amd -s ${{inputs.MAVEN_SETTINGS}} -Ddocker.repository.url=${{inputs.DOCKER_REPOSITORY_URL}} -Dquarkus.container-image.push=true -Dquarkus.container-image.username=${{inputs.ARTIFACTORY_USER}} -Dquarkus.container-image.password=${{inputs.ARTIFACTORY_API_KEY}} -Dminimum.upgrade.source.version=${{inputs.MINIMUM_UPGRADE_SOURCE_VERSION}} -Dminimum.rollback.target.version=${{inputs.MINIMUM_ROLLBACK_TARGET_VERSION}} -Dwn.provider.min.upgrade.source.version=${{inputs.WN_PROVIDER_MIN_UPGRADE_SOURCE_VERSION}} -Dwn.provider.min.rollback.target.version=${{inputs.WN_PROVIDER_MIN_ROLLBACK_TARGET_VERSION}}
+    - name: Build code & test
+      run: ./gradlew clean build
       shell: bash
-      
+
     #Sonarqube Analysis      
-    - name: Maven SonarQube Check      
-      run: mvn sonar:sonar -s ${{inputs.MAVEN_SETTINGS}} -Dsonar.host.url=${{ inputs.SONAR_HOST_URL }} -Dsonar.login=${{ inputs.SONAR_TOKEN }} -Dsonar.projectVersion=${{ github.run_number }}     
-      shell: bash
-
-    # Publish to Artifactory
-    - name: Publish Docker Images
-      run: mvn docker:build docker:push -B -s ${{inputs.MAVEN_SETTINGS}} -Ddocker.username=${{inputs.ARTIFACTORY_USER}} -Ddocker.password=${{inputs.ARTIFACTORY_API_KEY}} -Ddocker.repository.url=${{inputs.DOCKER_REPOSITORY_URL}}
-      shell: bash
-
-    # Publish Helm Chart
-    - name: Publish Helm Charts
-      run: mvn helm:package helm:upload -B -s ${{inputs.MAVEN_SETTINGS}} -Dhelm.repository.url=${{inputs.HELM_REGISTRY_HOST}} -Dhelm.username=${{inputs.ARTIFACTORY_USER}} -Dhelm.password=${{inputs.ARTIFACTORY_API_KEY}}
-      shell: bash
-
-    # on sucess
-    - name: Slack notification on success
-      if: success()
-      uses: hbfernandes/slack-action@1.0
-      env:
-        SLACK_TOKEN: ${{ inputs.SLACK_TOKEN }}
-      with:
-        args: |
-          {
-            "channel": "${{inputs.SLACK_CHANNEL}}",
-            "text": "[${{inputs.CURRENT_BRANCH}}] ${{inputs.SUCCESS_MESSAGE}}"
-          }
-    # On failure
-    - name: Slack notification on failure
-      if: failure ()
-      uses: hbfernandes/slack-action@1.0
-      env:
-        SLACK_TOKEN: ${{ inputs.SLACK_TOKEN }}
-      with:
-        args: |
-          {
-            "channel": "${{inputs.SLACK_CHANNEL}}",
-            "text": "[${{inputs.CURRENT_BRANCH}}] ${{inputs.FAILURE_MESSAGE}}"
-          }  
-    
+    - name: Publish to Sonar
+      run: ./gradlew sonarqube
+        -Dsonar.projectKey=${{env.SONAR_PROJECT_KEY}}
+        -Dsonar.host.url=${{env.SONAR_HOST_URL}}
+        -Dsonar.login=${{env.SONAR_LOGIN}}
+      shell: bash  
