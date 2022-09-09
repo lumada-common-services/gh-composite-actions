@@ -2,25 +2,6 @@ name: "Merge Composite Action Build and SQ Analysis"
 description: "Composite Action Template For Develop branch"
 inputs:  
 
-  SUCCESS_MESSAGE: 
-      description: "Artifacts sucessfully published to artifactory."
-      required: true
-      default: "Artifacts sucessfully published to artifactory."
-
-  FAILURE_MESSAGE: 
-      description: "Artifacts not published to artifactory. Please check logs for more information."
-      required: true
-      default: "Artifacts not published to artifactory. Please check logs for more information."
-
-  SLACK_TOKEN: 
-      description: "Slack Token"
-      required: true
-      
-  SLACK_CHANNEL: 
-      description: "data-flow-studio-notifications"
-      required: true
-      default: "data-flow-studio-notifications"
-  
   SONAR_HOST_URL: 
       description: "Sonar Host URL"
       required: true
@@ -29,55 +10,11 @@ inputs:
       description: "Sonar Token"
       required: true
       
-
-  ARTIFACTORY_API_KEY:
-      description: "Artifactory API Key"
-      required: true
-     
-  ARTIFACTORY_USER: 
-      description: "Artifactory User"
-      required: true
-
-  DOCKER_REPOSITORY_URL: 
-      description: "Docker Repo URL"
-      required: true
-      default: "tapestry-docker-dev-wal.repo.wal.eng.hitachivantara.com"
-
-  HELM_REGISTRY_HOST:
-      description: "HELM Registry Host"
-      required: true
-      default: "https://repo.wal.eng.hitachivantara.com/artifactory/tapestry-helm-dev-wal"
-
   BUILD_NUMBER: 
       description: "Build Number"
       required: true
       default: "${{ github.run_number }}"
 
-
-  HELM_VERSION: 
-      description: "HELM Version"
-      required: true
-      default: "v3.1.2"
-
-  MINIMUM_UPGRADE_SOURCE_VERSION: 
-      description: "Minimum Upgrade Source Version"
-      required: true
-      default: "1.1.0"
-
-  MINIMUM_ROLLBACK_TARGET_VERSION: 
-      description: "Minimum Rollback Target Version"
-      required: true
-      default: "1.1.0"
-
-  WN_PROVIDER_MIN_UPGRADE_SOURCE_VERSION: 
-      description: "WN Provider Min Upgrade Source Version"
-      required: true
-      default: "1.1.0"
-
-  WN_PROVIDER_MIN_ROLLBACK_TARGET_VERSION: 
-      description: "WN Provider Min Rollback Target Version"
-      required: true
-      default: "1.1.0 "
 
 runs:
   using: "composite"
@@ -108,6 +45,9 @@ runs:
       with:
         distribution: 'adopt'
         java-version: '11'
+        
+    - name: Setup Gradle
+      uses: gradle/gradle-build-action@v2
 
     # Build Code
     - name: Build code & test
