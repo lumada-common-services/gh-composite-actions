@@ -1,0 +1,62 @@
+# Bash script action
+name: Blackduck Scan
+description: Identifies the Docker images defined at SolutionMetadata.yaml file under the Helm charts and scans the Docker images and uploads the results to blackduck server.
+inputs:
+  blackduck_server:
+    description: The URL of the Blackduck server
+    required: true
+    default: "https://172.18.1.90/"
+  branch_name:
+    description: The Branchname of the current project
+    required: true
+    default: "${{ github.event.pull_request.head.ref }}"
+  commit_id:
+    description: Commit ID of the repo
+    required: true
+    default: ${{ github.sha }}
+  build_id:
+    description: Commit ID of the repo
+    required: true
+    default: ${{ github.run_number }}
+  source_directory:
+    description: The Source Directory of the current project
+    required: true
+    default: ${{ github.workspace }}
+  snippet_matching:
+    description: Snippet Matching of the code
+    required: true
+    default: "False"
+  dockerfile:
+    description: Dockerfile to be built
+    required: false
+    default: "No"
+  projectname:
+    description: Project Name
+    required: true
+  image:
+    description: Image Name to be used for the Dockerfile
+    required: true
+  tag:
+    description: Docker Image Tag to be used to build the Docker Image
+    required: false
+    default: No
+  pull_image:
+    description: Decides to pull or not to pull the Docker image
+    required: false
+    default: No
+
+runs:
+  using: "docker"
+  image: "Dockerfile"
+  args:
+    - --blackduck-url=${{ inputs.blackduck_server }}
+    - --blackduck-project-version=${{ inputs.branch_name }}
+    - --commit-id=${{ inputs.commit_id }}
+    - --build-id=${{ inputs.build_id }}
+    - --blackduck-source-directory=${{ inputs.source_directory }}
+    - --snippet.matching=${{ inputs.snippet_matching }}
+    - --docker-file=${{ inputs.dockerfile }}
+    - --project-name=${{ inputs.projectname }}
+    - --docker.image=${{ inputs.image }}
+    - --docker.tag=${{ inputs.tag }}
+    - --pull-image=${{ inputs.pull_image }}

@@ -1,0 +1,6 @@
+{
+ "baseurl": "https://172.18.1.90/",
+ "api_token": "ZDIxYzE2ZDctOGExMi00Y2JjLWIzNmMtMTdmYTExOTdlZTBkOjNiMGJjN2M0LTYyMWItNGM0ZS05M2Q1LTlkZmUyZWNlNDg3MQ==",
+ "insecure": true,
+ "debug": true
+}
