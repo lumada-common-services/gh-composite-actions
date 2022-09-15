@@ -32,17 +32,16 @@ EOF
 
 # tags them and pushes them to the remote registry.
 function handleDockerImages() {
-  # local dockerImageName="$DockerImage:$DockerTag"
   local localDockerImg="$(docker images --format "{{.ID}} {{.Tag}} {{.Repository}} {{.Repository}}:{{.Tag}}" | grep "$Blackduck_Image" | head -1)"
 
   if [ $Dockerfile != No ] || [ $PullImage == No ]; then
-    echo "Pulling Image is disabled."
+    echo "Pulling Image is disabled"
     if [[ "$localDockerImg" == "" ]]; then
        echo "Error: $Blackduck_Image doesn't exist"
        exit 1
     fi
   else
-    echo "Pulling Image is enabled."
+    echo "Pulling Image is enabled"
     for dockerRepo in  $(echo "$dockerRepos" | sed "s/,/ /g")
     do
       DockerImgPath="$dockerRepo/$Blackduck_Image"
@@ -68,7 +67,7 @@ function handleDockerImages() {
 
   echo "Running Blackduck Scan with the below values:"
   echo "Blackduck_Image: $Blackduck_Image"
-  echo "Blackduck_Project: Blackduck_Project"
+  echo "Blackduck_Project: $Blackduck_Project"
 
   python3 ./scan_docker_image_layer.py $Blackduck_Image ${Blackduck_Project} ${SnippetMatching}
 
@@ -87,7 +86,6 @@ function BuildDockerImage() {
   chmod +x $Dockerfile
   docker build -t $tag -f $Dockerfile .
   Blackduck_Image=$tag
-  # local localDockerImg="$(docker images --format "{{.ID}} {{.Tag}} {{.Repository}} {{.Repository}}:{{.Tag}}" | grep "$tag" | head -1)"
 }
 
 main() {
@@ -214,16 +212,6 @@ main() {
     exit 1
   fi  
 
-  python3 --version
-  # pip3 install blackduck
-  # pip3 install autopep8
-  # which jfrog
-  # jfrog config remove artifactory --quiet
-  echo "Dockerfile: $Dockerfile"
-  echo "DockerImage: $DockerImage"
-  echo "DockerTag: $DockerTag"
-  echo "PullImage: $PullImage"
-
   localDockerCont="$(docker ps --format "{{.ID}} {{.Command}} {{.Names}} {{.Image}}" | grep "/run_component_scan" | head -1)"
   ContainerID=$(echo $localDockerCont | cut -d ' ' -f1)
   docker cp $ContainerID:/detect7.sh .
@@ -256,9 +244,6 @@ main() {
   fi
   
   Blackduck_Project="${ProjectName}/${DockerImage}/${blackduckProjectVersion}"
-
-  echo "Blackduck_Project: ${Blackduck_Project}"
-  echo "Blackduck_Image: ${Blackduck_Image}"
   echo "Processing the Docker Image"
   handleDockerImages
 
