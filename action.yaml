@@ -18,7 +18,7 @@ inputs:
 
 runs:
   using: "composite"
-
+  uses: gradle
   steps:
 
     # Setup helm
