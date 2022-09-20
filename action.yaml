@@ -1,6 +1,10 @@
 name: "Merge Composite Action Build and SQ Analysis"
 description: "Composite Action Template For Develop branch"
 inputs:  
+  UPDATE_VERSIONS: 
+      description: "UPDATE_VERSIONS"
+      required: true
+      default: false
 
 runs:
   using: "composite"
@@ -29,7 +33,7 @@ runs:
 
     # Update version (add build number)
     - name: Update versions
-      if: "${{ Update_Versions }}"
+      if: "${{ UPDATE_VERSIONS }}"
       run: |
         echo "Running Update Versions"
       shell: bash
