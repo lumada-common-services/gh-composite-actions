@@ -1,0 +1,39 @@
+name: "Merge Composite Action Build and SQ Analysis"
+description: "Composite Action Template For Develop branch"
+inputs:  
+  UPDATE_VERSIONS: 
+      description: "UPDATE_VERSIONS"
+      required: true
+      default: false
+
+runs:
+  using: "composite"
+
+  steps:
+
+    - name: Discover current branch
+      run: |
+        REF=$( echo "${{ github.ref }}" ) # gets the branch or tag ref that triggered the workflow (something like 'refs/heads/branch-name')
+        REF=$( echo ${REF^^} ) # sets it to uppercase
+        REF=$( echo ${REF##*/} ) # removes the 'refs/heads/' reference
+        REF=$( echo ${REF//[_]/-} ) # replaces any '_' for a '-'
+
+        # echo "CURRENT_BRANCH=$REF" >> $GITHUB_ENV
+        echo "CURRENT_BRANCH=$REF"
+      shell: bash
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup Java version
+      uses: actions/setup-java@v2
+      with:
+        distribution: 'adopt'
+        java-version: '11'
+
+    # Update version (add build number)
+    - name: Update versions
+      if: "${{ UPDATE_VERSIONS }}"
+      run: |
+        echo "Running Update Versions"
+      shell: bash
