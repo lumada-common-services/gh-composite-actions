@@ -1,39 +1,51 @@
-name: "Merge Composite Action Build and SQ Analysis"
-description: "Composite Action Template For Develop branch"
-inputs:  
-  UPDATE_VERSIONS: 
-      description: "UPDATE_VERSIONS"
-      required: true
-      default: false
+name: "Pull Request Composite Action Template"
+description: "Composite Action Template For Pull Request"
+inputs:
+
+working-directory: webclient/impls/client
+  working-directory:
+    description: "Working Directory"
+    required: true
+    default: "."
+  lint_utility:
+    description: "Utility or Tool used for Linting, For ex npm or yarn"  
+    required: true
+  lint_image:
+    description: "Docker Image to be used"  
+    required: true
+    default: node    
+  lint_tag:
+    description: "Tag of the Docker image to be used. Default tag is latest"  
+    required: true
+    default: 12.14.1-alpine3.10
+  command:
+    description: "Command to run"  
+    required: true
+  perform_code_linting:
+    required: true
+    type: boolean
+    default: false    
 
 runs:
   using: "composite"
-
   steps:
 
-    - name: Discover current branch
-      run: |
-        REF=$( echo "${{ github.ref }}" ) # gets the branch or tag ref that triggered the workflow (something like 'refs/heads/branch-name')
-        REF=$( echo ${REF^^} ) # sets it to uppercase
-        REF=$( echo ${REF##*/} ) # removes the 'refs/heads/' reference
-        REF=$( echo ${REF//[_]/-} ) # replaces any '_' for a '-'
+    # Setup Environment
 
-        # echo "CURRENT_BRANCH=$REF" >> $GITHUB_ENV
-        echo "CURRENT_BRANCH=$REF"
-      shell: bash
-
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Setup Java version
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '11'
-
-    # Update version (add build number)
-    - name: Update versions
-      if: "${{ UPDATE_VERSIONS }}"
+    - name: Set version
       run: |
-        echo "Running Update Versions"
+        echo "working-directory: ${{ inputs.working-directory }}"
+        echo "utility: ${{ inputs.utility }}"
+        echo "image: ${{ inputs.image }}"
+        echo "tag: ${{ inputs.tag }}"        
+        echo "commands: @{{ inputs.commands }}"
+        echo "commands: @{{ inputs.commands[0] }}"        
+        echo "command: @${{ inputs.commands }}"
+        echo "command: @${{ inputs.commands[0] }}"        
+        echo "comman: ${{ inputs.commands }}"        
+        # echo "commands-version: ${{ inputs.commands.version }}"
+        # echo "commands-run: ${{ inputs.commands.ci-run }}"
       shell: bash
