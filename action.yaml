@@ -1,0 +1,51 @@
+name: "Pull Request Composite Action Template"
+description: "Composite Action Template For Pull Request"
+inputs:
+
+working-directory: webclient/impls/client
+  working-directory:
+    description: "Working Directory"
+    required: true
+    default: "."
+  lint_utility:
+    description: "Utility or Tool used for Linting, For ex npm or yarn"  
+    required: true
+  lint_image:
+    description: "Docker Image to be used"  
+    required: true
+    default: node    
+  lint_tag:
+    description: "Tag of the Docker image to be used. Default tag is latest"  
+    required: true
+    default: 12.14.1-alpine3.10
+  command:
+    description: "Command to run"  
+    required: true
+  perform_code_linting:
+    required: true
+    type: boolean
+    default: false    
+
+runs:
+  using: "composite"
+  steps:
+
+    # Setup Environment
+
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set version
+      run: |
+        echo "working-directory: ${{ inputs.working-directory }}"
+        echo "utility: ${{ inputs.utility }}"
+        echo "image: ${{ inputs.image }}"
+        echo "tag: ${{ inputs.tag }}"        
+        echo "commands: @{{ inputs.commands }}"
+        echo "commands: @{{ inputs.commands[0] }}"        
+        echo "command: @${{ inputs.commands }}"
+        echo "command: @${{ inputs.commands[0] }}"        
+        echo "comman: ${{ inputs.commands }}"        
+        # echo "commands-version: ${{ inputs.commands.version }}"
+        # echo "commands-run: ${{ inputs.commands.ci-run }}"
+      shell: bash
