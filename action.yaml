@@ -1,53 +1,69 @@
-name: "Merge Composite Action Build and SQ Analysis"
-description: "Composite Action Template For Develop branch"
-inputs:  
+name: "Pull Request Composite Action Template"
+description: "Composite Action Template For Pull Request"
 
-  SONAR_HOST_URL: 
-      description: "Sonar Host URL"
-      required: true
-      
-  SONAR_TOKEN: 
-      description: "Sonar Token"
-      required: true
-      
-  BUILD_NUMBER: 
-      description: "Build Number"
-      required: true
-      default: "${{ github.run_number }}"
+inputs:
+  working-directory:
+    description: "Working Directory"
+    required: true
+    default: "."
 
+  gradle_image:
+    description: "Docker Image to be used"  
+    required: true
+    default: gradle
+
+  gradle_tag:
+    description: "Tag of the Docker image to be used. Default tag is latest"  
+    required: true
+    default: 7.5.1-jdk11-alpine
+
+  gardle_commands:
+    description: "Command to run"  
+    required: true
+
+  perform_gradle_build:
+    required: true
+    type: boolean
+    default: false
+    
+  sonar_project_key:
+    description: "Project key"  
+    required: true  
+  
+  sonar_host_url:
+     description: "Project key"  
+     required: true
+     
+  sonar_login:
+    description: "Project key"  
+    required: true
+  
+  perform_sonar_scan:
+    required: true
+    type: boolean
+    default: false
+  
 
 runs:
   using: "composite"
-  uses: gradle
   steps:
 
-    # Setup helm
-    - name: Setup Helm
-      uses: azure/setup-helm@v1
-      with:
-        version: ${{inputs.HELM_VERSION}}
-
-    - name: Checkout code
+    - name: Checkout
       uses: actions/checkout@v2
 
-    - name: Setup Java version
-      uses: actions/setup-java@v2
+    - name: Gradle Build
+      if: ${{ inputs.perform_gradle_build == 'true'}}    
+      uses: lumada-data-services/lds-composite-action@build-action
       with:
-        distribution: 'adopt'
-        java-version: '11'
+        working-directory: ${{ inputs.working-directory }}
+        gradle_image: ${{ inputs.gradle_image }}
+        gradle_tag: ${{ inputs.gradle_tag }}
+        gradle_commands: ${{ inputs.gradle_commands }}
 
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-
-    # Build Code
-    - name: Build code & test
-      run: ./gradlew clean build
-      shell: bash
-
-    #Sonarqube Analysis      
-    - name: Publish to Sonar
-      run: ./gradlew sonarqube
-        -Dsonar.projectKey=${{env.SONAR_PROJECT_KEY}}
-        -Dsonar.host.url=${{env.SONAR_HOST_URL}}
-        -Dsonar.login=${{env.SONAR_LOGIN}}
-      shell: bash  
+    - name: Sonar Scan
+      if: ${{ inputs.perform_sonar_scan == 'true'}}    
+      uses: lumada-data-services/lds-composite-action@sonar-action
+      with:
+        sonar_project_key: ${{ inputs.sonar_project_key }}
+        sonar_host_url: ${{ inputs.sonar_host_url }}
+        sonar_login: ${{ inputs.sonar_login}}    
