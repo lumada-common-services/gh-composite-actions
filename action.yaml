@@ -1,18 +1,8 @@
-name: "Pull Request Composite Action Template"
-description: "Composite Action Template For Pull Request"
+name: "Maven Build Action Template"
+description: "Maven Build Action Template"
 
 runs:
-  using: "composite"
-  steps:
-
-    - name: Checkout
-      uses: actions/checkout@v2
-
-    - name: Code Linting
-      if: ${{ env.lint_commands }}
-      uses: hv-actions/blackduck-action@YKN-174
-
-    - name: Maven Build
-      if: ${{ env.maven_commands }}
-      uses: hv-actions/blackduck-action@YKN-161
-     
+  using: "docker"
+  image: "Dockerfile"
+  env:
+    IMAGE: 'node:12'
