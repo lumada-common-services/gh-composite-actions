@@ -1,11 +1,15 @@
-FROM maven:3.8.6-jdk-11
+# ARG image
+# ENV image node:12
 
-COPY run_maven_build.sh /run_maven_build.sh
+FROM node:14
+
+COPY run_code_lint.sh /run_code_lint.sh
+
+RUN chmod +x /run_code_lint.sh
+
+RUN sed -i -e 's/\r$//' /run_code_lint.sh
 
 RUN printenv
-RUN chmod +x /run_maven_build.sh
-
-RUN sed -i -e 's/\r$//' /run_maven_build.sh
 
 # file to execute when the docker container starts up
-ENTRYPOINT ["/bin/bash", "/run_maven_build.sh"]
+ENTRYPOINT ["/bin/bash", "/run_code_lint.sh"]

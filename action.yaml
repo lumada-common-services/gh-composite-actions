@@ -1,8 +1,9 @@
-name: "Maven Build Action Template"
-description: "Maven Build Action Template"
+name: "Pull Request Composite Action Template"
+description: "Composite Action Template For Pull Request"
 
 runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    IMAGE: 'node:12'
+    image: 'node:12'
+    
