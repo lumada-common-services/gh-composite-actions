@@ -10,9 +10,9 @@ runs:
 
     - name: Code Linting
       if: ${{ env.lint_commands }}
-      uses: hv-actions/blackduck-action@YKN-174
+      uses: lumada-common-services/gh-composite-actions@YKN-174
 
     - name: Maven Build
       if: ${{ env.maven_commands }}
-      uses: hv-actions/blackduck-action@YKN-161
+      uses: lumada-common-services/gh-composite-actions@YKN-161
      
