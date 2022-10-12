@@ -15,4 +15,3 @@ runs:
     - name: Maven Build
       if: ${{ env.maven_commands }}
       uses: lumada-common-services/gh-composite-actions@YKN-161
-          
