@@ -1,5 +1,5 @@
-ARG image=node:14
-FROM ${image}
+# ARG image=$image
+FROM node:14
 
 COPY run_code_lint.sh /run_code_lint.sh
 
