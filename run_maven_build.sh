@@ -5,6 +5,9 @@ set -eo pipefail
 echo "Listing Docker Image:"
 docker images
 
+echo "Maven Settings Value:"
+$MAVEN_SETTINGS
+
 if [[ -z ${maven_utility} ]]; then
    echo "maven_utility is a required environment variable"
    exit 1
@@ -25,9 +28,8 @@ do
   co=`echo $co | sed 's/^[[:space:]]*//g'`
   co=`echo $co | sed 's/[[:space:]]*$//g'`
   echo "Running $utility $co"
-  # $utility $co
+  $utility $co
 done
 
 echo "Listing Docker Image:"
 docker images
-
