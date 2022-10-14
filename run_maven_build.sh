@@ -2,9 +2,6 @@
 
 set -eo pipefail
 
-echo "Listing Docker Image:"
-docker images
-
 echo "Maven Settings Value:"
 $MAVEN_SETTINGS
 
@@ -30,6 +27,3 @@ do
   echo "Running $utility $co"
   $utility $co
 done
-
-echo "Listing Docker Image:"
-docker images
