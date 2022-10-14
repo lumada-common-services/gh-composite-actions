@@ -22,5 +22,5 @@ do
   co=`echo $co | sed 's/^[[:space:]]*//g'`
   co=`echo $co | sed 's/[[:space:]]*$//g'`
   echo "Running $utility $co"
-  $utility $co
+  # $utility $co
 done

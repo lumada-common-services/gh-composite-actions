@@ -4,5 +4,3 @@ description: "Maven Build Action Template"
 runs:
   using: "docker"
   image: "Dockerfile"
-  env:
-    IMAGE: 'node:12'
