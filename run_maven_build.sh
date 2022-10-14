@@ -2,6 +2,9 @@
 
 set -eo pipefail
 
+echo "Listing Docker Image:"
+docker images
+
 if [[ -z ${maven_utility} ]]; then
    echo "maven_utility is a required environment variable"
    exit 1
@@ -24,3 +27,7 @@ do
   echo "Running $utility $co"
   # $utility $co
 done
+
+echo "Listing Docker Image:"
+docker images
+
