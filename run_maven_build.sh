@@ -3,7 +3,7 @@
 set -eo pipefail
 
 echo "Maven Settings Value:"
-$MAVEN_SETTINGS
+echo "$MAVEN_SETTINGS"
 
 if [[ -z ${maven_utility} ]]; then
    echo "maven_utility is a required environment variable"
