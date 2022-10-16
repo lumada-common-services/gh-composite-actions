@@ -6,7 +6,7 @@ echo "Maven Settings Value:"
 echo "$MAVEN_SETTINGS"
 
 # chmod +x /pom.xml
-sed -i -e 's/\r$//' /pom.xml
+sed -i -e 's/\r$//' pom.xml
 
 if [[ -z ${maven_utility} ]]; then
    echo "maven_utility is a required environment variable"
