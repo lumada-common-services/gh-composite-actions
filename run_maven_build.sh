@@ -5,6 +5,8 @@ set -eo pipefail
 echo "Maven Settings Value:"
 echo "$MAVEN_SETTINGS"
 
+chmod +x pom.xml
+
 if [[ -z ${maven_utility} ]]; then
    echo "maven_utility is a required environment variable"
    exit 1
