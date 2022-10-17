@@ -2,12 +2,6 @@
 
 set -eo pipefail
 
-echo "Maven Settings Value:"
-echo "$MAVEN_SETTINGS"
-
-chmod +x pom.xml
-sed -i -e 's/\r$//' pom.xml
-
 if [[ -z ${maven_utility} ]]; then
    echo "maven_utility is a required environment variable"
    exit 1
@@ -28,5 +22,5 @@ do
   co=`echo $co | sed 's/^[[:space:]]*//g'`
   co=`echo $co | sed 's/[[:space:]]*$//g'`
   echo "Running $utility $co"
-  $utility $co
+  # $utility $co
 done
