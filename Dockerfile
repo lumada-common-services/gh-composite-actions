@@ -1,8 +1,11 @@
 ARG image=node:14
 FROM ${image}
 
+ARG LINT_IMAGE
+
 ENV NPM_CONFIG_LOGLEVEL warn
 ENV PORT=3000
+ENV LINT_IMAGE=$LINT_IMAGE
 
 COPY run_code_lint.sh /run_code_lint.sh
 
