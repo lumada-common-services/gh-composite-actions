@@ -5,5 +5,5 @@ runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    image: 'node:14'
+    image: node:14
     

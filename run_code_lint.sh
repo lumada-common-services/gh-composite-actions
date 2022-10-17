@@ -11,6 +11,8 @@ if [[ ${working_directory} ]]; then
    pwd
 fi
 
+echo "GitHub Env Variable: $GITHUB_ENV"
+
 if [[ -z ${lint_utility} ]]; then
    echo "lint_utility is a required environment variable"
    exit 1
@@ -31,5 +33,5 @@ do
   co=`echo $co | sed 's/^[[:space:]]*//g'`
   co=`echo $co | sed 's/[[:space:]]*$//g'`
   echo "Running $utility $co"
-  $utility $co
+  # $utility $co
 done
