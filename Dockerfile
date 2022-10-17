@@ -1,5 +1,6 @@
-ARG image=${image}
+ARG image=node:14
 FROM ${image}
+ENV NPM_CONFIG_LOGLEVEL warn
 
 COPY run_code_lint.sh /run_code_lint.sh
 
