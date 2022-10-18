@@ -11,9 +11,8 @@ if [[ ${working_directory} ]]; then
    pwd
 fi
 
-echo "GitHub Env Variable: $GITHUB_ENV"
-
 echo "Input Image: ${INPUT_ lintimage}"
+echo "Input Image: ${INPUT_ LINTIMAGE}"
 
 if [[ -z ${lint_utility} ]]; then
    echo "lint_utility is a required environment variable"
