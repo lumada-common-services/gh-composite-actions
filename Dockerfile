@@ -2,6 +2,8 @@
 ARG image=node:14
 FROM ${image}
 
+LABEL MAINTAINER Sridhar Pragada <sridhar.pragada@hitachivantara.com>
+
 COPY run_code_lint.sh /run_code_lint.sh
 
 RUN chmod +x /run_code_lint.sh
