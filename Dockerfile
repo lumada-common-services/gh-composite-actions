@@ -1,4 +1,4 @@
-ARG image=node:14
+ARG image=${INPUT_LINTIMAGE}
 FROM ${image}
 
 ARG LINT_IMAGE
