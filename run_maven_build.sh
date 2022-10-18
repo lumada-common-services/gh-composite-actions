@@ -9,6 +9,8 @@ else
   utility=$(which $maven_utility) 
 fi
 
+cat pom.xml | grep repositoryies
+
 maven_commands=`echo "$maven_commands" | sed 's/[)(]//g'`
 IFS="," read -a commands <<< $maven_commands
 
