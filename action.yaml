@@ -10,4 +10,4 @@ runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    LINTIMAGE: ${{ inputs.lintimage }}
+    LINTIMAGE: node:14
