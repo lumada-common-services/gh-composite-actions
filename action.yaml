@@ -10,4 +10,4 @@ runs:
   using: "docker"
   image: "Dockerfile"
   env:
-    LINTIMAGE=${INPUT_LINTIMAGE}
+    LINTIMAGE: ${INPUT_lintimage}
