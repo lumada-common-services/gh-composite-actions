@@ -12,7 +12,7 @@ if [[ ${working_directory} ]]; then
 fi
 
 # echo "Input Image: ${INPUT_ lintimage}"
-echo "Input Image: ${INPUT_ LINTIMAGE}"
+echo "Input Image: ${INPUT_LINTIMAGE}"
 
 if [[ -z ${lint_utility} ]]; then
    echo "lint_utility is a required environment variable"
