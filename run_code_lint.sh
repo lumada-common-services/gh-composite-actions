@@ -11,7 +11,7 @@ if [[ ${working_directory} ]]; then
    pwd
 fi
 
-echo "Input Image: ${INPUT_ lintimage}"
+# echo "Input Image: ${INPUT_ lintimage}"
 echo "Input Image: ${INPUT_ LINTIMAGE}"
 
 if [[ -z ${lint_utility} ]]; then
