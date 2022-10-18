@@ -1,4 +1,3 @@
-RUN printenv
 # ARG image='${LINTIMAGE}'
 ARG image=node:14
 FROM ${image}
