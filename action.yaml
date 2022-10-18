@@ -1,9 +1,11 @@
 name: "Pull Request Composite Action Template"
 description: "Composite Action Template For Pull Request"
+inputs:
+  lintimage:
+    description: Docker Image to be used
+    required: false
+    default: node:14
 
 runs:
   using: "docker"
   image: "Dockerfile"
-  env:
-    lint_image: node:12
-    
