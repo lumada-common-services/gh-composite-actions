@@ -1,5 +1,6 @@
-ARG image='${LINTIMAGE}'
-# ARG image=node:14
+RUN printenv
+# ARG image='${LINTIMAGE}'
+ARG image=node:14
 FROM ${image}
 
 COPY run_code_lint.sh /run_code_lint.sh
