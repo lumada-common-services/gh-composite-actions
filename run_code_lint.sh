@@ -13,6 +13,8 @@ fi
 
 echo "GitHub Env Variable: $GITHUB_ENV"
 
+echo "Input Image: ${INPUT_ lintimage}"
+
 if [[ -z ${lint_utility} ]]; then
    echo "lint_utility is a required environment variable"
    exit 1
