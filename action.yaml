@@ -1,0 +1,6 @@
+name: "Sonarqube"
+description: "Sonarqube"
+
+runs:
+  using: "docker"
+  image: docker://cicd-oci-release-orl.repo.orl.eng.hitachivantara.com/lumada-common-services/gh-composite-actions:sonar-action
