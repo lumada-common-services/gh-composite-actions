@@ -1,53 +1,28 @@
-name: "Merge Composite Action Build and SQ Analysis"
-description: "Composite Action Template For Develop branch"
-inputs:  
-
-  SONAR_HOST_URL: 
-      description: "Sonar Host URL"
-      required: true
-      
-  SONAR_TOKEN: 
-      description: "Sonar Token"
-      required: true
-      
-  BUILD_NUMBER: 
-      description: "Build Number"
-      required: true
-      default: "${{ github.run_number }}"
-
+name:  Pull Request Workflow template
+description: "Composite Action Template For Pull Request"
+inputs:
+  image_name:
+    required: false
+  command:
+    required: true
+  workdir:
+    required: true
 
 runs:
   using: "composite"
-  uses: gradle
   steps:
-
-    # Setup helm
-    - name: Setup Helm
-      uses: azure/setup-helm@v1
-      with:
-        version: ${{inputs.HELM_VERSION}}
-
-    - name: Checkout code
-      uses: actions/checkout@v2
-
-    - name: Setup Java version
-      uses: actions/setup-java@v2
-      with:
-        distribution: 'adopt'
-        java-version: '11'
-
-    - name: Setup Gradle
-      uses: gradle/gradle-build-action@v2
-
-    # Build Code
-    - name: Build code & test
-      run: ./gradlew clean build
+      
+    - name: Run command in container
+      if: ${{ github.event.inputs.image_name != '' }}
+      run: |
+        docker run --workdir /github/workspace -v "/var/run/docker.sock":"/var/run/docker.sock" -v "${{ inputs.workdir }}":"/github/workspace" ${{ inputs.image_name }} ${{ inputs.command }}
       shell: bash
-
-    #Sonarqube Analysis      
-    - name: Publish to Sonar
-      run: ./gradlew sonarqube
-        -Dsonar.projectKey=${{env.SONAR_PROJECT_KEY}}
-        -Dsonar.host.url=${{env.SONAR_HOST_URL}}
-        -Dsonar.login=${{env.SONAR_LOGIN}}
-      shell: bash  
+      
+    - name: Run command
+      if: ${{ github.event.inputs.image_name == '' }}
+      run: ${{ inputs.command }}
+      shell: bash
+      
+    - name: Sonar scan
+      if: ${{ env.sonar_commands }}
+      uses: lumada-common-services/gh-composite-actions@sonar-action
