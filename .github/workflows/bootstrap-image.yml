@@ -26,7 +26,7 @@ jobs:
 
       - name: Build
         id: build-image
-        run: docker build -t "${{ env.ARTIFACTORY }}/${{ env.IMAGE }}" -f .github/bootstrap-image/Dockerfile .
+        run: docker build -t "${{ env.ARTIFACTORY }}/${{ env.IMAGE }}" -f .github/bootstrap-image/
 
       - name: Push to Artifactory
         id: push-to-artifactory
