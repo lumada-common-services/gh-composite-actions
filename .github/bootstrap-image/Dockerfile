@@ -6,5 +6,5 @@ RUN chmod +x /run_sonar.sh
 
 RUN sed -i -e 's/\r$//' /run_sonar.sh
 
-# file to execute when the docker container starts up
+# file to execute when the docker container starts up.
 ENTRYPOINT ["/run_sonar.sh"]
