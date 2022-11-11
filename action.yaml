@@ -3,4 +3,4 @@ description: "Sonarqube"
 
 runs:
   using: "docker"
-  image: docker://golden-vc-docker.repo.orl.eng.hitachivantara.com/lumada-common-services/gh-composite-actions:sonar-action
+  image: docker://cicd-oci-release-orl.repo.orl.eng.hitachivantara.com/lumada-common-services/gh-composite-actions:20221111.6
