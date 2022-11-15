@@ -34,7 +34,10 @@ runs:
       id: owasp
       with:
         project: ${{ env.owasp_Project }}
-        path: '/github/workspace'
+        path: ${{ github.workspace }}
+        comand: >
+             ll /github/workspace
+             echo $pwd
         format: 'ALL'
         out: 'reports'
         args: >
