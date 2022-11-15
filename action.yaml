@@ -12,13 +12,13 @@ runs:
   using: "composite"
   steps:
       
-    - name: Run command in container
+    - name: Build ,version set,Unit Test
       if: ${{ github.event.inputs.image_name != '' }}
       run: |
         docker run --workdir /github/workspace -v "/var/run/docker.sock":"/var/run/docker.sock" -v "${{ inputs.workdir }}":"/github/workspace" ${{ inputs.image_name }} ${{ inputs.command }}
       shell: bash
       
-    - name: Run command
+    - name: Build ,version set,Unit Test
       if: ${{ github.event.inputs.image_name == '' }}
       run: ${{ inputs.command }}
       shell: bash
