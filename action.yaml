@@ -33,11 +33,10 @@ runs:
       uses: dependency-check/Dependency-Check_Action@main
       id: owasp
       with:
-        project: ${{ env.owasp_Project }}
-        path: ${{ github.workspace }}
+        project: ${{ env.owasp_Project }}        
         comand: >
-             ll /github/workspace
-             echo $pwd
+             pwd
+        path: '.'
         format: 'ALL'
         out: 'reports'
         args: >
