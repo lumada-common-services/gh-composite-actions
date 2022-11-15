@@ -26,3 +26,35 @@ runs:
     - name: Sonar scan
       if: ${{ env.sonar_commands }}
       uses: lumada-common-services/gh-composite-actions@sonar-action
+      
+      
+    - name: OWASP Scan
+      if: ${{ env.owasp_Project }}
+      uses: dependency-check/Dependency-Check_Action@main
+      id: owasp
+      with:
+        project: '$owasp_Project'
+        path: '.'
+        format: 'ALL'
+        out: 'reports'
+        args: >
+            --exclude ./*.zip \
+            --exclude ./*.tar \
+            --exclude ./*.gz \
+            --exclude ./*.war \
+            --disableNodeJS \
+            --disableAssembly \
+            --disableYarnAudit \
+            --enableRetired
+      
+    - name: Create tag
+      if: ${{ env.Tag_version }}
+      uses: actions/github-script@v5
+      with:
+        script: |
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: 'refs/tags/$Tag_version',
+              sha: context.sha
+            })
