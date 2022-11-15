@@ -33,7 +33,7 @@ runs:
       uses: dependency-check/Dependency-Check_Action@main
       id: owasp
       with:
-        project: '$owasp_Project'
+        project: ${{ env.owasp_Project }}
         path: '.'
         format: 'ALL'
         out: 'reports'
@@ -55,6 +55,6 @@ runs:
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: 'refs/tags/$Tag_version',
+              ref: 'refs/tags/${{ env.Tag_version }}',
               sha: context.sha
             })
