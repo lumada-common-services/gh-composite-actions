@@ -34,7 +34,7 @@ runs:
       id: owasp
       with:
         project: ${{ env.owasp_Project }}
-        path: '.'
+        path: '/github/workspace'
         format: 'ALL'
         out: 'reports'
         args: >
