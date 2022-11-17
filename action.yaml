@@ -12,18 +12,13 @@ runs:
   using: "composite"
   steps:
       
-    - name: Build ,version set,Unit Test
-      if: ${{ github.event.inputs.image_name != '' }}
-      run: |
-        docker run --workdir /github/workspace -v "/var/run/docker.sock":"/var/run/docker.sock" -v "${{ inputs.workdir }}":"/github/workspace" ${{ inputs.image_name }} ${{ inputs.command }}
-      shell: bash
-      
-    - name: Build ,version set,Unit Test
+    
+    - name: Build ,Version Set,Unit Test
       if: ${{ github.event.inputs.image_name == '' }}
       run: ${{ inputs.command }}
       shell: bash
       
-    - name: Sonar scan
+    - name: Sonar Scan
       if: ${{ env.sonar_commands }}
       uses: lumada-common-services/gh-composite-actions@sonar-action
       
@@ -43,7 +38,7 @@ runs:
             --disableYarnAudit \
             --enableRetired
       
-    - name: Create tag
+    - name: Create Tag
       if: ${{ env.Tag_version }}
       uses: actions/github-script@v5
       with:
