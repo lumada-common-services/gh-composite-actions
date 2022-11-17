@@ -1,5 +1,5 @@
-name:  Pull Request Workflow template
-description: "Composite Action Template For Pull Request"
+name:  Workflow Template
+description: "Composite Action Template"
 inputs:
   image_name:
     required: false
