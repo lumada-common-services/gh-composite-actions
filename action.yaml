@@ -10,9 +10,7 @@ inputs:
 
 runs:
   using: "composite"
-  steps:
-      
-    
+  steps:    
     - name: Build ,Version Set,Unit Test
       if: ${{ github.event.inputs.image_name == '' }}
       run: ${{ inputs.command }}
@@ -20,8 +18,7 @@ runs:
       
     - name: Sonar Scan
       if: ${{ env.sonar_commands }}
-      uses: lumada-common-services/gh-composite-actions@sonar-action
-      
+      uses: lumada-common-services/gh-composite-actions@sonar-action      
       
     - name: OWASP Scan
       if: ${{ env.owasp_Project }}
