@@ -8,7 +8,7 @@ runs:
   using: "composite"
   steps:    
     - name: Build ,Version Set,Unit Test
-      if: ${{ github.event.inputs.image_name == '' }}
+      if: ${{ github.event.inputs.command != '' }}
       run: ${{ inputs.command }}
       shell: bash
       
