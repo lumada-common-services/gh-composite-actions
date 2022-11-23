@@ -1,11 +1,7 @@
 name:  Workflow Template
 description: "Composite Action Template"
-inputs:
-  image_name:
-    required: false
+inputs:  
   command:
-    required: true
-  workdir:
     required: true
 
 runs:
