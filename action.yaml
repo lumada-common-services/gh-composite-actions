@@ -29,18 +29,7 @@ runs:
             --disableNodeJS \
             --disableAssembly \
             --disableYarnAudit \
-            --enableRetired
-            
-    - name: Citadel
-      if: ${{ env.citadel }}
-      uses: hv-devsecops/citadel/.github/citadel.yml@YKN-256
-      id: citadel
-      with:
-        project-name : 'LDOS'
-        project-id: '48'
-        dependency-check-scan: 'false'
-        blackduck-flat-scan: 'true'
-        
+            --enableRetired       
       
     - name: Create Tag
       if: ${{ env.Tag_version }}
