@@ -42,3 +42,17 @@ runs:
               ref: 'refs/tags/${{ env.Tag_version }}',
               sha: context.sha
             })
+
+    - name: Publish Artifacts to Registry
+      if: ${{ env.artifacts_manifest_file }}
+      continue-on-error: false
+      uses: lumada-common-services/registry-publication@v1
+      with:
+        ARTIFACTS_CONFIG_FILE: ${{ env.artifacts_manifest_file }}
+        ARTIFACTORY_APIKEY: ${{ env.artifactory_api_key }}
+        ARTIFACTORY_USER: ${{ env.artifactory_user }}
+        BUILD_NUMBER: ${{ env.run_number }}
+        BUILD_NAME: ${{ env.job }}
+        BUILD_VERSION: ${{ env.pkg_version }}
+        WORKSPACE: ${{ env.workspace }}
+        BUILD_URL: ${{ env.build_url }}
