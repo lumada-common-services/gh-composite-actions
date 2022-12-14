@@ -46,7 +46,7 @@ runs:
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
       continue-on-error: false
-      uses: lumada-common-services/registry-publication@v1
+      uses: lumada-common-services/registry-publication@YKN-288
       with:
         ARTIFACTS_CONFIG_FILE: ${{ env.artifacts_manifest_file }}
         ARTIFACTORY_APIKEY: ${{ env.artifactory_api_key }}
