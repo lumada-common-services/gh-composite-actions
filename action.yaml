@@ -49,15 +49,14 @@ runs:
       
     - name: Create Tag
       if: ${{ env.Tag_version }}
-      uses: actions/github-script@v5
+      uses: EndBug/add-and-commit@v9
       with:
-        script: |
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              ref: 'refs/tags/${{ env.Tag_version }}',
-              sha: context.sha
-            })
+        add: '.'
+        commit: --signoff
+        default_author: github_actions
+        message: '[CI/CD] - :robot: Changes captured in the ${{ env.Tag_version }} tag'
+        tag: '${{ env.Tag_version }}'
+        tag_push: '--force'
     
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
