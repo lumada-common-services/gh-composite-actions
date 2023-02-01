@@ -27,7 +27,6 @@ runs:
          echo "ls -la /github/workspace $(ls -la /github/workspace)"
          java -jar /synopsys-detect.jar \
           --detect.source.path=/workdir \
-          # --detect.output.path=/workdir \
           --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
           --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
           --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
