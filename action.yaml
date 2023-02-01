@@ -21,9 +21,9 @@ runs:
       uses: addnab/docker-run-action@v3
       with:
         image: blackducksoftware/detect:8
-        options:  --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
+        options:  --entrypoint "/bin/bash"
         run: |
-         echo "ls -la /workdir $(/workdir)"
+         # echo "ls -la /workdir $(/workdir)"
          echo "ls -la /github/workspace $(/github/workspace)"
          java -jar /synopsys-detect.jar \
           --detect.source.path=/github/workspace \
