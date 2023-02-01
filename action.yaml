@@ -24,7 +24,7 @@ runs:
         options:  --entrypoint "/bin/bash"
         run: |
          # echo "ls -la /workdir $(/workdir)"
-         echo "ls -la /github/workspace $(/github/workspace)"
+         echo "ls -la /github/workspace $(ls -la /github/workspace)"
          java -jar /synopsys-detect.jar \
           --detect.source.path=/github/workspace \
           --detect.output.path=/github/workspace \
