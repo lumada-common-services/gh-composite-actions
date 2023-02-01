@@ -23,8 +23,6 @@ runs:
         image: blackducksoftware/detect:8
         options:  --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
         run: |
-         echo "ls -la /workdir $(ls -la /workdir)"
-         echo "ls -la /workdir/frontend $(ls -la /workdir/frontend)"
          java -jar /synopsys-detect.jar \
           --detect.source.path=/workdir \
           --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
