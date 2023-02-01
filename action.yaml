@@ -21,7 +21,7 @@ runs:
       uses: addnab/docker-run-action@v3
       with:
         image: blackducksoftware/detect:8
-        options:  --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
+        options:  --entrypoint "/bin/bash" -v $GITHUB_WORKSPACE:/workdir
         run: |
          echo "ls -la /workdir $(ls -la /workdir)"
          # echo "ls -la /github/workspace $(ls -la /github/workspace)"
