@@ -24,7 +24,7 @@ runs:
         options:  --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
         run: |
          echo "ls -la /workdir $(ls -la /workdir)"
-         echo "ls -la /github/workspace $(ls -la /github/workspace)"
+         echo "ls -la /workdir/frontend $(ls -la /workdir/frontend)"
          java -jar /synopsys-detect.jar \
           --detect.source.path=/workdir \
           --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
