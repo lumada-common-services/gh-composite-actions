@@ -57,6 +57,7 @@ runs:
         message: '[CI/CD] - :robot: Changes captured in the ${{ env.Tag_version }} tag'
         tag: '${{ env.Tag_version }}'
         tag_push: '--force'
+        pull: '--rebase --autostash'
     
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
