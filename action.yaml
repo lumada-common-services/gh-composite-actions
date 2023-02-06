@@ -29,7 +29,8 @@ runs:
           --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
           --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
           --blackduck.url="${{ env.BlackDuck_Url }}" \
-          --detect.blackduck.signature.scanner.snippet.matching="NONE" 
+          --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARG }}
+          
       
     - name: OWASP Scan
       if: ${{ env.owasp_Project }}
