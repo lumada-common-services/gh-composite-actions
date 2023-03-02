@@ -1,38 +1,30 @@
-name:  "ArgoCD deployment GitHub Action"
-description: "ArgoCD deployment GitHub Action"
+name:  "kubectl deployment GitHub Action"
+description: "kubectl deployment GitHub Action"
 inputs:
   DEPLOYMENT_METHOD:
     description: "Deployment type either ArgoCD or helm or kubectl"
     required: true
-  APP_DEFINITION_TEMPLATE_YAML:
-    description: "Path to the template file where action file need to update the new Version of solution and app definitions"
+  SOLUTIONDEFINITION_YAML:
+    description: "Path to the template file where action file need to update the new Version of solution"
     required: true
-  APP_DEFINITION_YAML_ARGO:
-    description: "Path to the folder where Argocd will monitor for change in the files"
+  APP_DEFINITION_YAML:
+    description: "Path to the appdefinition file"
     required: true
-  APP_VERSION:
-    description: "New version of solution and app definitions"
+#   APP_VERSION:
+#     description: "New version of solution and app definitions"
+#     required: true
+  CLUSTERKUBECONFIG:
+    description: "New version of configfile"
     required: true
+    
 
 runs:
   using: "composite"
   steps:    
-    - name: Override appVersion, version and registry
-      if: ${{ inputs.DEPLOYMENT_METHOD }} == "ArgoCD"
+    - name: kubectl deploy
+      if: ${{ inputs.DEPLOYMENT_METHOD }} == "KUBECTL"
       run: |
-        sed 's/%VERSION%/${{ inputs.APP_VERSION }}/g' ${{ inputs.APP_DEFINITION_TEMPLATE_YAML }} > ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
-        echo "Deployment yaml file is updated with new version: ${{ inputs.APP_VERSION }}. Below is the file going to be deployed"
-        cat ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
+        echo "Doing deployment with kubectl"
+        kubectl apply -f ${{ inputs.SOLUTIONDEFINITION_YAML }} --kubeconfig ${{ inputs.CLUSTERKUBECONFIG }}
+        kubectl apply -f ${{ inputs.APP_DEFINITION_YAML }} --kubeconfig ${{ inputs.CLUSTERKUBECONFIG }}
       shell: bash
-
-    - name: commiting deployment.yml file for ArgoCD to current branch
-      if: ${{ inputs.deployment_method }} == "ArgoCD"
-      uses: EndBug/add-and-commit@v9
-      with:
-        add: '.'
-        commit: --signoff
-        default_author: github_actions
-        author_email: hv.buildguy@hitachivantara.com
-        author_name: buildguy
-        cwd: '.'
-        message: "Publishing  deployment.yaml file"
