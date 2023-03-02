@@ -25,6 +25,8 @@ runs:
   steps:    
       - name: set up Helm
         uses: azure/setup-helm@v3
+        with:
+          token: ${HITACHIVANTARA_DEVSECOPS_GITHUB_TOKEN}
         
       - name: Deploy helm charts
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
