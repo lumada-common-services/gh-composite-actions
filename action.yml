@@ -1,0 +1,39 @@
+name:  "ArgoCD deployment GitHub Action"
+description: "ArgoCD deployment GitHub Action"
+inputs:
+  DEPLOYMENT_METHOD:
+    description: "Deployment type either ArgoCD or helm or kubectl"
+    required: true
+  APP_DEFINITION_YAML_LOCAL:
+    description: "Path to the template file where action file need to update the new Version of solution and app definitions"
+    required: true
+  APP_DEFINITION_YAML_ARGO:
+    description: "Path to the folder where Argocd will monitor for change in the files"
+    required: true
+  APP_VERSION:
+    description: "New version of solution and app definitions"
+    required: true
+
+runs:
+  using: "composite"
+  steps:    
+    - name: Override appVersion, version and registry
+      if: ${{ inputs.DEPLOYMENT_METHOD }} == "ArgoCD"
+      run: |
+        sed 's/%VERSION%/${{ inputs.APP_VERSION }}/g' ${{ inputs.APP_DEFINITION_YAML_LOCAL }} > ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
+        echo "Deployment yaml file is updated with new version: ${{ inputs.APP_VERSION }}. Below is the file going to be deployed"
+        cat ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
+      shell: bash
+
+    - name: commiting deployment.yml file for ArgoCD to current branch
+      if: ${{ inputs.deployment_method }} == "ArgoCD"
+      uses: EndBug/add-and-commit@v9
+      with:
+        add: '.'
+        commit: --signoff
+        default_author: github_actions
+        author_email: hv.buildguy@hitachivantara.com
+        author_name: buildguy
+        cwd: '.'
+        message: "Publishing  deployment.yaml file"
+      shell: bash
