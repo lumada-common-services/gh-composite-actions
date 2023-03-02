@@ -1,15 +1,6 @@
-name:  "ArgoCD deployment GitHub Action"
-description: "ArgoCD deployment GitHub Action"
+name:  "Helm deployment GitHub Action"
+description: "Helm deployment GitHub Action"
 inputs:
-  DEPLOYMENT_METHOD:
-    description: "Deployment type either ArgoCD or helm or kubectl"
-    required: true
-  APP_DEFINITION_TEMPLATE_YAML:
-    description: "Path to the template file where action file need to update the new Version of solution and app definitions"
-    required: true
-  APP_DEFINITION_YAML_ARGO:
-    description: "Path to the folder where Argocd will monitor for change in the files"
-    required: true
   APP_VERSION:
     description: "New version of solution and app definitions"
     required: true
