@@ -35,7 +35,7 @@ runs:
           echo "testing helm for version ${APP_VERSION}"
 
           # updating kubeconfig
-          cat $JARJAR_CLUSER_KUBECONFIG} > kubeconfig
+          cat ${JARJAR_CLUSER_KUBECONFIG} > kubeconfig
 
           echo "helm list"
           helm list
