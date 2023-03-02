@@ -33,7 +33,7 @@ runs:
       - name: Deploy helm charts
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
-          echo "testing helm for version ${inputs.APP_VERSION}"
+          echo "testing helm for version ${APP_VERSION}"
           echo "username -> ${inputs.JFROG_USERNAME}"
 
           # updating kubeconfig
