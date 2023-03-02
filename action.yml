@@ -33,14 +33,14 @@ runs:
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
           echo "testing helm for version ${APP_VERSION}"
-          echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
 
           # updating kubeconfig
-          cat $[JARJAR_CLUSER_KUBECONFIG} > kubeconfig
+          cat $JARJAR_CLUSER_KUBECONFIG} > kubeconfig
 
           echo "helm list"
           helm list
           
+          echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${JFROG_USERNAME} --password ${JFROG_PASSWORD}
           helm repo update
           
