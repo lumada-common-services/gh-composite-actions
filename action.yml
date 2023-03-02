@@ -4,7 +4,7 @@ inputs:
   DEPLOYMENT_METHOD:
     description: "Deployment type either ArgoCD or helm or kubectl"
     required: true
-  APP_DEFINITION_YAML_LOCAL:
+  APP_DEFINITION_TEMPLATE_YAML:
     description: "Path to the template file where action file need to update the new Version of solution and app definitions"
     required: true
   APP_DEFINITION_YAML_ARGO:
@@ -20,7 +20,7 @@ runs:
     - name: Override appVersion, version and registry
       if: ${{ inputs.DEPLOYMENT_METHOD }} == "ArgoCD"
       run: |
-        sed 's/%VERSION%/${{ inputs.APP_VERSION }}/g' ${{ inputs.APP_DEFINITION_YAML_LOCAL }} > ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
+        sed 's/%VERSION%/${{ inputs.APP_VERSION }}/g' ${{ inputs.APP_DEFINITION_TEMPLATE_YAML }} > ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
         echo "Deployment yaml file is updated with new version: ${{ inputs.APP_VERSION }}. Below is the file going to be deployed"
         cat ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
       shell: bash
