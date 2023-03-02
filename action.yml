@@ -44,11 +44,11 @@ runs:
           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
           helm repo update
           
-          echo "helm list"
-          helm search repo -l csaf-helm-dev hello-world-solutiondefinition
+          # echo "helm list"
+          # helm search repo -l csaf-helm-dev hello-world-solutiondefinition
           
-          # helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig kubeconfig
-          # helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig kubeconfig
+          helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig kubeconfig
+          helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig kubeconfig
           
         shell: bash
   
