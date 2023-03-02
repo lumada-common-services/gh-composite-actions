@@ -1,0 +1,74 @@
+name:  Workflow Template
+description: "Composite Action Template"
+inputs:  
+  command:
+    required: true
+
+runs:
+  using: "composite"
+  steps:    
+    - name: Build ,Version Set,Unit Test
+      if: ${{ inputs.command }}
+      run: ${{ inputs.command }}
+      shell: bash
+      
+    - name: Sonar Scan
+      if: ${{ env.sonar_commands }}
+      uses: lumada-common-services/gh-composite-actions@sonar-action
+      
+    - name: Blackduck Scan
+      if: ${{ env.BlackDuck_Project_Name }}
+      uses: addnab/docker-run-action@v3
+      with:
+        image: blackducksoftware/detect:8
+        options:  --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
+        run: |
+         java -jar /synopsys-detect.jar \
+          --detect.source.path=/workdir \
+          --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
+          --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
+          --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
+          --blackduck.url="${{ env.BlackDuck_Url }}" \
+          --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
+          
+      
+    - name: OWASP Scan
+      if: ${{ env.owasp_Project }}
+      uses: dependency-check/Dependency-Check_Action@main
+      id: owasp
+      with:
+        project: ${{ env.owasp_Project }}
+        path: '.'
+        format: 'ALL'
+        out: 'reports'
+        args: >
+            --disableNodeJS \
+            --disableAssembly \
+            --disableYarnAudit \
+            --enableRetired
+      
+    - name: Create Tag
+      if: ${{ env.Tag_version }}
+      uses: EndBug/add-and-commit@v9
+      with:
+        add: '.'
+        commit: --signoff
+        default_author: github_actions
+        message: '[CI/CD] - :robot: Changes captured in the ${{ env.Tag_version }} tag'
+        tag: '${{ env.Tag_version }}'
+        tag_push: '--force'
+        pull: '--rebase --autostash'
+    
+    - name: Publish Artifacts to Registry
+      if: ${{ env.artifacts_manifest_file }}
+      continue-on-error: false
+      uses: lumada-common-services/registry-publication@v1.1
+      with:
+        ARTIFACTS_CONFIG_FILE: ${{ env.artifacts_manifest_file }}
+        ARTIFACTORY_APIKEY: ${{ env.artifactory_api_key }}
+        ARTIFACTORY_USER: ${{ env.artifactory_user }}
+        BUILD_NUMBER: ${{ env.run_number }}
+        BUILD_NAME: ${{ env.job }}
+        BUILD_VERSION: ${{ env.pkg_version }}
+        WORKSPACE: ${{ env.workspace }}
+        BUILD_URL: ${{ env.build_url }}
