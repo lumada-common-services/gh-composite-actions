@@ -24,8 +24,9 @@ runs:
       - name: Deploy helm charts
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
-          echo "testing helm for version ${APP_VERSION}"
-          echo "username -> ${{ inputs.JFROG_USERNAME }}"
+        
+          # print out version to be used
+          echo "helm deployment for version ${APP_VERSION}"
 
           # updating kubeconfig
           cat ${JARJAR_CLUSER_KUBECONFIG} > kubeconfig
@@ -36,8 +37,9 @@ runs:
           helm repo update
           
           # echo "helm list"
-          # helm search repo -l csaf-helm-dev hello-world-solutiondefinition
+          # helm list
           
+          # install helm charts
           helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig kubeconfig
           helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig kubeconfig
           
