@@ -23,6 +23,7 @@ runs:
         sed 's/%VERSION%/${{ inputs.APP_VERSION }}/g' ${{ inputs.APP_DEFINITION_YAML_LOCAL }} > ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
         echo "Deployment yaml file is updated with new version: ${{ inputs.APP_VERSION }}. Below is the file going to be deployed"
         cat ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
+      shell: bash
 
     - name: commiting deployment.yml file for ArgoCD to current branch
       if: ${{ inputs.deployment_method }} == "ArgoCD"
