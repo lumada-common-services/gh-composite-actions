@@ -23,15 +23,27 @@ inputs:
 runs:
   using: "composite"
   steps:    
+      - name: set up Helm
+        uses: azure/setup-helm@v3
+        
       - name: Deploy helm charts
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
           echo "testing helm for version ${APP_VERSION}"
           echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
+          
           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${JFROG_USERNAME} --password ${JFROG_PASSWORD}
           helm repo update
+          
           echo "helm list"
           helm list
+          
+          # updating kubeconfig
+          cat $[JARJAR_CLUSER_KUBECONFIG} > kubeconfig
+          
+          # helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig kubeconfig
+          # helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig kubeconfig
+          
         shell: bash
   
   
