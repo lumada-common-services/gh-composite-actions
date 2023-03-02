@@ -13,6 +13,12 @@ inputs:
   APP_VERSION:
     description: "New version of solution and app definitions"
     required: true
+  JFROG_USERNAME:
+    description: "User name for https://hitachi.jfrog.io/"
+    required: true
+  JFROG_PASSWORD:
+    description: "Password for https://hitachi.jfrog.io/"
+    required: true
 
 runs:
   using: "composite"
@@ -21,6 +27,10 @@ runs:
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
           echo "testing helm for version ${APP_VERSION}"
+          echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
+          helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${JFROG_USERNAME} --password ${JFROG_PASSWORD}
+          helm repo update
+          echo "helm list"
         shell: bash
   
   
