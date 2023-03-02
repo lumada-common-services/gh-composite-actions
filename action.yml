@@ -45,7 +45,7 @@ runs:
           helm repo update
           
           echo "helm list"
-          helm search csaf-helm-dev hello-world-solutiondefinition
+          helm search repo -l csaf-helm-dev hello-world-solutiondefinition
           
           # helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig kubeconfig
           # helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig kubeconfig
