@@ -41,7 +41,7 @@ runs:
 
           # add helm registry
           echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
-          helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${inputs.JFROG_USERNAME} --password ${inputs.JFROG_PASSWORD}
+          helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
           helm repo update
           
           echo "helm list"
