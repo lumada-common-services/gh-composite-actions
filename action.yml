@@ -38,16 +38,12 @@ runs:
           cat ${JARJAR_CLUSER_KUBECONFIG} > kubeconfig
 
           # add helm registry
-          echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
-          helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${JFROG_USERNAME} --password ${JFROG_PASSWORD}
-          helm repo update
+          # echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
+          # helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${JFROG_USERNAME} --password ${JFROG_PASSWORD}
+          # helm repo update
           
           echo "helm list"
           helm list
-          
-          echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
-          helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${JFROG_USERNAME} --password ${JFROG_PASSWORD}
-          helm repo update
           
           # helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig kubeconfig
           # helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig kubeconfig
