@@ -34,7 +34,7 @@ runs:
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
           echo "testing helm for version ${APP_VERSION}"
-          echo "username -> ${inputs.JFROG_USERNAME}"
+          echo "username -> ${{ inputs.JFROG_USERNAME }}"
 
           # updating kubeconfig
           cat ${JARJAR_CLUSER_KUBECONFIG} > kubeconfig
