@@ -14,6 +14,10 @@ inputs:
   CLUSTERKUBECONFIG:
     description: "New version of configfile"
     required: true
+  DEPLOYMENT_METHOD:
+    description: "Deployment method"
+    required: true
+    
 #   SOLUTION_DEFINATION_CHART_PATH:
 #     description: "Pass solution definition chart path from git repo"
 #     required: true
@@ -38,7 +42,7 @@ runs:
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
           echo "${{ inputs.CLUSTERKUBECONFIG }}" > $RUNNER_TEMP/config
-          kubectl get pods -A --kubeconfig $RUNNER_TEMP/config
+          kubectl get namespaces --kubeconfig $RUNNER_TEMP/config
 
           # print out version to be used
           echo "helm deployment for version ${APP_VERSION}"
