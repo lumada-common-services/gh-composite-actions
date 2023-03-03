@@ -38,9 +38,10 @@ runs:
 
           # updating kubeconfig
           echo "${JARJAR_CLUSER_KUBECONFIG}" > $RUNNER_TEMP/config
-          
-          helm install ${{ inputs.SOLUTION_DEFINATION_CHART_PATH }} --kubeconfig $RUNNER_TEMP/config
-          helm install ${{ inputs.APP_DEFINITION_CHART_PATH }} --kubeconfig $RUNNER_TEMP/config
+          SOLUTION_NAME=`echo ${{ inputs.SOLUTION_DEFINATION_CHART_PATH }} | awk -F"/" '{print $(NF)}'`
+          APP_NAME=`echo ${{ inputs.APP_DEFINITION_CHART_PATH }} | awk -F"/" '{print $(NF)}'`
+          helm install ${SOLUTION_NAME} ${{ inputs.SOLUTION_DEFINATION_CHART_PATH }} --kubeconfig $RUNNER_TEMP/config
+          helm install ${APP_NAME} ${{ inputs.APP_DEFINITION_CHART_PATH }} --kubeconfig $RUNNER_TEMP/config
 
 #           # add helm registry
 #           echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
