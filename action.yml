@@ -40,23 +40,20 @@ runs:
           echo "$RUNNER_TEMP"
 
           # updating kubeconfig
-          echo "${JARJAR_CLUSER_KUBECONFIG}" > $RUNNER_TEMP/config
-#           SOLUTION_NAME=`echo ${{ inputs.SOLUTION_DEFINATION_CHART_PATH }} | awk -F"/" '{print $(NF)}'`
-#           APP_NAME=`echo ${{ inputs.APP_DEFINITION_CHART_PATH }} | awk -F"/" '{print $(NF)}'`
-#           helm install ${SOLUTION_NAME} ${{ inputs.SOLUTION_DEFINATION_CHART_PATH }} --kubeconfig $RUNNER_TEMP/config
-#           helm install ${APP_NAME} ${{ inputs.APP_DEFINITION_CHART_PATH }} --kubeconfig $RUNNER_TEMP/config
+          echo "${JARJAR_CLUSER_KUBECONFIG}" > config
+          chmod 600 config
 
           # add helm registry
-          echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
-          helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
-          helm repo update
+#           echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
+#           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
+#           helm repo update
           
           # echo "helm list"
-          helm list --kubeconfig $RUNNER_TEMP/config
+          helm list --kubeconfig config
           
           # install helm charts
-          helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
-          helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
+          helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig config
+          helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig config
           
         shell: bash
   
