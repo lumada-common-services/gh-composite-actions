@@ -25,6 +25,7 @@ runs:
       if: ${{ inputs.DEPLOYMENT_METHOD }} == "KUBECTL"
       run: |
         echo "Doing deployment with kubectl"
-        kubectl apply -f ${{ inputs.SOLUTIONDEFINITION_YAML }} --kubeconfig ${{ inputs.CLUSTERKUBECONFIG }}
-        kubectl apply -f ${{ inputs.APP_DEFINITION_YAML }} --kubeconfig ${{ inputs.CLUSTERKUBECONFIG }}
+        echo "${{ inputs.CLUSTERKUBECONFIG }}" > $RUNNER_TEMP/config
+        kubectl apply -f ${{ inputs.SOLUTIONDEFINITION_YAML }} --kubeconfig $RUNNER_TEMP/config
+        kubectl apply -f ${{ inputs.APP_DEFINITION_YAML }} --kubeconfig $RUNNER_TEMP/config
       shell: bash
