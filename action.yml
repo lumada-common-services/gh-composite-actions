@@ -39,7 +39,7 @@ runs:
           echo "helm deployment for version ${APP_VERSION}"
 
           # updating kubeconfig
-          echo "${secrets.AKS_JARJAR_01_KUBECONFIG}" > config
+          echo "${AKS_JARJAR_01_KUBECONFIG}" > config
           chmod 600 config
 
           # add helm registry
