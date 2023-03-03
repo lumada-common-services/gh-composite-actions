@@ -59,8 +59,8 @@ runs:
           
           helm search repo 
           # install helm charts hello-world-solutiondefinition
-          helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
-          helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
+          helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --create-namespace=default --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
+          helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --create-namespace=default --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
           
         shell: bash
 
