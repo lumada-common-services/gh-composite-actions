@@ -45,14 +45,14 @@ runs:
           # add helm registry
           echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
-          helm repo update
+          helm repo update --kubeconfig config
           
           # echo "helm list"
           helm list --kubeconfig config
           
           # install helm charts
-          helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig config
-          helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig config
+          # helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig config
+          # helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig config
           
         shell: bash
 
