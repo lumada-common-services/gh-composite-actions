@@ -42,6 +42,7 @@ runs:
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
           echo "${{ inputs.CLUSTERKUBECONFIG }}" > $RUNNER_TEMP/config
+          chmod 600 $RUNNER_TEMP/config
           kubectl get namespaces --kubeconfig $RUNNER_TEMP/config
 
           # print out version to be used
