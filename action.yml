@@ -40,22 +40,17 @@ runs:
           echo "${{ inputs.CLUSTERKUBECONFIG }}" > $RUNNER_TEMP/config
           kubectl get pods -A --kubeconfig $RUNNER_TEMP/config
 
-
           # print out version to be used
-          # echo "helm deployment for version ${APP_VERSION}"
+          echo "helm deployment for version ${APP_VERSION}"
 
-          # updating kubeconfig
-          
-          # echo "${AKS_JARJAR_01_KUBECONFIG}" > config
-          # chmod 600 config
 
           # add helm registry
-          # echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
-          # helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
-          # helm repo update --kubeconfig config
+          echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
+          helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
+          helm repo update --kubeconfig $RUNNER_TEMP/config
           
           # echo "helm list"
-          # helm list --kubeconfig config
+          helm list --kubeconfig $RUNNER_TEMP/config
           
           # install helm charts
           # helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig config
