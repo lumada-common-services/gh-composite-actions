@@ -47,6 +47,7 @@ runs:
           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
           helm repo update --kubeconfig config
           
+          kubectl get pods -A
           # echo "helm list"
           helm list --kubeconfig config
           
