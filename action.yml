@@ -20,19 +20,19 @@ runs:
     - name: Override appVersion, version and registry
       if: ${{ inputs.DEPLOYMENT_METHOD }} == "ArgoCD"
       run: |
-        sed 's/%VERSION%/${{ inputs.APP_VERSION }}/g' ${{ inputs.APP_DEFINITION_TEMPLATE_YAML }} > ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
+        sed 's/%VERSION%/${{ inputs.APP_VERSION }}/g' $GITHUB_WORKSPACE/${{ inputs.APP_DEFINITION_TEMPLATE_YAML }} > $GITHUB_WORKSPACE/${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
         echo "Deployment yaml file is updated with new version: ${{ inputs.APP_VERSION }}. Below is the file going to be deployed"
-        cat ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
+        cat $GITHUB_WORKSPACE/${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml
       shell: bash
 
     - name: commiting deployment.yml file for ArgoCD to current branch
       if: ${{ inputs.deployment_method }} == "ArgoCD"
       uses: EndBug/add-and-commit@v9
       with:
-        add: '.'
+        add: '${{ inputs.APP_DEFINITION_YAML_ARGO }}/'
         commit: --signoff
         default_author: github_actions
         author_email: hv.buildguy@hitachivantara.com
         author_name: buildguy
         cwd: '.'
-        message: "Publishing  deployment.yaml file"
+        message: "Updated ${{ inputs.APP_DEFINITION_YAML_ARGO }}/deployment.yaml file with new Version: ${{ inputs.APP_VERSION }} "
