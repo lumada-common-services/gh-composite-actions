@@ -37,7 +37,7 @@ runs:
           helm repo update
           
           # echo "helm list"
-          # helm list
+          helm list --kubeconfig kubeconfig
           
           # install helm charts
           helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig kubeconfig
