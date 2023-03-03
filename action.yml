@@ -26,6 +26,6 @@ runs:
       run: |
         echo "Doing deployment with kubectl"
         echo "${{ inputs.CLUSTERKUBECONFIG }}" > $RUNNER_TEMP/config
-        kubectl apply -f ${{ inputs.SOLUTIONDEFINITION_YAML }} --kubeconfig $RUNNER_TEMP/config
-        kubectl apply -f ${{ inputs.APP_DEFINITION_YAML }} --kubeconfig $RUNNER_TEMP/config
+        kubectl apply -f $GITHUB_WORKSPACE/${{ inputs.SOLUTIONDEFINITION_YAML }} --kubeconfig $RUNNER_TEMP/config
+        kubectl apply -f $GITHUB_WORKSPACE/${{ inputs.APP_DEFINITION_YAML }} --kubeconfig $RUNNER_TEMP/config
       shell: bash
