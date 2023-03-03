@@ -37,7 +37,7 @@ runs:
         
           # print out version to be used
           echo "helm deployment for version ${APP_VERSION}"
-          echo "$RUNNER_TEMP"
+#           echo "$RUNNER_TEMP"
 
           # updating kubeconfig
           echo "${JARJAR_CLUSER_KUBECONFIG}" > config
