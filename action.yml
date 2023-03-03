@@ -31,30 +31,30 @@ runs:
         id: install-kubectl
         uses: azure/setup-kubectl@v3
         
-      - name: Deploy helm charts
-        if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
-        run: |
+#       - name: Deploy helm charts
+#         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
+#         run: |
         
-          # print out version to be used
-          echo "helm deployment for version ${APP_VERSION}"
-#           echo "$RUNNER_TEMP"
+#           # print out version to be used
+#           echo "helm deployment for version ${APP_VERSION}"
+# #           echo "$RUNNER_TEMP"
 
-          # updating kubeconfig
-          echo "${JARJAR_CLUSER_KUBECONFIG}" > config
-          chmod 600 config
+#           # updating kubeconfig
+#           echo "${JARJAR_CLUSER_KUBECONFIG}" > config
+#           chmod 600 config
 
-          # add helm registry
-#           echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
-#           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
-#           helm repo update
+#           # add helm registry
+# #           echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
+# #           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
+# #           helm repo update
           
-          # echo "helm list"
-          helm list --kubeconfig config
+#           # echo "helm list"
+#           helm list --kubeconfig config
           
-          # install helm charts
-          helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig config
-          helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig config
+#           # install helm charts
+#           helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig config
+#           helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig config
           
-        shell: bash
+#         shell: bash
   
   
