@@ -1,15 +1,21 @@
 name:  "Helm deployment GitHub Action"
 description: "Helm deployment GitHub Action"
 inputs:
-  APP_VERSION:
-    description: "New version of solution and app definitions"
+#   APP_VERSION:
+#     description: "New version of solution and app definitions"
+#     required: true
+#   JFROG_USERNAME:
+#     description: "User name for https://hitachi.jfrog.io/"
+#     default: 'devops-service-cicd'
+#     required: true
+#   JFROG_PASSWORD:
+#     description: "Password for https://hitachi.jfrog.io/"
+#     required: true
+  SOLUTION_DEFINATION_CHART_PATH:
+    description: "Pass solution definition chart path from git repo"
     required: true
-  JFROG_USERNAME:
-    description: "User name for https://hitachi.jfrog.io/"
-    default: 'devops-service-cicd'
-    required: true
-  JFROG_PASSWORD:
-    description: "Password for https://hitachi.jfrog.io/"
+  APP_DEFINITION_CHART_PATH:
+    description: "Pass app definition chart path from git repo"
     required: true
 
 runs:
@@ -32,18 +38,21 @@ runs:
 
           # updating kubeconfig
           echo "${JARJAR_CLUSER_KUBECONFIG}" > $RUNNER_TEMP/config
+          
+          helm install ${{ inputs.SOLUTION_DEFINATION_CHART_PATH }} --kubeconfig $RUNNER_TEMP/config
+          helm install ${{ inputs.APP_DEFINITION_CHART_PATH }} --kubeconfig $RUNNER_TEMP/config
 
-          # add helm registry
-          echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
-          helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
-          helm repo update
+#           # add helm registry
+#           echo "Adding helm registry https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev as csaf-helm-dev"
+#           helm repo add csaf-helm-dev https://hitachi.jfrog.io/artifactory/api/helm/csaf-helm-dev --username ${{ inputs.JFROG_USERNAME }} --password ${{ inputs.JFROG_PASSWORD }}
+#           helm repo update
           
-          # echo "helm list"
-          helm list --kubeconfig $RUNNER_TEMP/config
+#           # echo "helm list"
+#           helm list --kubeconfig $RUNNER_TEMP/config
           
-          # install helm charts
-          helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
-          helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
+#           # install helm charts
+#           helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
+#           helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
           
         shell: bash
   
