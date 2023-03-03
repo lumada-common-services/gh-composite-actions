@@ -26,15 +26,18 @@ runs:
         with:
           version: 'v3.11.1'
           # token: "nope-not-going-to-provide"
+          
       - name: Setup kubectl 
         id: install-kubectl
         uses: azure/setup-kubectl@v3
+        
       - name: Deploy helm charts
         if: ${{ inputs.DEPLOYMENT_METHOD }} == "Helm"
         run: |
         
           # print out version to be used
           echo "helm deployment for version ${APP_VERSION}"
+          echo $RUNNER_TEMP
 
           # updating kubeconfig
           echo "${JARJAR_CLUSER_KUBECONFIG}" > $RUNNER_TEMP/config
@@ -52,8 +55,8 @@ runs:
           helm list --kubeconfig $RUNNER_TEMP/config
           
           # install helm charts
-          helm install lumadasolution-definition csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
-          helm install hello-world-definition csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
+          helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
+          helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
           
         shell: bash
   
