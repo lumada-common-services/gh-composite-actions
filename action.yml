@@ -43,7 +43,7 @@ runs:
         run: |
           echo "${{ inputs.CLUSTERKUBECONFIG }}" > $RUNNER_TEMP/config
           chmod 600 $RUNNER_TEMP/config
-          kubectl get namespaces --kubeconfig $RUNNER_TEMP/config
+          # kubectl get namespaces --kubeconfig $RUNNER_TEMP/config
 
           # print out version to be used
           echo "helm deployment for version ${APP_VERSION}"
@@ -55,9 +55,8 @@ runs:
           helm repo update --kubeconfig $RUNNER_TEMP/config
           
           # echo "helm list"
-          helm list --all-namespaces --kubeconfig $RUNNER_TEMP/config
+          # helm list --all-namespaces --kubeconfig $RUNNER_TEMP/config
           
-          helm search repo 
           # install helm charts hello-world-solutiondefinition
           helm install lumadasolution-definition-${APP_VERSION} csaf-helm-dev/hello-world-solutiondefinition --namespace default --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
           helm install hello-world-definition-${APP_VERSION} csaf-helm-dev/hello-world-lumadaappdefinition --namespace default --version ${APP_VERSION} --kubeconfig $RUNNER_TEMP/config
