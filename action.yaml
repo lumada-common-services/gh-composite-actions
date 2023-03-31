@@ -102,6 +102,7 @@ runs:
         BUILD_URL: ${{ env.build_url }}
 
     - name: Report Tracking
+      if: ${{ env.report }}
       shell: bash
       run: |
         cat $RUNNER_TEMP/tracking.out >> $GITHUB_STEP_SUMMARY
