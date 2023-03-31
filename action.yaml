@@ -87,7 +87,8 @@ runs:
       shell: bash
       if: ${{ env.Tag_version && success() }}
       run: |
-        echo "| Created Tag | :white_check_mark: |" >> $RUNNER_TEMP/tracking.out
+        sed -i "s/| Created Tag | :x: |/| Created Tag | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
+        # echo "| Created Tag | :white_check_mark: |" >> $RUNNER_TEMP/tracking.out
 
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
