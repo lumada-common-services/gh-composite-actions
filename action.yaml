@@ -32,7 +32,7 @@ runs:
       if: ${{ env.sonar_commands && success() }}
       shell: bash
       run: |
-        echo "| Sonar Scan | :white_check_mark: |" >> $RUNNER_TEMP/tracking.out
+        sed -i "s/| Sonar Scan | :x: |/| sonar Scan | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
 
     - name: Blackduck Scan
       if: ${{ env.BlackDuck_Project_Name }}
@@ -53,8 +53,7 @@ runs:
       if: ${{ env.BlackDuck_Project_Name && success() }}
       shell: bash
       run: |
-        echo "| Blackduck | :white_check_mark: |" >> $RUNNER_TEMP/tracking.out
-
+        sed -i "s/| Blackduck Scan | :x: |/| Blackduck Scan | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
 
     - name: OWASP Scan
       if: ${{ env.owasp_Project }}
@@ -88,7 +87,6 @@ runs:
       if: ${{ env.Tag_version && success() }}
       run: |
         sed -i "s/| Created Tag | :x: |/| Created Tag | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
-        # echo "| Created Tag | :white_check_mark: |" >> $RUNNER_TEMP/tracking.out
 
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
