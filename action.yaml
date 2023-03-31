@@ -7,6 +7,13 @@ inputs:
 runs:
   using: "composite"
   steps:
+
+    - name: Setup Steps Tracking
+      run: |
+        echo "Sonar Scan :x:" >> $RUNNER_TEMP/tracking.out
+        echo "Blackduck Scan :x:" >> $RUNNER_TEMP/tracking.out
+        echo "Created Tag :x:" >> $RUNNER_TEMP/tracking.out
+
     - name: Build ,Version Set, Unit Test
       if: ${{ inputs.command }}
       run: ${{ inputs.command }}
@@ -15,6 +22,11 @@ runs:
     - name: Sonar Scan
       if: ${{ env.sonar_commands }}
       uses: lumada-common-services/gh-composite-actions@sonar-action
+
+    - name: Sonar Scan Tracking
+      if: ${{ env.sonar_commands && success() }}
+      run: |
+        echo "Sonar Scan :white_check_mark:" >> $RUNNER_TEMP/tracking.out
 
     - name: Blackduck Scan
       if: ${{ env.BlackDuck_Project_Name }}
@@ -30,6 +42,11 @@ runs:
           --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
           --blackduck.url="${{ env.BlackDuck_Url }}" \
           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
+
+    - name: Blackduck Scan Tracking
+      if: ${{ env.BlackDuck_Project_Name && success() }}
+      run: |
+        echo "Blackduck :white_check_mark:" >> $RUNNER_TEMP/tracking.out
 
 
     - name: OWASP Scan
@@ -58,6 +75,11 @@ runs:
         tag: '${{ env.Tag_version }}'
         tag_push: '--force'
         pull: '--rebase --autostash'
+
+    - name: Create Tag Tracking
+      if: ${{ env.Tag_version && success() }}
+      run: |
+        echo "Created Tag :white_check_mark:" >> $RUNNER_TEMP/tracking.out
 
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
