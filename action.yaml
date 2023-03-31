@@ -11,9 +11,9 @@ runs:
     - name: Setup Steps Tracking
       shell: bash
       run: |
-        echo "Sonar Scan :x:" >> $RUNNER_TEMP/tracking.out
-        echo "Blackduck Scan :x:" >> $RUNNER_TEMP/tracking.out
-        echo "Created Tag :x:" >> $RUNNER_TEMP/tracking.out
+        echo "* Sonar Scan :x:" >> $RUNNER_TEMP/tracking.out
+        echo "* Blackduck Scan :x:" >> $RUNNER_TEMP/tracking.out
+        echo "* Created Tag :x:" >> $RUNNER_TEMP/tracking.out
 
     - name: Build ,Version Set, Unit Test
       if: ${{ inputs.command }}
@@ -28,7 +28,7 @@ runs:
       if: ${{ env.sonar_commands && success() }}
       shell: bash
       run: |
-        echo "Sonar Scan :white_check_mark:" >> $RUNNER_TEMP/tracking.out
+        echo "* Sonar Scan :white_check_mark:" >> $RUNNER_TEMP/tracking.out
 
     - name: Blackduck Scan
       if: ${{ env.BlackDuck_Project_Name }}
@@ -49,7 +49,7 @@ runs:
       if: ${{ env.BlackDuck_Project_Name && success() }}
       shell: bash
       run: |
-        echo "Blackduck :white_check_mark:" >> $RUNNER_TEMP/tracking.out
+        echo "* Blackduck :white_check_mark:" >> $RUNNER_TEMP/tracking.out
 
 
     - name: OWASP Scan
@@ -83,7 +83,7 @@ runs:
       shell: bash
       if: ${{ env.Tag_version && success() }}
       run: |
-        echo "Created Tag :white_check_mark:" >> $RUNNER_TEMP/tracking.out
+        echo "* Created Tag :white_check_mark:" >> $RUNNER_TEMP/tracking.out
 
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
@@ -98,3 +98,8 @@ runs:
         BUILD_VERSION: ${{ env.pkg_version }}
         WORKSPACE: ${{ env.workspace }}
         BUILD_URL: ${{ env.build_url }}
+
+    - name: Report Tracking
+      shell: bash
+      run: |
+        cat $RUNNER_TEMP/tracking.out >> $GITHUB_STEP_SUMMARY
