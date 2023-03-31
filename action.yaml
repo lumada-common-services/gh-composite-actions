@@ -9,6 +9,7 @@ runs:
   steps:
 
     - name: Setup Steps Tracking
+      shell: bash
       run: |
         echo "Sonar Scan :x:" >> $RUNNER_TEMP/tracking.out
         echo "Blackduck Scan :x:" >> $RUNNER_TEMP/tracking.out
@@ -25,6 +26,7 @@ runs:
 
     - name: Sonar Scan Tracking
       if: ${{ env.sonar_commands && success() }}
+      shell: bash
       run: |
         echo "Sonar Scan :white_check_mark:" >> $RUNNER_TEMP/tracking.out
 
@@ -45,6 +47,7 @@ runs:
 
     - name: Blackduck Scan Tracking
       if: ${{ env.BlackDuck_Project_Name && success() }}
+      shell: bash
       run: |
         echo "Blackduck :white_check_mark:" >> $RUNNER_TEMP/tracking.out
 
@@ -77,6 +80,7 @@ runs:
         pull: '--rebase --autostash'
 
     - name: Create Tag Tracking
+      shell: bash
       if: ${{ env.Tag_version && success() }}
       run: |
         echo "Created Tag :white_check_mark:" >> $RUNNER_TEMP/tracking.out
