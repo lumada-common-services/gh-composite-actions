@@ -7,7 +7,7 @@ inputs:
 runs:
   using: "composite"
   steps:
-    - name: Build ,Version Set,Unit Test
+    - name: Build ,Version Set, Unit Test
       if: ${{ inputs.command }}
       run: ${{ inputs.command }}
       shell: bash
@@ -62,7 +62,7 @@ runs:
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
       continue-on-error: false
-      uses: lumada-common-services/registry-publication@v1.1
+      uses: lumada-common-services/registry-publication@v1.1.1
       with:
         ARTIFACTS_CONFIG_FILE: ${{ env.artifacts_manifest_file }}
         ARTIFACTORY_APIKEY: ${{ env.artifactory_api_key }}
