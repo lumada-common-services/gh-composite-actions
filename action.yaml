@@ -107,3 +107,19 @@ runs:
       shell: bash
       run: |
         cat $RUNNER_TEMP/tracking.out >> $GITHUB_STEP_SUMMARY
+
+    - name: Slack notification on success
+      uses: hv-actions/slack-action@v3
+      if: ${{ env.report }}
+      env:
+        SLACK_TOKEN: ${{ env.SLACK_TOKEN }}
+      with:
+        title: "testing slack messaging"
+        channel: "yukon-test"
+        message: >
+          Job Steps :
+              :arrow_right:  Build       Success  :+1:
+              :arrow_right:  Sonarqube   Failed   :-1:
+          Pull Request last commit message: something
+
+          xxxxxxx
