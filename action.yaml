@@ -13,13 +13,13 @@ runs:
       shell: bash
       run: |
         if [ ! -e $RUNNER_TEMP/tracking.out ]; then
-          echo "| <div style="max-width:60%">Step/Command</div> | Executed | Result |" >> $RUNNER_TEMP/tracking.out
-          echo "|:---------|:--------:|:-------:|" >> $RUNNER_TEMP/tracking.out
-          echo "| Sonar Scan | :x: | - |" >> $RUNNER_TEMP/tracking.out
+          echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $RUNNER_TEMP/tracking.out
+          echo "|:---------|:-------:|" >> $RUNNER_TEMP/tracking.out
+          echo "| Sonar Scan | :x: |" >> $RUNNER_TEMP/tracking.out
 
           if [ "${{ github.event_name }}" == "push" ]; then
-            echo "| Blackduck Scan | :x: | - |" >> $RUNNER_TEMP/tracking.out
-            echo "| Created Tag | :x: | - |" >> $RUNNER_TEMP/tracking.out
+            echo "| Blackduck Scan | :x: |" >> $RUNNER_TEMP/tracking.out
+            echo "| Created Tag | :x: |" >> $RUNNER_TEMP/tracking.out
           fi
         fi
 
@@ -33,14 +33,14 @@ runs:
       if: ${{ success() && inputs.command }}
       run: |
         cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
-        echo "| ${cmd} | :white_check_mark: | :white_check_mark: |" >> $RUNNER_TEMP/tracking.out
+        echo "| ${cmd} | :white_check_mark: |" >> $RUNNER_TEMP/tracking.out
 
     - name: Command tracking unsuccessful execution
       shell: bash
       if: ${{ failure() && inputs.command }}
       run: |
         cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
-        echo "| ${cmd} | :white_check_mark: | :boom: |" >> $RUNNER_TEMP/tracking.out
+        echo "| ${cmd} | :boom: |" >> $RUNNER_TEMP/tracking.out
 
     # Sonar section
     - name: Sonar Scan
@@ -51,13 +51,13 @@ runs:
       if: ${{ success() && env.sonar_commands }}
       shell: bash
       run: |
-        sed -i "s/| Sonar Scan | :x: | - |/| Sonar Scan | :white_check_mark: | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/| Sonar Scan | :x: |/| Sonar Scan | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
 
     - name: Sonar scan tracking unsuccessful execution
       if: ${{ failure() && env.sonar_commands }}
       shell: bash
       run: |
-        sed -i "s/| Sonar Scan | :x: | - |/| Sonar Scan | :white_check_mark: | :boom: |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/| Sonar Scan | :x: |/| Sonar Scan | :boom: |/g" $RUNNER_TEMP/tracking.out
 
     # Blackduck section
     - name: Blackduck Scan
@@ -79,13 +79,13 @@ runs:
       if: ${{ success() && env.BlackDuck_Project_Name }}
       shell: bash
       run: |
-        sed -i "s/| Blackduck Scan | :x: | - |/| Blackduck Scan | :white_check_mark: | :checkered_flag |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/| Blackduck Scan | :x: |/| Blackduck Scan | :checkered_flag |/g" $RUNNER_TEMP/tracking.out
 
     - name: Blackduck scan tracking unsuccessful execution
       if: ${{ failure() && env.BlackDuck_Project_Name }}
       shell: bash
       run: |
-        sed -i "s/| Blackduck Scan | :x: | - |/| Blackduck Scan | :white_check_mark: | :boom: |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/| Blackduck Scan | :x: |/| Blackduck Scan | :boom: |/g" $RUNNER_TEMP/tracking.out
 
     - name: OWASP Scan
       if: ${{ env.owasp_Project }}
@@ -119,13 +119,13 @@ runs:
       shell: bash
       if: ${{ success() && env.Tag_version }}
       run: |
-        sed -i "s/| Created Tag | :x: | - |/| Created Tag | :white_check_mark: | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/| Created Tag | :x: |/| Created Tag | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
 
     - name: Create tag tracking unsuccessful execution
       shell: bash
       if: ${{ failure() && env.Tag_version }}
       run: |
-        sed -i "s/| Created Tag | :x: | - |/| Created Tag | :white_check_mark: | :boom: |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/| Created Tag | :x: |/| Created Tag | :boom: |/g" $RUNNER_TEMP/tracking.out
 
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
