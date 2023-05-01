@@ -14,9 +14,8 @@ runs:
       
     - name: FrogBot
       if: ${{ env.FROGBOT }}
-      uses: lumada-common-services/data-plane@YKN-394
-      with:
-        image: cicd-oci-release-orl.repo.orl.eng.hitachivantara.com/lumada-common-services/data-plane:20221214.3-maven-node
+      uses: jfrog/frogbot@v2
+
 
 #     - name: Sonar Scan
 #       if: ${{ env.sonar_commands }}
