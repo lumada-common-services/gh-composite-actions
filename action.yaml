@@ -16,6 +16,11 @@ runs:
 #       if: ${{ env.FROGBOT }}
       uses: jfrog/frogbot@v2
       with:
+        env:
+          JF_URL: ${{ env.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
+          JF_GIT_TOKEN: ${{ env.GITHUB_TOKEN }}
+
         run: | 
           ls -la
 
