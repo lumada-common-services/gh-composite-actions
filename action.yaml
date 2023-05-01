@@ -13,7 +13,7 @@ runs:
       shell: bash
       
     - name: FrogBot
-#       if: ${{ env.FROGBOT }}
+      if: ${{ env.FROGBOT }}
       uses: jfrog/frogbot@v2
       with:
         env:
