@@ -12,8 +12,8 @@ inputs:
   JF_GIT_TOKEN:
     required: true
     
-  RUN_FROGBOT:
-    required: true
+  # RUN_FROGBOT:
+   #  required: true
 
 runs:
   using: "composite"
@@ -24,7 +24,6 @@ runs:
       shell: bash
       
     - name: FrogBot
-      if: ${{ env.RUN_FROGBOT }}
       uses: jfrog/frogbot@v2
       with:
         JF_URL: ${{ env.JF_URL }}
