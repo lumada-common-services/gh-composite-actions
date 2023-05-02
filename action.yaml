@@ -1,16 +1,16 @@
 name:  Workflow Template
 description: "Composite Action Template"
-# inputs:
+inputs:
   # command:
   #   required: true
-  # JF_URL:
-  #   required: true
+  JF_URL:
+    required: true
     
-  # JF_ACCESS_TOKEN:
-  #   required: true
+  JF_ACCESS_TOKEN:
+    required: true
     
-  # JF_GIT_TOKEN:
-  #   required: true
+  JF_GIT_TOKEN:
+    required: true
     
   # RUN_FROGBOT:
    #  required: true
@@ -26,9 +26,9 @@ runs:
     - name: FrogBot
       uses: jfrog/frogbot@v2
       with:
-        JF_URL: ${{ env.JF_URL }}
-        JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
-        JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
+        JF_URL: ${{ inputs.JF_URL }}
+        JF_ACCESS_TOKEN: ${{ inputs.JF_ACCESS_TOKEN }}
+        JF_GIT_TOKEN: ${{ inputs.JF_GIT_TOKEN }}
 
 
 #     - name: Sonar Scan
