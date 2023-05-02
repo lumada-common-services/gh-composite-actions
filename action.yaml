@@ -1,7 +1,6 @@
 name:  Workflow Template
 description: "Composite Action Template"
 inputs:
-
   JF_URL:
     required: true
     
@@ -9,9 +8,6 @@ inputs:
     required: true
     
   JF_GIT_TOKEN:
-    required: true
-    
-  RUN_FROGBOT:
     required: true
 
 runs:
