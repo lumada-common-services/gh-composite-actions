@@ -14,8 +14,6 @@ inputs:
     
   RUN_FROGBOT:
     required: true
-    
-  
 
 runs:
   using: "composite"
