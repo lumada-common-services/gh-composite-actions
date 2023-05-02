@@ -1,6 +1,6 @@
 name:  Workflow Template
 description: "Composite Action Template"
-inputs:
+# inputs:
   # command:
   #   required: true
   # JF_URL:
