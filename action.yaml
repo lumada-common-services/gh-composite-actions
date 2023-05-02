@@ -1,8 +1,8 @@
 name:  Workflow Template
 description: "Composite Action Template"
 inputs:
-  command:
-    required: true
+  # command:
+  #   required: true
   # JF_URL:
   #   required: true
     
@@ -17,7 +17,7 @@ inputs:
 
 runs:
   using: "composite"
-  # steps:
+  steps:
   #   - name: Build ,Version Set, Unit Test
   #     if: ${{ inputs.command }}
   #     run: ${{ inputs.command }}
