@@ -3,6 +3,19 @@ description: "Composite Action Template"
 inputs:
   command:
     required: true
+  JF_URL:
+    required: true
+    
+  JF_ACCESS_TOKEN:
+    required: true
+    
+  GITHUB_TOKEN:
+    required: true
+    
+  RUN_FROGBOT:
+    required: true
+    
+  
 
 runs:
   using: "composite"
@@ -13,7 +26,7 @@ runs:
       shell: bash
       
     - name: FrogBot
-      if: ${{ env.FROGBOT }}
+      if: ${{ env.RUN_FROGBOT }}
       uses: jfrog/frogbot@v2
       with:
         JF_URL: ${{ env.JF_URL }}
