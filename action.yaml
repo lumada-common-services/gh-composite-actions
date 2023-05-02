@@ -9,7 +9,7 @@ inputs:
   JF_ACCESS_TOKEN:
     required: true
     
-  GITHUB_TOKEN:
+  JF_GIT_TOKEN:
     required: true
     
   RUN_FROGBOT:
@@ -29,7 +29,7 @@ runs:
       with:
         JF_URL: ${{ env.JF_URL }}
         JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
-        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+        JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
 
 
 #     - name: Sonar Scan
