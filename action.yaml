@@ -1,36 +1,91 @@
-name:  Workflow Template
+name: Workflow Template
 description: "Composite Action Template"
 inputs:
   command:
     required: true
+    description: "A command line statement"
 
 runs:
   using: "composite"
   steps:
-    - name: Build ,Version Set, Unit Test
+
+    - name: Setup Steps Tracking
+      shell: bash
+      run: |
+        if [ ! -e $RUNNER_TEMP/tracking.out ]; then
+          echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $RUNNER_TEMP/tracking.out
+          echo "|:---------|:-------:|" >> $RUNNER_TEMP/tracking.out
+          echo "| Sonar Scan | :x: |" >> $RUNNER_TEMP/tracking.out
+
+          if [ "${{ github.event_name }}" == "push" ]; then
+            echo "| Blackduck Scan | :x: |" >> $RUNNER_TEMP/tracking.out
+            echo "| Created Tag | :x: |" >> $RUNNER_TEMP/tracking.out
+          fi
+        fi
+
+    - name: Build, Version Set, Unit Test
       if: ${{ inputs.command }}
       run: ${{ inputs.command }}
       shell: bash
 
+    - name: Command tracking success
+      shell: bash
+      if: ${{ success() && inputs.command }}
+      run: |
+        cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
+        echo "| ${cmd} | :white_check_mark: |" >> $RUNNER_TEMP/tracking.out
+
+    - name: Command tracking unsuccessful execution
+      shell: bash
+      if: ${{ failure() && inputs.command }}
+      run: |
+        cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
+        echo "| ${cmd} | :boom: |" >> $RUNNER_TEMP/tracking.out
+
+    # Sonar section
     - name: Sonar Scan
       if: ${{ env.sonar_commands }}
       uses: lumada-common-services/gh-composite-actions@sonar-action
 
+    - name: Sonar scan tracking success
+      if: ${{ success() && env.sonar_commands }}
+      shell: bash
+      run: |
+        sed -i "s/| Sonar Scan | :x: |/| Sonar Scan | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
+
+    - name: Sonar scan tracking unsuccessful execution
+      if: ${{ failure() && env.sonar_commands }}
+      shell: bash
+      run: |
+        sed -i "s/| Sonar Scan | :x: |/| Sonar Scan | :boom: |/g" $RUNNER_TEMP/tracking.out
+
+    # Blackduck section
     - name: Blackduck Scan
       if: ${{ env.BlackDuck_Project_Name }}
       uses: addnab/docker-run-action@v3
       with:
         image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:8
-        options:  --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
+        options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
         run: |
-         java -jar /synopsys-detect.jar \
-          --detect.source.path=/workdir \
-          --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
-          --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
-          --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
-          --blackduck.url="${{ env.BlackDuck_Url }}" \
-          --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
+          java -jar /synopsys-detect.jar \
+           --detect.source.path=/workdir \
+           --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
+           --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
+           --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
+           --blackduck.url="${{ env.BlackDuck_Url }}" \
+           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
 
+    - name: Blackduck scan tracking success
+      if: ${{ success() && env.BlackDuck_Project_Name }}
+      shell: bash
+      run: |
+        sed -i "s/| Blackduck Scan | :x: |/| Blackduck Scan | :checkered_flag |/g" $RUNNER_TEMP/tracking.out
+
+    - name: Blackduck scan tracking unsuccessful execution
+      if: ${{ failure() && env.BlackDuck_Project_Name }}
+      shell: bash
+      run: |
+        sed -i "s/| Blackduck Scan | :x: |/| Blackduck Scan | :boom: |/g" $RUNNER_TEMP/tracking.out
 
     - name: OWASP Scan
       if: ${{ env.owasp_Project }}
@@ -42,11 +97,12 @@ runs:
         format: 'ALL'
         out: 'reports'
         args: >
-            --disableNodeJS \
-            --disableAssembly \
-            --disableYarnAudit \
-            --enableRetired
+          --disableNodeJS \
+          --disableAssembly \
+          --disableYarnAudit \
+          --enableRetired
 
+    # Tagging
     - name: Create Tag
       if: ${{ env.Tag_version }}
       uses: EndBug/add-and-commit@v9
@@ -58,6 +114,18 @@ runs:
         tag: '${{ env.Tag_version }}'
         tag_push: '--force'
         pull: '--rebase --autostash'
+
+    - name: Create tag tracking success
+      shell: bash
+      if: ${{ success() && env.Tag_version }}
+      run: |
+        sed -i "s/| Created Tag | :x: |/| Created Tag | :white_check_mark: |/g" $RUNNER_TEMP/tracking.out
+
+    - name: Create tag tracking unsuccessful execution
+      shell: bash
+      if: ${{ failure() && env.Tag_version }}
+      run: |
+        sed -i "s/| Created Tag | :x: |/| Created Tag | :boom: |/g" $RUNNER_TEMP/tracking.out
 
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
@@ -72,3 +140,9 @@ runs:
         BUILD_VERSION: ${{ env.pkg_version }}
         WORKSPACE: ${{ env.workspace }}
         BUILD_URL: ${{ env.build_url }}
+
+    - name: Report Tracking
+      if: ${{ env.report }}
+      shell: bash
+      run: |
+        cat $RUNNER_TEMP/tracking.out >> $GITHUB_STEP_SUMMARY
