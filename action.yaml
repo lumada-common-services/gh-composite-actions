@@ -17,7 +17,7 @@ runs:
     - name: FrogBot
       if: $${{ env.RUN_FROGBOT }}
       uses: jfrog/frogbot@v2
-      with:
+      env:
         JF_URL: ${{ inputs.JF_URL }}
         JF_ACCESS_TOKEN: ${{ inputs.JF_ACCESS_TOKEN }}
         JF_GIT_TOKEN: ${{ inputs.JF_GIT_TOKEN }}
