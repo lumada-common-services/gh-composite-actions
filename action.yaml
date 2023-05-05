@@ -1,14 +1,14 @@
 name:  Workflow Template
 description: "Composite Action Template"
-inputs:
-  JF_URL:
-    required: true
-    
-  JF_ACCESS_TOKEN:
-    required: true
-    
-  JF_GIT_TOKEN:
-    required: true
+# inputs:
+#   JF_URL:
+#     required: true
+#     
+#   JF_ACCESS_TOKEN:
+#     required: true
+ #    
+#   JF_GIT_TOKEN:
+#     required: true
 
 runs:
   using: "composite"
