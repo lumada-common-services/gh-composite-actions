@@ -1,14 +1,14 @@
 name:  Workflow Template
 description: "Composite Action Template"
-inputs:
-  JF_URL:
-    required: true
+# inputs:
+#   JF_URL:
+#     required: true
     
-  JF_ACCESS_TOKEN:
-    required: true
+#   JF_ACCESS_TOKEN:
+#     required: true
     
-  JF_GIT_TOKEN:
-    required: true
+#   JF_GIT_TOKEN:
+#     required: true
 
 runs:
   using: "composite"
@@ -19,6 +19,54 @@ runs:
       if: $${{ env.RUN_FROGBOT }}
       uses: jfrog/frogbot@v2
       env:
-        JF_URL: ${{ inputs.JF_URL }}
-        JF_ACCESS_TOKEN: ${{ inputs.JF_ACCESS_TOKEN }}
-        JF_GIT_TOKEN: ${{ inputs.JF_GIT_TOKEN }}
+        JF_URL: ${{ env.JF_URL }}
+        JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
+        JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
+        
+        # [Optional, default: https://api.github.com]
+        # API endpoint to GitHub
+        # JF_GIT_API_ENDPOINT: https://github.example.com
+
+        # [Optional]
+        # If the machine that runs Frogbot has no access to the internet, set the name of a remote repository
+        # in Artifactory, which proxies https://releases.jfrog.io
+        # The 'frogbot' executable and other tools it needs will be downloaded through this repository.
+        # JF_RELEASES_REPO: ""
+
+        ###########################################################################
+        ##   If your project uses a 'frogbot-config.yml' file, you can define     ##
+        ##   the following variables inside the file, instead of here.           ##
+        ###########################################################################
+
+        # [Mandatory if the two conditions below are met]
+        # 1. The project uses yarn 2, NuGet or .NET Core to download its dependencies
+        # 2. The `installCommand` variable isn't set in your frogbot-config.yml file.
+        #
+        # The command that installs the project dependencies (e.g "nuget restore")
+        # JF_INSTALL_DEPS_CMD: ""
+
+        # [Optional, default: "."]
+        # Relative path to the root of the project in the Git repository
+        # JF_WORKING_DIR: path/to/project/dir
+
+        # [Optional]
+        # Xray Watches. Learn more about them here: https://www.jfrog.com/confluence/display/JFROG/Configuring+Xray+Watches
+        # JF_WATCHES: <watch-1>,<watch-2>...<watch-n>
+
+        # [Optional]
+        # JFrog project. Learn more about it here: https://www.jfrog.com/confluence/display/JFROG/Projects
+        # JF_PROJECT: <project-key>
+
+        # [Optional, default: "FALSE"]
+        # Displays all existing vulnerabilities, including the ones that were added by the pull request.
+        # JF_INCLUDE_ALL_VULNERABILITIES: "TRUE"
+
+        # [Optional, default: "TRUE"]
+        # Fails the Frogbot task if any security issue is found.
+        # JF_FAIL: "FALSE"
+
+        # [Optional]
+        # Frogbot will download the project dependencies if they're not cached locally. To download the
+        # dependencies from a virtual repository in Artifactory, set the name of the repository. There's no
+        # need to set this value, if it is set in the frogbot-config.yml file.
+        # JF_DEPS_REPO: ""
