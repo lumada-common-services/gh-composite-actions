@@ -12,34 +12,51 @@ runs:
     - name: Setup Steps Tracking
       shell: bash
       run: |
-        if [ ! -e $RUNNER_TEMP/tracking.out ]; then
-          echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $RUNNER_TEMP/tracking.out
-          echo "|:---------|:-------:|" >> $RUNNER_TEMP/tracking.out
-          echo "| Sonar Scan | :x: |" >> $RUNNER_TEMP/tracking.out
-
+        if [ ! -e $RUNNER_TEMP/icons.properties ]; then
+          echo "sonar_scan=x" >> $RUNNER_TEMP/icons.properties
+          echo "build=x" >> $RUNNER_TEMP/icons.properties
+          echo "unit_test=x" >> $RUNNER_TEMP/icons.properties          
+          
+          
           if [ "${{ github.event_name }}" == "push" ]; then
-            echo "| Blackduck Scan | :x: |" >> $RUNNER_TEMP/tracking.out
-            echo "| Created Tag | :x: |" >> $RUNNER_TEMP/tracking.out
+            echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
+            echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
           fi
+          
         fi
 
-    - name: Build, Version Set, Unit Test
+    - name: Commands Execution
       if: ${{ inputs.command }}
       id: run-command
       run: ${{ inputs.command }}
       shell: bash
 
-    - name: Command tracking
+    - name: Commands Execution tracking
       shell: bash
       if: ${{ always() && inputs.command }}
-      run: |
-        cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
-        icon=":boom:"
-        [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon=":white_check_mark:"
+      run: |       
+        icon="boom"
         
-        echo "| ${cmd} | ${icon} |" >> $RUNNER_TEMP/tracking.out
+        if [ "${{ env.cmd_type }}" == "BUILD" ]; then
+        
+           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark" 
+           sed -i "s/build=x/build=${icon}/g" $RUNNER_TEMP/icons.properties  
 
-    # Sonar section
+        elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
+        
+          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+          sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties  
+          
+        elif [ "${{ env.cmd_type }}" == "" ]; then         
+        
+          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"        
+          cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
+          echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties  
+          
+        fi
+  
+
+      # Sonar section
     - name: Sonar Scan
       if: ${{ env.sonar_commands }}
       id: sonar-scan
@@ -49,10 +66,10 @@ runs:
       shell: bash
       if: ${{ always() && env.sonar_commands }}
       run: |
-        icon=":boom:"
-        [[ "${{ steps.sonar-scan.outcome }}" == "success" ]] && icon=":white_check_mark:"
+        icon="boom"
+        [[ "${{ steps.sonar-scan.outcome }}" == "success" ]] && icon="white_check_mark"
 
-        sed -i "s/| Sonar Scan | :x: |/| Sonar Scan | ${icon} |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
     # Blackduck section
     - name: Blackduck Scan
@@ -75,10 +92,10 @@ runs:
       shell: bash
       if: ${{ always() && env.BlackDuck_Project_Name }}
       run: |      
-        icon=":boom:"
-        [[ "${{ steps.blackduck-scan.outcome }}" == "success" ]] && icon=":white_check_mark:"
+        icon="boom"
+        [[ "${{ steps.blackduck-scan.outcome }}" == "success" ]] && icon="white_check_mark"
 
-        sed -i "s/| Blackduck Scan | :x: |/| Blackduck Scan | ${icon} |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/blackduck_scan=x/blackduck_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
     - name: OWASP Scan
       if: ${{ env.owasp_Project }}
@@ -113,10 +130,10 @@ runs:
       shell: bash
       if: ${{ always() && env.Tag_version }}
       run: |       
-        icon=":boom:"
-        [[ "${{ steps.git-tag.outcome }}" == "success" ]] && icon=":white_check_mark:"
+        icon="boom"
+        [[ "${{ steps.git-tag.outcome }}" == "success" ]] && icon="white_check_mark"
 
-        sed -i "s/| Created Tag | :x: |/| Created Tag | ${icon} |/g" $RUNNER_TEMP/tracking.out
+        sed -i "s/create_tag=x/create_tag=${icon}/g" $RUNNER_TEMP/icons.properties
 
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
@@ -132,8 +149,133 @@ runs:
         WORKSPACE: ${{ env.workspace }}
         BUILD_URL: ${{ env.build_url }}
 
-    - name: Report Tracking
+    - name: Read icon properties
+      if: ${{ env.report }}
+      id: all_icons
+      shell: bash
+      run: |
+        props=$(cat $RUNNER_TEMP/icons.properties)
+        
+        for prop in $props
+        do
+          echo "$prop" >> $GITHUB_OUTPUT
+        done
+
+    - name: Report Summary Tracking
       if: ${{ env.report }}
       shell: bash
       run: |
-        cat $RUNNER_TEMP/tracking.out >> $GITHUB_STEP_SUMMARY
+        echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $GITHUB_STEP_SUMMARY
+        echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
+        echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
+        echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
+
+        sonar_result="${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&"
+
+        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ] && [ "${{ steps.all_icons.outputs.sonar_scan }}" == "white_check_mark" ]; then       
+            if [ "${{ github.event_name }}" == "pull_request" ]; then
+              sonar_result+="pullRequest=${{ github.event.pull_request.number }}"
+            elif [ "${{ github.event_name }}" == "push" ]; then         
+              sonar_result+="branch=${GITHUB_REF#refs/heads/}"
+            fi
+            echo "| [Sonar Scan]($sonar_result) | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
+        else
+            echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
+        fi  
+        
+        if [ "${{ github.event_name }}" == "push" ]; then
+          if [ "${{ steps.all_icons.outputs.blackduck_scan }}" == "white_check_mark" ] && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
+            blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
+            echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Blackduck Scan | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
+        fi  
+
+        # display all commands
+        if [ -f "$RUNNER_TEMP/commands.properties" ]; then
+         while IFS='=' read -r key value; do
+           if [ "$value" == "" ]; then
+             continue
+           fi
+           echo "| ${value} | :${key}: |" >> $GITHUB_STEP_SUMMARY
+         done < "$RUNNER_TEMP/commands.properties"
+        fi
+        
+    - name: Prepare Slack Notification
+      if: ${{ env.report && env.Slack_Channel }}
+      id: slack-template
+      shell: bash
+      run: |
+        details=""
+        commit=""
+        blackduck_result=""
+        blackduck_message=""
+        branch="${GITHUB_REF#refs/heads/}"
+        if [ "${{ github.event_name }}" == "push" ]; then
+            details="<${{ github.event.head_commit.url}}| Details>"
+            commit="Commit Message: ${{ github.event.head_commit.message }}"
+            
+            blackduck_result="Blackduck"
+            if [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
+              blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
+            fi
+            
+            blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
+        
+        elif [ "${{ github.event_name }}" == "pull_request" ]; then
+            details="<${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}| Details>"
+        
+        fi
+        build_result="<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Build>"
+        
+        Sonar_result="SonarQube"       
+        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]; then         
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&pullRequest=${{ github.event.pull_request.number }}|${Sonar_result}>"
+          elif [ "${{ github.event_name }}" == "push" ]; then         
+          sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&branch=${branch}|${Sonar_result}>"
+          fi
+        fi
+
+        template="{ \"value\": \"Event: ${{ github.event_name }}\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
+        template="$template{ \"value\": \"${build_result}\", \"short\": true },"
+        template="$template{ \"value\": \"${details}\", \"short\": true },"
+        template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
+        template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
+        template="$template{ \"value\": \"Unit Test\", \"short\": true },"
+        template="$template{ \"value\": \"${commit}\", \"short\": true },"        
+        template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
+        template="$template{ \"value\": \"$sonar_result\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
+        template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
+        template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
+        template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
+        
+        echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
+            
+    - name: Slack Notification
+      if: ${{ env.report && env.Slack_Channel }}
+      uses: hv-actions/slack-action@v3
+      env:
+        SLACK_TOKEN: ${{ env.Slack_Token }}
+      with:
+          raw-input: >
+            {
+              "channel": "${{ env.Slack_Channel }}",
+              "status": "${{ job.status }}",
+              "attachments": [
+                {
+                  "fields": [
+                    ${{ steps.slack-template.outputs.slack-attach-fields }}
+                  ],
+                  "footer": "by ${{ github.actor }}",
+                  "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
+                }  
+              ]      
+            }

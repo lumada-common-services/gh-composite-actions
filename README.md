@@ -1,6 +1,8 @@
 # gh-composite-actions
 As part of bootstrapped [container approach](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584472476/Implementation+Architecture+of+Containerization+Theme) we shall use Composite Actions which allows you to modularise a predefined repeated task  into a single action, combining multiple run commands into a single reusable action. However, they are different from workflow reuse, so you will need a separate repository to manage them. For easy maintenance these composite actions can be populated in an `action.yaml` in separate repo. These composite actions have to be called from the Workflow where the pipeline has to be implemented by passing the necessary variables required for the pipeline to run.
 
+Please refer the confluence for the usage of various composite actions https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30729275169/Standard+parameters+required+for+the+PR+and+merge+composite+actions
+
 Advantages:
 
 1) Breakdown complex workflows into simple self contained modules;
