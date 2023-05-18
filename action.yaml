@@ -171,14 +171,15 @@ runs:
       run: |
         details=""
         commit=""
-        blackduck_result="Blackduck"
+        blackduck_result=""
         blackduck_message=""
         branch="${GITHUB_REF#refs/heads/}"
         if [ "${{ github.event_name }}" == "push" ]; then
             details="<${{ github.event.head_commit.url}}| Details>"
             commit="Commit Message: ${{ github.event.head_commit.message }}"
             
-            if [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ] && [ "${{ env.BLACKDUCK_PROJ_ID }}" != "" ] && [ "${{ env.BLACKDUCK_VERSION_ID }}" != "" ]; then
+            blackduck_result="Blackduck"
+            if [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
               blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
             fi
             
