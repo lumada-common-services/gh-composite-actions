@@ -191,9 +191,13 @@ runs:
         fi
         build_result="<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Build>"
         
-        sonar_result="SonarQube"       
-        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]; then
-          sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&branch=${branch}|${sonar_result}>"
+        Sonar_result="SonarQube"       
+        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]; then         
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&pullRequest=${{ github.event.pull_request.number }}|${Sonar_result}>"
+          elif [ "${{ github.event_name }}" == "push" ]; then         
+          sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&branch=${branch}|${Sonar_result}>"
+          fi
         fi
 
         first_line=false
