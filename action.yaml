@@ -14,6 +14,9 @@ runs:
       run: |
         if [ ! -e $RUNNER_TEMP/icons.properties ]; then
           echo "sonar_scan=x" >> $RUNNER_TEMP/icons.properties
+          echo "build=x" >> $RUNNER_TEMP/icons.properties
+          echo "unit_test=x" >> $RUNNER_TEMP/icons.properties          
+          
           
           if [ "${{ github.event_name }}" == "push" ]; then
             echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
@@ -22,23 +25,38 @@ runs:
           
         fi
 
-    - name: Build, Version Set, Unit Test
+    - name: Commands Execution
       if: ${{ inputs.command }}
       id: run-command
       run: ${{ inputs.command }}
       shell: bash
 
-    - name: Command tracking
+    - name: Commands Execution tracking
       shell: bash
       if: ${{ always() && inputs.command }}
       run: |       
         icon="boom"
-        [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
         
-        cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
-        echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
+        if [ "${{ env.cmd_type }}" == "BUILD" ]; then
+        
+           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"        
+           cmd=$(echo "${{ inputs.Command }}" | sed -e 's/|/\\|/')
+           echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
+           sed -i "s/build=x/build=${icon}/g" $RUNNER_TEMP/icons.properties  
 
-    # Sonar section
+        elif [ "${{ env.cmd_type }}" == "TEST" ]; then
+        
+          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"        
+          cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
+          echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
+          sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties     
+          
+        fi       
+        
+       # Code for no cmd_type passed from the workdflow will be added as a separate PR 
+  
+
+      # Sonar section
     - name: Sonar Scan
       if: ${{ env.sonar_commands }}
       id: sonar-scan
@@ -150,12 +168,15 @@ runs:
         echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $GITHUB_STEP_SUMMARY
         echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
         echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
+        
 
         if [ "${{ github.event_name }}" == "push" ]; then
           echo "| Blackduck Scan | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
           echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
+          echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
+          echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY         
         fi
-        
+   
         # display all commands
         while IFS='=' read -r key value; do
           if [ "$value" == "" ]; then
@@ -200,28 +221,18 @@ runs:
           fi
         fi
 
-        first_line=false
-        build_icon=""
-        while IFS='=' read -r key value; do
-          if [ "$value" == "" ]; then
-            continue
-          fi
-          
-          if [ fist_line == true ]; then
-            break
-          fi
-          build_icon=":${key}:"
-          first_line=true
-        done < "$RUNNER_TEMP/commands.properties"
-
         template="{ \"value\": \"Event: ${{ github.event_name }}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \"${build_result}\", \"short\": true },"
         template="$template{ \"value\": \"${details}\", \"short\": true },"
-        template="$template{ \"value\": \":arrow_right: Result  ${build_icon}\n\", \"short\": true },"
+        template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
+        template="$template{ \"value\": \"Unit Test\", \"short\": true },"
+        template="$template{ \"value\": \"${commit}\", \"short\": true },"        
+        template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \"$sonar_result\", \"short\": true },"
-        template="$template{ \"value\": \"${commit}\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
