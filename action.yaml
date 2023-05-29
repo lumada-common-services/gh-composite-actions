@@ -169,13 +169,31 @@ runs:
         echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
         echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
         echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
-        echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
         
+        
+        sonar_result="${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&"
 
+        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ] && [ "${{ steps.all_icons.outputs.sonar_scan }}" == "white_check_mark" ]; then       
+            if [ "${{ github.event_name }}" == "pull_request" ]; then
+              sonar_result+="pullRequest=${{ github.event.pull_request.number }}"
+            elif [ "${{ github.event_name }}" == "push" ]; then         
+              sonar_result+="branch=${GITHUB_REF#refs/heads/}"
+            fi
+            echo "| [Sonar Scan]($sonar_result) | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
+        else
+            echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
+        fi  
+        
         if [ "${{ github.event_name }}" == "push" ]; then
-          echo "| Blackduck Scan | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
-          echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY                   
-        fi
+          if [ "${{ steps.all_icons.outputs.blackduck_scan }}" == "white_check_mark" ] && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
+            blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
+            echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "| Blackduck Scan | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
+          fi
+          echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
+        fi  
+
    
         # display all commands
         if [ -f "$RUNNER_TEMP/commands.properties" ]; then
@@ -242,6 +260,7 @@ runs:
         template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
         
         echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
+        
             
     - name: Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
