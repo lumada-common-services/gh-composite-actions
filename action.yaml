@@ -166,7 +166,7 @@ runs:
       shell: bash
       run: |
         echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $GITHUB_STEP_SUMMARY
-        echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY 
+        echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
         echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
         echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
 
@@ -193,7 +193,6 @@ runs:
           echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
         fi  
 
-        
         # display all commands
         if [ -f "$RUNNER_TEMP/commands.properties" ]; then
          while IFS='=' read -r key value; do
