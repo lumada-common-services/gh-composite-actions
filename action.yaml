@@ -20,7 +20,7 @@ runs:
           
           if [ "${{ github.event_name }}" == "push" ]; then
             echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
-            echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
+            echo "create_tag=x" >> $RUNNER_TEMP/icons.properties            
           fi
           
         fi
@@ -33,28 +33,27 @@ runs:
 
     - name: Commands Execution tracking
       shell: bash
-      if: ${{ always() && inputs.command }}
+      if: ${{ always() && inputs.Command }}
       run: |       
         icon="boom"
         
         if [ "${{ env.cmd_type }}" == "BUILD" ]; then
         
-           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"        
-           cmd=$(echo "${{ inputs.Command }}" | sed -e 's/|/\\|/')
-           echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
+           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark" 
            sed -i "s/build=x/build=${icon}/g" $RUNNER_TEMP/icons.properties  
 
-        elif [ "${{ env.cmd_type }}" == "TEST" ]; then
+        elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
+        
+          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+          sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties  
+          
+        elif [ "${{ env.cmd_type }}" == "" ]; then         
         
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"        
           cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
-          echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
-          sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties     
+          echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties  
           
-        fi       
-        
-       # Code for no cmd_type passed from the workdflow will be added as a separate PR 
-  
+        fi 
 
       # Sonar section
     - name: Sonar Scan
@@ -167,23 +166,27 @@ runs:
       run: |
         echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $GITHUB_STEP_SUMMARY
         echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
+        echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
+        echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
         echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
+        
+             
         
 
         if [ "${{ github.event_name }}" == "push" ]; then
           echo "| Blackduck Scan | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
-          echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
-          echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
-          echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY         
+          echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY             
         fi
    
         # display all commands
-        while IFS='=' read -r key value; do
-          if [ "$value" == "" ]; then
-            continue
-          fi
-          echo "| ${value} | :${key}: |" >> $GITHUB_STEP_SUMMARY
-        done < "$RUNNER_TEMP/commands.properties"
+        if [ -f "$RUNNER_TEMP/commands.properties" ]; then
+         while IFS='=' read -r key value; do
+           if [ "$value" == "" ]; then
+             continue
+           fi
+           echo "| ${value} | :${key}: |" >> $GITHUB_STEP_SUMMARY
+         done < "$RUNNER_TEMP/commands.properties"
+        fi
         
     - name: Prepare Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
