@@ -173,7 +173,7 @@ runs:
         
         sonar_result="${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&"
 
-        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ] && [ "${{ steps.all_icons.outputs.sonar_scan }}" == "white_check_mark" ]; then       
+        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]  && [ "${{ steps.all_icons.outputs.sonar_scan }}" != "x" ]; then       
             if [ "${{ github.event_name }}" == "pull_request" ]; then
               sonar_result+="pullRequest=${{ github.event.pull_request.number }}"
             elif [ "${{ github.event_name }}" == "push" ]; then         
@@ -185,7 +185,7 @@ runs:
         fi  
         
         if [ "${{ github.event_name }}" == "push" ]; then
-          if [ "${{ steps.all_icons.outputs.blackduck_scan }}" == "white_check_mark" ] && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
+          if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
             blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
             echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
           else
@@ -220,7 +220,7 @@ runs:
             commit="Commit Message: ${{ github.event.head_commit.message }}"
             
             blackduck_result="Blackduck"
-            if [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
+            if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
               blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
             fi
             
@@ -232,7 +232,7 @@ runs:
         fi
         build_result="<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Build>"
         
-        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]; then         
+        if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]  && [ "${{ steps.all_icons.outputs.sonar_scan }}" != "x" ]; then         
           if [ "${{ github.event_name }}" == "pull_request" ]; then
           sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&pullRequest=${{ github.event.pull_request.number }}|SonarQube>"
           elif [ "${{ github.event_name }}" == "push" ]; then         
