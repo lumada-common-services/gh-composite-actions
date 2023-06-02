@@ -17,7 +17,7 @@ runs:
     # uses frogbot gh action, docs refer to https://github.com/jfrog/frogbot/tree/master/docs
     - name: FrogBot
       if: $${{ env.RUN_FROGBOT }}
-      uses: jfrog/frogbot@v2
+      uses: jfrog/frogbot@v2.8.4
       env:
         JF_URL: ${{ env.JF_URL }}
         JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
