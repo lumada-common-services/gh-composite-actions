@@ -217,7 +217,7 @@ runs:
         branch="${GITHUB_REF#refs/heads/}"
         if [ "${{ github.event_name }}" == "push" ]; then
             details="<${{ github.event.head_commit.url}}| Details>"
-            commit="Commit Message: ${{ github.event.head_commit.message }}"
+            commit="$(echo "''${{ github.event.head_commit.message }}" | cut -c1-27) ...''"
             
             blackduck_result="Blackduck"
             if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
@@ -230,7 +230,7 @@ runs:
             details="<${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}| Details>"
         
         fi
-        build_result="<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|Build>"
+        
         
         if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]  && [ "${{ steps.all_icons.outputs.sonar_scan }}" != "x" ]; then         
           if [ "${{ github.event_name }}" == "pull_request" ]; then
@@ -241,10 +241,10 @@ runs:
         else
           sonar_result="SonarQube"        
         fi
-
-        template="{ \"value\": \"Event: ${{ github.event_name }}\", \"short\": true },"
+        workflow_url="<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.event_name }}>"
+        template="{ \"value\": \"Event: $workflow_url\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"${build_result}\", \"short\": true },"
+        template="$template{ \"value\": \"Build\", \"short\": true },"
         template="$template{ \"value\": \"${details}\", \"short\": true },"
         template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
