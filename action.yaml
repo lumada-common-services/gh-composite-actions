@@ -125,6 +125,7 @@ runs:
         tag: '${{ env.Tag_version }}'
         tag_push: '--force'
         pull: '--rebase --autostash'
+        push: ${{ env.push_commit || true }}
 
     - name: Create tag tracking
       shell: bash
