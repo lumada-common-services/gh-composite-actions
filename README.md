@@ -22,9 +22,23 @@ List of Composite Actions:
 
 5) OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
 
-6) Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);
-
-7) Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
+6) Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
+7) Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
+```
+eg.,
+      - name: FrogBot
+        uses: jfrog/frogbot@v2.8.4
+        env:
+          JF_URL: ${{ secrets.JF_URL }}
+          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          JF_WORKING_DIR: ./frontend
+```
+Note:
+JF_WORKING_DIR: we need to explicitly mention the WORK DIR for the scan as mentioned above or else it will scan the entire root directory
+                                                                                                                            
+                                                                                     
+8) Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
 
 
 Sample code snippet for Calling Composite Actions:
