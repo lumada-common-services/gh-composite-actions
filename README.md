@@ -24,7 +24,7 @@ List of Composite Actions:
 
 6) Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);
 
-7) Tag: Commit the changes available in the workspace and tag the code as per the latest commit id.
+7) Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
 
 
 Sample code snippet for Calling Composite Actions:
