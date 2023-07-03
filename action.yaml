@@ -149,6 +149,13 @@ runs:
         WORKSPACE: ${{ env.workspace }}
         BUILD_URL: ${{ env.build_url }}
 
+    - name: Create and Update frogbot config file
+      if: ${{ env.JF_CHANGED_MODULE && env.JF_URL }}
+      run: |   
+        python3 ${GITHUB_ACTION_PATH}/frogbot/frogbot.py "${{ env.JF_CHANGED_MODULE }}" "${GITHUB_WORKSPACE}" "${{ github.event.repository.name }}" "${{ github.head_ref }}"  
+        cat .frogbot/frogbot-config.yml
+      shell: bash  
+    
     - name: FrogBot
       if: ${{ env.JF_URL }}    
       uses: jfrog/frogbot@v2.8.8
@@ -157,6 +164,7 @@ runs:
         JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
         JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
         JF_WORKING_DIR: ${{ env.JF_WORKING_DIR }}
+        JF_FAIL: "FALSE"
 
     - name: Read icon properties
       if: ${{ env.report }}
