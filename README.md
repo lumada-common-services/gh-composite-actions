@@ -46,15 +46,17 @@ main workflow:
 that correspond to in the composite action:
 
 ```
+# Blackduck section
 - name: Blackduck Scan
   if: ${{ env.BlackDuck_Project_Name }}
+  id: blackduck-scan
   uses: addnab/docker-run-action@v3
   with:
-    image: blackducksoftware/detect:8
-    options:  --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
+    image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:8
+    options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
     run: |
-     java -jar /synopsys-detect.jar \
-      --detect.source.path=/workdir \
+      java -jar /synopsys-detect.jar \
+      --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
       --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
       --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
       --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
