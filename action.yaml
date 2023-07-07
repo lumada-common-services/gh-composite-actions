@@ -160,7 +160,7 @@ runs:
 
     - name: Creating Kind Cluster 
       id: cluster-creation
-      if: ${{env.KIND_CLUSTER_NAME && env.SERVICE_CONTAINER_NAME }}
+      if: ${{env.KIND_CLUSTER_NAME }}
       run: |
         docker exec -i kind-container kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/kind_config.yaml 
         docker exec -i kind-container kind export kubeconfig --name ${{ env.KIND_CLUSTER_NAME }} --kubeconfig /mnt/kubeconfig
