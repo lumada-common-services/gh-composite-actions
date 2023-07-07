@@ -158,6 +158,21 @@ runs:
         JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
         JF_WORKING_DIR: ${{ env.JF_WORKING_DIR }}
 
+    - name: Creating Kind Cluster 
+      id: cluster-creation
+      if: ${{env.KIND_CLUSTER_NAME && env.SERVICE_CONTAINER_NAME }}
+      run: |
+        docker exec -i ${{env.SERVICE_CONTAINER_NAME}} kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/kind_config.yaml 
+        docker exec -i ${{env.SERVICE_CONTAINER_NAME}} kind export kubeconfig --name ${{ env.KIND_CLUSTER_NAME }} --kubeconfig /mnt/kubeconfig
+        docker exec -i ${{env.SERVICE_CONTAINER_NAME}} kind get clusters
+        sleep 15s
+        docker network connect kind bootstrap-image
+        kubectl config set-cluster kind-${{ env.KIND_CLUSTER_NAME }} --server=https://${{ env.KIND_CLUSTER_NAME }}-control-plane:6443 --kubeconfig=./kubeconfig
+
+    - name: Deleting kind cluster
+      if: ${{ always() }}  
+      run: docker exec -i ${{env.SERVICE_CONTAINER_NAME}} kind delete cluster --name ${{ env.KIND_CLUSTER_NAME }} 
+
     - name: Read icon properties
       if: ${{ env.report }}
       id: all_icons
