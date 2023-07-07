@@ -170,11 +170,6 @@ runs:
         kubectl config set-cluster kind-${{ env.KIND_CLUSTER_NAME }} --server=https://${{ env.KIND_CLUSTER_NAME }}-control-plane:6443 --kubeconfig=./kubeconfig
       shell: bash
 
-    - name: Deleting kind cluster
-      if: ${{ always() }}  
-      run: docker exec -i kind-container kind delete cluster --name ${{ env.KIND_CLUSTER_NAME }} 
-      shell: bash
-
     - name: Read icon properties
       if: ${{ env.report }}
       id: all_icons
