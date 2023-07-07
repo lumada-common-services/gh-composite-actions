@@ -162,7 +162,7 @@ runs:
       id: cluster-creation
       if: ${{env.KIND_CLUSTER_NAME }}
       run: |
-        docker exec -i kind-container kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/kind_config.yaml 
+        docker exec -i kind-container kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/kind_config.yaml --kubeconfig /mnt/kubeconfig
         docker exec -i kind-container kind export kubeconfig --name ${{ env.KIND_CLUSTER_NAME }} --kubeconfig /mnt/kubeconfig
         docker exec -i kind-container kind get clusters
         sleep 15s
@@ -174,7 +174,7 @@ runs:
       if: ${{ always() }}  
       run: docker exec -i kind-container kind delete cluster --name ${{ env.KIND_CLUSTER_NAME }} 
       shell: bash
-      
+
     - name: Read icon properties
       if: ${{ env.report }}
       id: all_icons
