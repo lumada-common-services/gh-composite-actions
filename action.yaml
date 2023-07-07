@@ -165,9 +165,13 @@ runs:
         docker exec -i kind-container kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/kind_config.yaml 
         docker exec -i kind-container kind export kubeconfig --name ${{ env.KIND_CLUSTER_NAME }} --kubeconfig /mnt/kubeconfig
         docker exec -i kind-container kind get clusters
-        sleep 15s
         docker network connect kind bootstrap-image
         kubectl config set-cluster kind-${{ env.KIND_CLUSTER_NAME }} --server=https://${{ env.KIND_CLUSTER_NAME }}-control-plane:6443 --kubeconfig=./kubeconfig
+      shell: bash
+    
+    - name: Deleting Kind Cluster
+      if: ${{env.DEL_KIND_CLUSTER_NAME}}
+      run : docker exec -i kind-container kind delete cluster --name ${{ env.DEL_KIND_CLUSTER_NAME }} 
       shell: bash
 
     - name: Read icon properties
