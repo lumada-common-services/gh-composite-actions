@@ -162,10 +162,10 @@ runs:
       id: cluster-creation
       if: ${{env.KIND_CLUSTER_NAME }}
       run: |
-        docker exec -i kind-container kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/kind_config.yaml 
-        docker exec -i kind-container kind export kubeconfig --name ${{ env.KIND_CLUSTER_NAME }} --kubeconfig /mnt/kubeconfig
+        docker exec -i kind-container kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/${{env.CONFIG_FILE_NAME}}                              # Creating a kind cluster inside of kind-container where the Configuration file is at the root level 
+        docker exec -i kind-container kind export kubeconfig --name ${{ env.KIND_CLUSTER_NAME }} --kubeconfig /mnt/kubeconfig                                      # Exporting kubeconfig file to /mnt folder mapped to GitHub workspace
         docker exec -i kind-container kind get clusters
-        docker network connect kind bootstrap-image
+        docker network connect kind bootstrap-image                                                                                                                # Connecting Bootstrap image to a kind network                        
         kubectl config set-cluster kind-${{ env.KIND_CLUSTER_NAME }} --server=https://${{ env.KIND_CLUSTER_NAME }}-control-plane:6443 --kubeconfig=./kubeconfig
       shell: bash
     
