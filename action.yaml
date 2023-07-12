@@ -172,7 +172,7 @@ runs:
     - name: Deleting Kind Cluster
       id: cluster-deletion
       if: ${{env.KIND_CLUSTER_NAME && env.KIND_CLUSTER_ACTION == 'DELETE' }}
-      run : docker exec -i kind-container kind delete cluster --name ${{ env.DEL_KIND_CLUSTER_NAME }} 
+      run : docker exec -i kind-container kind delete cluster --name ${{ env.KIND_CLUSTER_NAME }} 
       shell: bash
 
     - name: Read icon properties
