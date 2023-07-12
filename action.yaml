@@ -160,7 +160,7 @@ runs:
 
     - name: Creating Kind Cluster 
       id: cluster-creation
-      if: ${{env.KIND_CLUSTER_NAME }}
+      if: ${{env.KIND_CLUSTER_NAME && env.KIND_CLUSTER_ACTION == 'CREATE' }
       run: |
         docker exec -i kind-container kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/${{env.CONFIG_FILE_NAME}}                              # Creating kind cluster inside of kind-container where Configuration file is at root level 
         docker exec -i kind-container kind export kubeconfig --name ${{ env.KIND_CLUSTER_NAME }} --kubeconfig /mnt/kubeconfig                                      # Exporting kubeconfig file to /mnt folder mapped to github workspace
@@ -170,7 +170,8 @@ runs:
       shell: bash
     
     - name: Deleting Kind Cluster
-      if: ${{env.DEL_KIND_CLUSTER_NAME}}
+      id: cluster-deletion
+      if: ${{env.KIND_CLUSTER_NAME && env.KIND_CLUSTER_ACTION == 'DELETE' }}
       run : docker exec -i kind-container kind delete cluster --name ${{ env.DEL_KIND_CLUSTER_NAME }} 
       shell: bash
 
