@@ -35,6 +35,12 @@ eg.,
           JF_WORKING_DIR: ./frontend
 ```
 Note:
+
+1)JF_WORKING_DIR: we need to explicitly mention the WORK DIR for the scan as mentioned above or else it will scan the entire root directory.
+
+2)When using Frogbot scan with `changed_modules`, the bootstrap image must have both Python and the PYYAML package installed. And we need to use these env variable `JF_CHANGED_PATHS: "${{ steps.change_detection.outputs.changed_modules }}"` to scan only for changed_modules.
+                                                                                                                            
+                                                                                     
 JF_WORKING_DIR: we need to explicitly mention the WORK DIR for the scan as mentioned above or else it will scan the entire root directory
                                                                                                                             
                                                                                      
