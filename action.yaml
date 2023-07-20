@@ -162,6 +162,40 @@ runs:
         WORKSPACE: ${{ env.workspace }}
         BUILD_URL: ${{ env.build_url }}
 
+    - name: Create and Update frogbot config file
+      if: ${{ env.JF_CHANGED_PATHS && env.JF_URL }}
+      run: |   
+        python3 ${GITHUB_ACTION_PATH}/frogbot/frogbot.py "${{ env.JF_CHANGED_PATHS }}" "${GITHUB_WORKSPACE}" "${{ github.event.repository.name }}" "${{ github.head_ref }}"  
+        cat .frogbot/frogbot-config.yml
+      shell: bash  
+    
+    - name: FrogBot
+      if: ${{ env.JF_URL }}    
+      uses: jfrog/frogbot@v2.8.8
+      env:
+        JF_URL: ${{ env.JF_URL }}
+        JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
+        JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
+        JF_WORKING_DIR: ${{ env.JF_WORKING_DIR }}
+        JF_FAIL: "FALSE"
+
+    - name: Creating Kind Cluster 
+      id: cluster-creation
+      if: ${{env.KIND_CLUSTER_NAME && env.KIND_CLUSTER_ACTION == 'CREATE' }}
+      run: |
+        docker exec -i kind-container kind create cluster --name ${{ env.KIND_CLUSTER_NAME }} --config /mnt/${{env.CONFIG_FILE_NAME}}                              # Creating kind cluster inside of kind-container where Configuration file is at root level 
+        docker exec -i kind-container kind export kubeconfig --name ${{ env.KIND_CLUSTER_NAME }} --kubeconfig /mnt/kubeconfig                                      # Exporting kubeconfig file to /mnt folder mapped to github workspace
+        docker exec -i kind-container kind get clusters
+        docker network connect kind bootstrap-image                                                                                                                # Connecting Bootstrap image to kind network                        
+        kubectl config set-cluster kind-${{ env.KIND_CLUSTER_NAME }} --server=https://${{ env.KIND_CLUSTER_NAME }}-control-plane:6443 --kubeconfig=./kubeconfig
+      shell: bash
+    
+    - name: Deleting Kind Cluster
+      id: cluster-deletion
+      if: ${{env.KIND_CLUSTER_NAME && env.KIND_CLUSTER_ACTION == 'DELETE' }}
+      run : docker exec -i kind-container kind delete cluster --name ${{ env.KIND_CLUSTER_NAME }} 
+      shell: bash
+
     - name: Read icon properties
       if: ${{ env.report }}
       id: all_icons
@@ -274,7 +308,6 @@ runs:
         template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
 
         echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
-
 
     - name: Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
