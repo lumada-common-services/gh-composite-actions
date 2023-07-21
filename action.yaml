@@ -230,7 +230,8 @@ runs:
         else
             echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
         fi
-
+             
+        echo "Blackduck icon ${{ steps.all_icons.outputs.blackduck_scan }}"
         if [ "${{ github.event_name }}" == "push" ] || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
           if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
             blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
