@@ -264,7 +264,11 @@ runs:
         blackduck_message=""
         branch="${GITHUB_REF#refs/heads/}"
         if [ "${{ github.event_name }}" == "push" ]  || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
-            details="<${{ github.event.head_commit.url}}| Details>"
+            if [ -z "${{ github.event.head_commit.url }}" ]; then
+              details="Details"
+            else
+              details="<${{ github.event.head_commit.url }}| Details>"
+            fi
             commit="$(echo "''${{ github.event.head_commit.message }}" | cut -c1-27) ...''"
 
             blackduck_result="Blackduck"
