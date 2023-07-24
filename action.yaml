@@ -273,7 +273,6 @@ runs:
             # Check if the commit message is empty.
             if [ -z "$commit" ]; then
               # If it's empty, set a default message based on the triggering event.
-              commit="Triggered by ${{ github.event_name }}."
               commit="$(echo "''Triggered by ${{ github.event_name }}")''"
             else
               commit="$(echo "''${{ github.event.head_commit.message }}" | cut -c1-27) ...''"
