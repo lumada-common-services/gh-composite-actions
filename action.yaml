@@ -273,7 +273,7 @@ runs:
             # Check if the commit message is empty.
             if [ -z "$commit" ]; then
               # If it's empty, set a default message based on the triggering event.
-              commit=""Triggered by ${{ github.event_name }}.""
+              commit="\"Workflow was triggered by ${{ github.event_name }} event.\""
             else
               commit="$(echo "''${{ github.event.head_commit.message }}" | cut -c1-27) ...''"
             fi
