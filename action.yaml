@@ -276,7 +276,7 @@ runs:
               # If it's empty, set a default message based on the triggering event.
               commit="$(echo "''Triggered by ${{ github.event_name }}")''"
             else
-              commit="$(echo "$commit" | tr -d '\n' | cut -c1-27) ...''"          
+              commit="$(echo "''$commit" | tr -d '\n' | cut -c1-27) ...''"          
             fi
 
             blackduck_result="Blackduck"
