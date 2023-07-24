@@ -270,7 +270,11 @@ runs:
               details="<${{ github.event.head_commit.url }}| Details>"
             fi
             commit="$(echo "''${{ github.event.head_commit.message }}" | cut -c1-27) ...''"
-
+            # Check if the commit message is empty.
+            if [ -z "$commit" ]; then
+              # If it's empty, set "github.event_name" as a message.
+              commit="Workflow was triggered by ${{ github.event_name }} event."
+            fi
             blackduck_result="Blackduck"
             if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
               blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
