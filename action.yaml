@@ -265,6 +265,7 @@ runs:
         branch="${GITHUB_REF#refs/heads/}"
         if [ "${{ github.event_name }}" == "push" ]  || [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             if [ -z "${{ github.event.head_commit.url }}" ]; then
+              # If ${{ github.event.head_commit.url }} empty, set a default value.
               details="Details"
             else
               details="<${{ github.event.head_commit.url }}| Details>"
@@ -277,7 +278,7 @@ runs:
             else
               commit="$(echo "$commit" | tr -d '\n' | cut -c1-27) ...''"          
             fi
-            
+
             blackduck_result="Blackduck"
             if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
               blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
