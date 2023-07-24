@@ -272,7 +272,6 @@ runs:
             commit="$(echo "''${{ github.event.head_commit.message }}" | cut -c1-27) ...''"
             # Check if the commit message is empty.
             if [ -z "$commit" ]; then
-              # If it's empty, set "github.event_name" as a message.
               commit="Workflow was triggered by ${{ github.event_name }} event."
             fi
             blackduck_result="Blackduck"
