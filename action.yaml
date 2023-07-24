@@ -276,7 +276,7 @@ runs:
               commit="$(echo "''Triggered by ${{ github.event_name }}")''"
             else           
               commit=$(echo "$commit" | tr -d '\n')
-              commit="$(echo "''$commit}" | cut -c1-27) ...''" 
+              commit="$(echo "''$commit" | cut -c1-27) ...''" 
             fi
             blackduck_result="Blackduck"
             if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
