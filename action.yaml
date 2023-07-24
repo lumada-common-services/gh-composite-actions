@@ -1,8 +1,7 @@
 name: Workflow Template
 description: "Composite Action Template"
 inputs:
-  command:
-    required: true
+  command:   
     description: "A command line statement"
 
 runs:
@@ -264,8 +263,9 @@ runs:
         branch="${GITHUB_REF#refs/heads/}"
         if [ "${{ github.event_name }}" == "push" ]; then
             details="<${{ github.event.head_commit.url}}| Details>"
-            commit="$(echo "''${{ github.event.head_commit.message }}" | cut -c1-27) ...''"
-
+            commit="${{ github.event.head_commit.message }}"            
+            commit=$(echo "$commit" | tr -d '\n')
+            commit="$(echo "''$commit}" | cut -c1-27) ...''" 
             blackduck_result="Blackduck"
             if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
               blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
