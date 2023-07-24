@@ -274,10 +274,10 @@ runs:
             if [ -z "$commit" ]; then
               # If it's empty, set a default message based on the triggering event.
               commit="$(echo "''Triggered by ${{ github.event_name }}")''"
-            else           
-              commit=$(echo "$commit" | tr -d '\n')
-              commit="$(echo "''$commit" | cut -c1-27) ...''" 
+            else
+              commit="$(echo "$commit" | tr -d '\n' | cut -c1-27) ...''"          
             fi
+            
             blackduck_result="Blackduck"
             if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
               blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
