@@ -17,7 +17,7 @@ runs:
           echo "unit_test=x" >> $RUNNER_TEMP/icons.properties
 
 
-          if [ "${{ github.event_name }}" == "push" ]; then
+          if [ "${{ github.event_name }}" != "pull_request" ]; then
             echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
             echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
           fi
@@ -229,8 +229,8 @@ runs:
         else
             echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
         fi
-
-        if [ "${{ github.event_name }}" == "push" ]; then
+             
+        if [ "${{ github.event_name }}" != "pull_request" ]; then
           if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
             blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
             echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
@@ -261,11 +261,22 @@ runs:
         blackduck_result=""
         blackduck_message=""
         branch="${GITHUB_REF#refs/heads/}"
-        if [ "${{ github.event_name }}" == "push" ]; then
-            details="<${{ github.event.head_commit.url}}| Details>"
-            commit="${{ github.event.head_commit.message }}"            
-            commit=$(echo "$commit" | tr -d '\n')
-            commit="$(echo "''$commit}" | cut -c1-27) ...''" 
+        if [ "${{ github.event_name }}" != "pull_request" ]; then
+            if [ -z "${{ github.event.head_commit.url }}" ]; then
+              # If ${{ github.event.head_commit.url }} empty, set a default value.
+              details="Details"
+            else
+              details="<${{ github.event.head_commit.url }}| Details>"
+            fi
+            commit="${{ github.event.head_commit.message }}"
+            # Check if the commit message is empty.
+            if [ -z "$commit" ]; then
+              # If it's empty, set a default message based on the triggering event.
+              commit="$(echo "''Triggered by ${{ github.event_name }}")''"
+            else
+              commit="$(echo "''$commit" | tr '\n' ' ' | sed 's/ \+/ /g' | cut -c1-27)...''"      
+            fi
+
             blackduck_result="Blackduck"
             if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
               blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
