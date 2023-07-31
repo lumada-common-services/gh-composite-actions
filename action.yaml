@@ -1,7 +1,7 @@
 name: Workflow Template
 description: "Composite Action Template"
 inputs:
-  command:   
+  command:
     description: "A command line statement"
 
 runs:
