@@ -291,9 +291,9 @@ runs:
 
 
         if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]  && [ "${{ steps.all_icons.outputs.sonar_scan }}" != "x" ]; then
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          if [ "${{ github.event_name }}" != "push" ]; then
           sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&pullRequest=${{ github.event.pull_request.number }}|SonarQube>"
-          elif [ "${{ github.event_name }}" == "push" ]; then
+          else
           sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&branch=${branch}|SonarQube>"
           fi
         else
