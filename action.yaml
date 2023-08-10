@@ -230,7 +230,7 @@ runs:
             echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
         fi
              
-        if [ "${{ github.event_name }}" != "pull_request" ]; then
+        if [ "${{ github.event_name }}" == "push" ]; then
           if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
             blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
             echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
@@ -261,7 +261,7 @@ runs:
         blackduck_result=""
         blackduck_message=""
         branch="${GITHUB_REF#refs/heads/}"
-        if [ "${{ github.event_name }}" != "pull_request" ]; then
+        if [ "${{ github.event_name }}" == "push" ]; then
             if [ -z "${{ github.event.head_commit.url }}" ]; then
               # If ${{ github.event.head_commit.url }} empty, set a default value.
               details="Details"
@@ -284,7 +284,7 @@ runs:
 
             blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
 
-        elif [ "${{ github.event_name }}" == "pull_request" ]; then
+        else
             details="<${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}| Details>"
 
         fi
