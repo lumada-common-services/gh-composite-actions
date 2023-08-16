@@ -3,48 +3,68 @@ As part of bootstrapped [container approach](https://hv-eng.atlassian.net/wiki/s
 
 Advantages:
 
-1) Breakdown complex workflows into simple self contained modules;
+1. Breakdown complex workflows into simple self contained modules;
 
-2) Create templatized actions which can be called from multiple workflows there by enhancing the reusability;
+2. Create templatized actions which can be called from multiple workflows there by enhancing the reusability;
 
-3) The descriptive nature of an `action.yml` file improves the readability of a GitHub workflow when understanding necessary inputs and outputs.
+3. The descriptive nature of an `action.yml` file improves the readability of a GitHub workflow when understanding necessary inputs and outputs.
 
 
 List of Composite Actions:
 
-1) Build: Please refer to the link how we defined the composite action for [build](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30470897989/Build);
+1. Build: Please refer to the link how we defined the composite action for [build](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30470897989/Build);
+2. Unit Test: Please refer to the link how we defined the composite action for [unit tests](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471323921/Testing);
 
-2) Unit Test: Please refer to the link how we defined the composite action for [unit tests](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471323921/Testing);
+      ```
+      eg.
+        - name: Unit Test Maven
+          uses: lumada-common-services/gh-composite-actions@develop
+          with:
+            command: |
+              mvn verify -B -Daudit -amd -Dmaven.test.failure.ignore=true 
+          env:
+            cmd_type: UNIT_TEST 
+            reporter: 'java-junit'
+            test_report_path: '**/target/*/*.xml'
+            copy-to-target-path: './test_report'
+            fail-on-error: 'false'
+      ```
+      Note:
 
-3) Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
+      1. reporter: Supported options for the format of test results:(dart-json,dotnet-trx,flutter-json,java-junit,jest-junit,mocha-json).
 
-4) Blackduck Scan: Please refer to the link how we defined the composite action for [blackduck scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471291264/Software+Composition+Analysis+Blackduck);
+      2. test_report_path: Folder path where the complete test reports are automatically generated upon the execution of test cases.
 
-5) OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
+      3. copy-to-target-path: Destination folder path where the reports need to be copied from their default location.
 
-6) Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
-7) Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
-```
-eg.,
-      - name: FrogBot
-        uses: jfrog/frogbot@v2.8.4
-        env:
-          JF_URL: ${{ secrets.JF_URL }}
-          JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
-          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          JF_WORKING_DIR: ./frontend
-```
-Note:
+      4. fail-on-error: It's boolean-type parameter that determines whether the workflow should be marked as failed if there are any test cases that have failed.
 
-1)JF_WORKING_DIR: we need to explicitly mention the WORK DIR for the scan as mentioned above or else it will scan the entire root directory.
 
-2)When using Frogbot scan with `changed_modules`, the bootstrap image must have both Python and the PYYAML package installed. And we need to use these env variable `JF_CHANGED_PATHS: "${{ steps.change_detection.outputs.changed_modules }}"` to scan only for changed_modules.
-                                                                                                                            
-                                                                                     
-JF_WORKING_DIR: we need to explicitly mention the WORK DIR for the scan as mentioned above or else it will scan the entire root directory
-                                                                                                                            
-                                                                                     
-8) Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
+3. Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
+
+4. Blackduck Scan: Please refer to the link how we defined the composite action for [blackduck scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471291264/Software+Composition+Analysis+Blackduck);
+
+5. OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
+
+6. Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
+7. Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
+      ```
+      eg.
+        - name: FrogBot
+          uses: jfrog/frogbot@v2.8.4
+          env:
+            JF_URL: ${{ secrets.JF_URL }}
+            JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
+            JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            JF_WORKING_DIR: ./frontend
+      ```
+      Note:
+
+      1. JF_WORKING_DIR: we need to explicitly mention the WORK_DIR for the scan as mentioned above or else it will scan the entire root directory.
+
+      2. When using Frogbot scan with `changed_modules`, the bootstrap image must have both Python and the PYYAML package installed. And we need to use these env variable `JF_CHANGED_PATHS: "${{ steps.change_detection.outputs.changed_modules }}"` to scan only for changed_modules.
+
+8. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
 
 
 Sample code snippet for Calling Composite Actions:
