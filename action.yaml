@@ -6,8 +6,7 @@ inputs:
 
 runs:
   using: "composite"
-  steps:
-
+  steps: 
     - name: Setup Steps Tracking
       shell: bash
       run: |
@@ -54,6 +53,66 @@ runs:
 
         fi
 
+    - name: Test Report
+      uses: dorny/test-reporter@v1
+      id : test-result
+      if: ${{ env.cmd_type == 'UNIT_TEST' &&  env.test_report_path !='' && env.reporter !='' }}                   
+      with:
+        name: ${{ github.job }}-Unit Test                          
+        path: ${{ env.test_report_path}}              # '**/target/**/*.xml'   
+        reporter: ${{ env.reporter }}                 # Format of test results. 
+        only-summary: 'true' 
+        fail-on-error: ${{ env.fail-on-error || false }}     # Set action as failed if test report contains any failed test
+
+    - name: Copy test report to target folder
+      if: ${{ always() && env.copy-to-target-path !='' && env.cmd_type == 'UNIT_TEST' }}
+      run: |
+        # checking destination folder exist or not.
+        if [ ! -d "${{env.copy-to-target-path}}" ]; then
+          echo -e "\e[31mError\e[0m: Destination folder does not exist!"
+        else
+          echo "Copy report files to target folder......"
+          cp ${{ env.test_report_path}} ${{env.copy-to-target-path}}
+        fi
+      shell: bash
+
+
+    - name: Fetch Unit Test Report Url 
+      if: ${{ always() && env.cmd_type == 'UNIT_TEST' }}
+      id: unit-test-report
+      env:
+        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
+      run: |
+          # Call the GitHub API to get check runs associated with the push event
+          response=$(curl -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" \
+                    "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-runs")
+
+          # Job Name to search  
+          search_name="${{github.job}}-Unit Test"     
+
+          # Search for the starting line number of the JSON object with the specified "name" value.
+          # If grep or cut commands don't find a match (exit with non-zero status),
+          # the 'true' command ensures an overall success status (exit status 0),
+          # preventing the entire line from failing regardless of match result.
+          start_line=$(echo "$response" | grep -n '"name": "'"$search_name"'"' | cut -d ':' -f 1 || true) 
+
+          if [ -n "$start_line" ]; then
+
+              # Search for the ending line number of the JSON object
+              end_line=$(echo "$response" | awk -v start="$start_line" 'NR >= start && /}/ { print NR; exit }')
+
+              # Extract the JSON object lines
+              extracted_object=$(echo "$response" | sed -n "$start_line","$end_line"p)
+
+              html_url=$(echo "$extracted_object" | grep -o '"html_url": "[^"]*' | awk -F '"html_url": "' '{print $2}' | sed 's/",//')
+          else
+              html_url=""
+          fi
+          
+          # Passing report url to "$RUNNER_TEMP/links.txt" file
+          echo "url=$html_url" > $RUNNER_TEMP/links.txt
+
+      shell: bash    
 
       # Sonar section
     - name: Sonar Scan
@@ -207,6 +266,18 @@ runs:
           echo "$prop" >> $GITHUB_OUTPUT
         done
 
+    - name: Read unit test report url
+      if: ${{ env.report }}
+      id: unit_test_url
+      shell: bash
+      run: |
+        if [ -f $RUNNER_TEMP/links.txt ]; then
+          value=$(cat $RUNNER_TEMP/links.txt)
+          echo "$value" >> $GITHUB_OUTPUT
+        else
+          echo "url=" >> $GITHUB_OUTPUT
+        fi   
+           
     - name: Report Summary Tracking
       if: ${{ env.report }}
       shell: bash
@@ -214,15 +285,19 @@ runs:
         echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $GITHUB_STEP_SUMMARY
         echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
         echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
-        echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
-
+        
+        if [ "${{ steps.all_icons.outputs.unit_test }}" != "x" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
+          echo "| [Unit Test](${{ steps.unit_test_url.outputs.url }}) | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
+        fi
 
         sonar_result="${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&"
 
         if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]  && [ "${{ steps.all_icons.outputs.sonar_scan }}" != "x" ]; then
-            if [ "${{ github.event_name }}" == "pull_request" ]; then
+            if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
               sonar_result+="pullRequest=${{ github.event.pull_request.number }}"
-            elif [ "${{ github.event_name }}" == "push" ]; then
+            else
               sonar_result+="branch=${GITHUB_REF#refs/heads/}"
             fi
             echo "| [Sonar Scan]($sonar_result) | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
@@ -230,7 +305,7 @@ runs:
             echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
         fi
              
-        if [ "${{ github.event_name }}" == "push" ]; then
+        if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
           if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
             blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
             echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
@@ -261,7 +336,14 @@ runs:
         blackduck_result=""
         blackduck_message=""
         branch="${GITHUB_REF#refs/heads/}"
-        if [ "${{ github.event_name }}" == "push" ]; then
+
+        if [ "${{ steps.all_icons.outputs.unit_test }}" != "x" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
+          unit_test="<${{ steps.unit_test_url.outputs.url }}|Unit Test>"
+        else
+          unit_test="Unit Test"
+        fi
+
+        if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
             if [ -z "${{ github.event.head_commit.url }}" ]; then
               # If ${{ github.event.head_commit.url }} empty, set a default value.
               details="Details"
@@ -284,17 +366,17 @@ runs:
 
             blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
 
-        else
+        elif [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             details="<${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}| Details>"
 
         fi
 
 
         if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]  && [ "${{ steps.all_icons.outputs.sonar_scan }}" != "x" ]; then
-          if [ "${{ github.event_name }}" != "push" ]; then
-          sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&pullRequest=${{ github.event.pull_request.number }}|SonarQube>"
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
+            sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&pullRequest=${{ github.event.pull_request.number }}|SonarQube>"
           else
-          sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&branch=${branch}|SonarQube>"
+            sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&branch=${branch}|SonarQube>"
           fi
         else
           sonar_result="SonarQube"
@@ -306,7 +388,7 @@ runs:
         template="$template{ \"value\": \"${details}\", \"short\": true },"
         template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
-        template="$template{ \"value\": \"Unit Test\", \"short\": true },"
+        template="$template{ \"value\": \"$unit_test\", \"short\": true },"
         template="$template{ \"value\": \"${commit}\", \"short\": true },"
         template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
