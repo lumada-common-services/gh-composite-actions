@@ -295,7 +295,7 @@ runs:
         sonar_result="${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&"
 
         if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]  && [ "${{ steps.all_icons.outputs.sonar_scan }}" != "x" ]; then
-            if [ "${{ github.event_name }}" == "pull_request" ]; then
+            if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
               sonar_result+="pullRequest=${{ github.event.pull_request.number }}"
             else
               sonar_result+="branch=${GITHUB_REF#refs/heads/}"
@@ -305,7 +305,7 @@ runs:
             echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
         fi
              
-        if [ "${{ github.event_name }}" != "pull_request" ]; then
+        if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
           if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
             blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
             echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
@@ -343,7 +343,7 @@ runs:
           unit_test="Unit Test"
         fi
 
-        if [ "${{ github.event_name }}" != "pull_request" ]; then
+        if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
             if [ -z "${{ github.event.head_commit.url }}" ]; then
               # If ${{ github.event.head_commit.url }} empty, set a default value.
               details="Details"
@@ -366,14 +366,14 @@ runs:
 
             blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
 
-        elif [ "${{ github.event_name }}" == "pull_request" ]; then
+        elif [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             details="<${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}| Details>"
 
         fi
 
 
         if [ "${{ env.SONAR_HOST_URL }}" != "" ] && [ "${{ env.SONAR_PROJECT_KEY }}" != "" ]  && [ "${{ steps.all_icons.outputs.sonar_scan }}" != "x" ]; then
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&pullRequest=${{ github.event.pull_request.number }}|SonarQube>"
           else
             sonar_result="<${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&branch=${branch}|SonarQube>"
