@@ -135,7 +135,7 @@ runs:
       id: citadel 
       shell: bash
       run: |
-        curl -vX POST 'http://${{ env.citadel-host }}/citadel' -d @${{ github.workspace }}/${{ env.CITADEL_JSON_PATH }} --header 'Content-Type: application/json'  
+        curl -vX POST 'http://${{ env.citadel-host }}/citadel' -d @${{ github.workspace }}/${{ env.CITADEL_JSON_PATH }} --header 'Content-Type: application/json' --header 'Connection: close'  
 
     # Blackduck section
     - name: Blackduck Scan
