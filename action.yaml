@@ -282,7 +282,7 @@ runs:
       if: ${{ env.report }}
       shell: bash
       run: |
-        echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $GITHUB_STEP_SUMMARY
+        echo "| <div style="max-width:60%">Step/Command</div> | Status |" >> $GITHUB_STEP_SUMMARY
         echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
         echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
         
@@ -325,6 +325,8 @@ runs:
            echo "| ${value} | :${key}: |" >> $GITHUB_STEP_SUMMARY
          done < "$RUNNER_TEMP/commands.properties"
         fi
+
+        echo " > Note - Success :white_check_mark: , Executed But Failed :boom:  and Skipped/Not Executed :x: " >> $GITHUB_STEP_SUMMARY
 
     - name: Prepare Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
