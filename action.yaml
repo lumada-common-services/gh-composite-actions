@@ -131,13 +131,12 @@ runs:
 
     # Citadel
     - name: Upload to the citadel host
-      if: ${{ env.Citadel_json_path }}
+      if: ${{ env.CITADEL_JSON_PATH }}
       id: citadel 
       shell: bash
       run: |
         ls -l ${{ github.workspace }}
-        cat ${{ env.project-name }}.json
-        curl -vX POST 'http://${{ env.citadel-host }}/citadel' -d @${{ github.workspace }}/${{ env.project-name }}.json --header 'Content-Type: application/json'  
+        curl -vX POST 'http://${{ env.citadel-host }}/citadel' -d @${{ github.workspace }}/${{ env.CITADEL_JSON_PATH }} --header 'Content-Type: application/json'  
 
     # Blackduck section
     - name: Blackduck Scan
