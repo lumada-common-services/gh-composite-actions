@@ -129,6 +129,16 @@ runs:
 
         sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
+    # Citadel
+    - name: Upload to the citadel host
+      if: ${{ env.Citadel_json_path }}
+      id: citadel 
+      shell: bash
+      run: |
+        ls -l ${{ github.workspace }}
+        cat ${{ env.project-name }}.json
+        curl -vX POST 'http://${{ env.citadel-host }}/citadel' -d @${{ github.workspace }}/${{ env.project-name }}.json --header 'Content-Type: application/json'  
+
     # Blackduck section
     - name: Blackduck Scan
       if: ${{ env.BlackDuck_Project_Name }}
