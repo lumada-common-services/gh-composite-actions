@@ -128,6 +128,13 @@ runs:
         [[ "${{ steps.sonar-scan.outcome }}" == "success" ]] && icon="white_check_mark"
 
         sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
+    
+    - uses: actions/checkout@v3
+      if: ${{ env.CITADEL_JSON_PATH }}
+      with:
+        ref: YKN-256
+        repository: hv-devsecops/citadel
+        token: ${{ env.DEVSECOPS_GITHUB_TOKEN }}
 
     # Citadel
     - name: Upload to the citadel host
