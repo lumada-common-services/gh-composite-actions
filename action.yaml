@@ -139,7 +139,7 @@ runs:
         IFS=', ' read -ra VALUES_ARRAY <<< "$VALUES"
         for VALUE in "${VALUES_ARRAY[@]}"; do
           echo "Processing File ${{ env.CITADEL_JSON_PATH }}"
-          curl -vX POST 'http://${{ env.citadel-host }}/citadel' -d @${{ github.workspace }}/$VALUE --header 'Content-Type: application/json'
+          curl -vX POST 'http://${{ env.citadel-host }}/citadel' -d ${{ github.workspace }}/$VALUE --header 'Content-Type: application/json'
           sleep ${{ env.CITADEL_JSON_LIST_SLEEP_SECONDS }}  # Adjust the sleep duration (in seconds) as needed
         done
 
