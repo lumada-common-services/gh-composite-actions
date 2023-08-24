@@ -129,7 +129,7 @@ runs:
 
         sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
-    # Citadel
+    # Citadel section
     - name: Upload to the citadel host
       if: ${{ env.CITADEL_JSON_PATH }}
       id: citadel 
