@@ -129,6 +129,21 @@ runs:
 
         sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
+    # Citadel section
+    - name: Upload to the citadel host
+      if: ${{ env.CITADEL_JSON_PATH }}
+      id: citadel 
+      shell: bash
+      run: |
+        VALUES="${{ env.CITADEL_JSON_PATH }}"  
+        IFS=', ' read -ra VALUES_ARRAY <<< "$VALUES"
+        for VALUE in "${VALUES_ARRAY[@]}"; do
+          echo                               #Empty Line 
+          echo "Processing File $VALUE"
+          curl -vX POST 'http://${{ env.citadel-host }}:5000/citadel' -d ${{ github.workspace }}/$VALUE --header 'Content-Type: application/json'
+          sleep ${{ env.CITADEL_JSON_LIST_SLEEP_SECONDS || 60  }}   # If env not passed, Sleeping for 60 seconds (default)
+        done
+        
     # Blackduck section
     - name: Blackduck Scan
       if: ${{ env.BlackDuck_Project_Name }}
