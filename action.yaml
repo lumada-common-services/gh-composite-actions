@@ -129,6 +129,21 @@ runs:
 
         sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
+    # Citadel section
+    - name: Upload to the citadel host
+      if: ${{ env.CITADEL_JSON_PATH }}
+      id: citadel 
+      shell: bash
+      run: |
+        VALUES="${{ env.CITADEL_JSON_PATH }}"  
+        IFS=', ' read -ra VALUES_ARRAY <<< "$VALUES"
+        for VALUE in "${VALUES_ARRAY[@]}"; do
+          echo                               #Empty Line 
+          echo "Processing File $VALUE"
+          curl -vX POST 'http://${{ env.citadel-host }}:5000/citadel' -d ${{ github.workspace }}/$VALUE --header 'Content-Type: application/json'
+          sleep ${{ env.CITADEL_JSON_LIST_SLEEP_SECONDS || 60  }}   # If env not passed, Sleeping for 60 seconds (default)
+        done
+        
     # Blackduck section
     - name: Blackduck Scan
       if: ${{ env.BlackDuck_Project_Name }}
@@ -282,7 +297,7 @@ runs:
       if: ${{ env.report }}
       shell: bash
       run: |
-        echo "| <div style="max-width:60%">Step/Command</div> | Result |" >> $GITHUB_STEP_SUMMARY
+        echo "| <div style="max-width:60%">Step/Command</div> | Status |" >> $GITHUB_STEP_SUMMARY
         echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
         echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
         
@@ -325,6 +340,8 @@ runs:
            echo "| ${value} | :${key}: |" >> $GITHUB_STEP_SUMMARY
          done < "$RUNNER_TEMP/commands.properties"
         fi
+
+        echo " > Note - Success :white_check_mark: , Executed But Failed :boom:  and Skipped/Not Executed :x: " >> $GITHUB_STEP_SUMMARY
 
     - name: Prepare Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
