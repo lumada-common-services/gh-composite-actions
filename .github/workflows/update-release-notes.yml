@@ -1,0 +1,88 @@
+name: "Update Release Notes"
+on:
+  release:
+    types: [released]
+
+env: 
+  file_path_md: ./docs/release.md                                # path to .md file
+  confluence_page_id: '30835966301'                              # The confluence page id where to write the output
+  sub_domain_name: 'hv-eng'                                      # confluence domain
+  confluence_page_title: 'Github Composite Actions Releases'     # Title of confluence page
+  slack_channel_name: honeycomb                                  # slack channel name
+  user_for_confluence: honeycomb@hitachivantara.com              # user for API token of Confluence
+  
+jobs:
+  update_release_md:
+    runs-on: [k8s]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+
+      - name: Update release.md file
+        uses: stefanzweifel/changelog-updater-action@v1
+        with:
+          latest-version: ${{ github.event.release.name }}
+          release-notes: ${{ github.event.release.body }}
+          path-to-changelog: ${{ env.file_path_md }}
+
+      - name: Commit 
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: ${{ github.event.release.target_commitish }}
+          commit_message: Updated Release Notes
+          file_pattern: ${{ env.file_path_md }}
+
+  update_confluence_page:
+    runs-on: [k8s]
+    needs: update_release_md
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.release.target_commitish }}
+      
+      - name: Update Confluence Page
+        uses: cupcakearmy/confluence-markdown-sync@v1
+        with:
+          from: ${{ env.file_path_md }}
+          to: ${{ env.confluence_page_id }} 
+          cloud: ${{ env.sub_domain_name }}
+          user: ${{ env.user_for_confluence }}
+          token: ${{ secrets.HNC_JIRA_CONFLUENCE_TOKEN }}
+
+      - name: Send Slack Notification
+        uses: hv-actions/slack-action@v3
+        env:
+          SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+        with:
+          raw-input: >
+            {
+              "channel": "${{ env.slack_channel_name }}",
+              "type": "modal",
+              "title": {
+                "type": "plain_text",
+                "text": "Honeycomb Release",
+                "emoji": true
+              },
+              "blocks": [
+                {
+                  "type": "header",
+                  "text": {
+                    "type": "plain_text",
+                    "text": "Honeycomb Release  :bee:",
+                    "emoji": true
+                  }
+                },
+                {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "New Release! *<https://github.com/${{github.repository}}/releases/tag/${{ github.event.release.tag_name }}|Version ${{ github.event.release.tag_name }}>* is now available!\n\nFor more details, check out the *<https://${{env.sub_domain_name}}.atlassian.net/wiki/spaces/MCI/pages/${{env.confluence_page_id}}/${{env.confluence_page_title}}|Release Notes>*.\n\n:bell:Subscribe to receive notifications from the *<${{ github.server_url }}/${{ github.repository }}|Github repository>*."
+                  }
+                }
+              ]
+            }
