@@ -146,7 +146,6 @@ runs:
 
     # Blackduck section
     - name: Blackduck Scan
-      if: ${{ env.BlackDuck_Project_Name }}
       id: blackduck-scan
       uses: addnab/docker-run-action@v3
       with:
