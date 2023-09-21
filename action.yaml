@@ -156,7 +156,7 @@ runs:
            --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
            --blackduck.url="${{ env.BlackDuck_Url }}" \
            --spring.config.name=blackduck  \
-           --spring.config.location=file:${{ github.workspace }}/${{env.file_path}}
+           --spring.config.location=file:/path/to${{ github.workspace }}/${{env.file_path}}
 
         
 
