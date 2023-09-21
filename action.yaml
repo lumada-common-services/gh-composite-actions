@@ -439,3 +439,16 @@ runs:
                 }
               ]
             }
+
+    - name: Teams Notification
+      if: ${{ env.report && env.teams_Webhook_Url  }}
+      uses: hv-actions/teams-notify-action@1.0.0
+      with:
+        steps_json: '${{ env.steps_json }}'
+        teams_Webhook_Url: '${{ env.teams_Webhook_Url }}'
+        sonar_Host_Url: '${{ env.SONAR_HOST_URL }}'
+        sonar_Project_Key: '${{env.SONAR_PROJECT_KEY}}'
+        blackDuck_Server_Url: '${{env.BLACKDUCK_SERVER_URL}}'
+        blackDuck_ProjId: '${{env.BLACKDUCK_PROJ_ID}}'
+        blackDuck_VersionId: '${{env.BLACKDUCK_VERSION_ID}}'
+        unit_test_url: '${{ steps.unit_test_url.outputs.url }}'
