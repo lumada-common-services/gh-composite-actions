@@ -66,6 +66,20 @@ List of Composite Actions:
 
 8. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
 
+9. Reporting: Aims to send messages to a Microsoft Teams channel and/or a Slack channel to help users keep track of all the defined steps in a workflow, along with additional workflow details. A summary table will also be added to the job's summary after the execution of the job, consisting of the same details.
+
+      ```
+      - name: Reporting
+        if: always()
+        uses: lumada-common-services/gh-composite-actions@develop
+        env:
+          Slack_Token: ${{ secrets.SLACK_TOKEN }}                 # Secret Token for Slack channel
+          Slack_Channel: yukon-test                               # The slack channel to receive notifications. 
+          steps_json: '${{ toJson(steps) }}'
+          teams_Webhook_Url: '${{ secrets.TEAMS_WEBHOOK_URL }}'   #Incoming Webhook URL for Teams channel 
+          report: true
+          
+      ```
 
 Sample code snippet for Calling Composite Actions:
 
