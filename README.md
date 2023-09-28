@@ -13,7 +13,7 @@ Advantages:
 List of Composite Actions:
 
 1. Build: Please refer to the link how we defined the composite action for [build](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30470897989/Build);
-2. Unit Test: Please refer to the link how we defined the composite action for [unit tests](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471323921/Testing);
+2. Unit Test: Please refer to the link how we defined the composite action for [unit test](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471323921/Testing);
 
       ```
       eg.
@@ -42,15 +42,16 @@ List of Composite Actions:
   
       5. GITHUB_TOKEN: The unit test step requires the GitHub App installation access token (GITHUB_TOKEN) to be passed in order to function correctly.
 
+3. Integration Test: Please refer to the link how we defined the composite action for [Integration Test](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30781997882/KIND+Kubernetes+in+Docker);
+   
+4. Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
 
-3. Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
+5. Blackduck Scan: Please refer to the link how we defined the composite action for [blackduck scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471291264/Software+Composition+Analysis+Blackduck);
 
-4. Blackduck Scan: Please refer to the link how we defined the composite action for [blackduck scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471291264/Software+Composition+Analysis+Blackduck);
+6. OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
 
-5. OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
-
-6. Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
-7. Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
+7. Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
+8. Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
       ```
       eg.
         - name: FrogBot
@@ -67,7 +68,7 @@ List of Composite Actions:
 
       2. When using Frogbot scan with `changed_modules`, the bootstrap image must have both Python and the PYYAML package installed. And we need to use these env variable `JF_CHANGED_PATHS: "${{ steps.change_detection.outputs.changed_modules }}"` to scan only for changed_modules.
 
-8. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
+9. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
 
 9. Reporting: Aims to send messages to a Microsoft Teams channel and/or a Slack channel to help users keep track of all the defined steps in a workflow, along with additional workflow details. A summary table will also be added to the job's summary after the execution of the job, consisting of the same details.
 
