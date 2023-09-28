@@ -28,6 +28,7 @@ List of Composite Actions:
             test_report_path: '**/target/*/*.xml'
             copy-to-target-path: './test_report'
             fail-on-error: 'false'
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       ```
       Note:
 
@@ -38,6 +39,8 @@ List of Composite Actions:
       3. copy-to-target-path: Destination folder path where the reports need to be copied from their default location.
 
       4. fail-on-error: It's boolean-type parameter that determines whether the workflow should be marked as failed if there are any test cases that have failed.
+  
+      5. GITHUB_TOKEN: The unit test step requires the GitHub App installation access token (GITHUB_TOKEN) to be passed in order to function correctly.
 
 
 3. Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
