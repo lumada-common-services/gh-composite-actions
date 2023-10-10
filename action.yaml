@@ -84,9 +84,9 @@ runs:
         GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
       run: |
           # Call the GitHub API to get check runs associated with the push event
+          echo "Branch name - ${{ github.head_ref || github.ref_name }}"
           response=$(curl -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" \
-                    "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${GITHUB_SHA}/check-runs")
-
+                    "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${{ github.head_ref || github.ref_name }}/check-runs")
           # Job Name to search  
           search_name="${{github.job}}-Unit Test"     
 
