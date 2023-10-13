@@ -154,13 +154,15 @@ runs:
         options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
         run: |
           java -jar /synopsys-detect.jar \
-           --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
+        #  --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
            --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
            --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
            --detect.accuracy.required=NONE \
            --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
            --blackduck.url="${{ env.BlackDuck_Url }}" \
-           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
+           --detect.blackduck.signature.scanner.paths="${{ env.BlackDuck_Source_Path }}"
+           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }} 
+           
 
     - name: Blackduck scan tracking
       shell: bash
