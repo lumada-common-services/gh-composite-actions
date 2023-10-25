@@ -21,6 +21,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.release.target_commitish }}
+          token: ${{ secrets.HV_ADMIN_GITHUB_TOKEN}} 
 
       - name: Update release.md file
         uses: stefanzweifel/changelog-updater-action@v1
@@ -28,13 +29,14 @@ jobs:
           latest-version: ${{ github.event.release.name }}
           release-notes: ${{ github.event.release.body }}
           path-to-changelog: ${{ env.file_path_md }}
-
+      
       - name: Commit 
-        uses: stefanzweifel/git-auto-commit-action@v4
+        uses: EndBug/add-and-commit@v9 
         with:
-          branch: ${{ github.event.release.target_commitish }}
-          commit_message: Updated Release Notes
-          file_pattern: ${{ env.file_path_md }}
+          add: ${{ env.file_path_md }} --force
+          message: "[CI/CD] - :robot: Update release notes."
+          push: true
+          default_author: github_actions    
 
   update_confluence_page:
     runs-on: [k8s]
