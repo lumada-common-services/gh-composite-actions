@@ -106,7 +106,6 @@ runs:
           else
               html_url=""
           fi
-          echo "$html_url"
           # Passing report url to "$RUNNER_TEMP/links.txt" file
           echo "url=$html_url" > $RUNNER_TEMP/links.txt
 
