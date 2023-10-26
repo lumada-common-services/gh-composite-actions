@@ -349,7 +349,11 @@ runs:
         fi
         
         if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
-          echo "| [Blackduck](${{ steps.blackduck_test_url.outputs.url }}) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
+            if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ] && [ "${{ steps.blackduck_test_url.outputs.url }}" != "" ]; then  
+              echo "| [Blackduck](${{ steps.blackduck_test_url.outputs.url }}) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
+            else
+              echo "| Blackduck | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
+            fi
         fi	
         
         if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
@@ -415,10 +419,15 @@ runs:
         else
           sonar_result="SonarQube"
         fi
-
+        
         if [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
-          blackduck_result="<${{ steps.blackduck_test_url.outputs.url }}|Blackduck>"
-          blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
+            if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ] && [ "${{ steps.blackduck_test_url.outputs.url }}" != "" ]; then
+              blackduck_result="<${{ steps.blackduck_test_url.outputs.url }}|Blackduck>"
+              blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
+            else
+              blackduck_result="Blackduck"
+              blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
+            fi 
         fi
 
         workflow_url="<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.event_name }}>"
