@@ -128,30 +128,43 @@ runs:
         sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
     # Citadel section
+    - name: Prepare citadel Json file
+      if: ${{ env.TRIGGER_CITADEL_SCAN }}
+      shell: bash
+      run: |
+        pip3 install pyyaml==6.0.1
+
+        python3 ${GITHUB_ACTION_PATH}/citadel/citadel.py \
+          "${GITHUB_WORKSPACE}/citadel-config.yaml" "${{ env.PROJECT_PATH }}" "$GITHUB_WORKFLOW_REF" "$RUNNER_TEMP"
+        
+        echo "CITADEL_JSON_PATH=$RUNNER_TEMP/citadel.json" >> $GITHUB_ENV
+
     - name: Upload to the citadel host
       if: ${{ env.CITADEL_JSON_PATH }}
       id: citadel 
       shell: bash
-      run: |
-        VALUES="${{ env.CITADEL_JSON_PATH }}"  
-        IFS=', ' read -ra VALUES_ARRAY <<< "$VALUES"
-        for VALUE in "${VALUES_ARRAY[@]}"; do
-          echo                               #Empty Line 
-          echo "Processing File $VALUE"
-          curl -vX POST 'http://${{ env.citadel-host }}:5000/citadel' -d ${{ github.workspace }}/$VALUE --header 'Content-Type: application/json'
+      run: |        
+        file_paths="${{ env.CITADEL_JSON_PATH }}"
+        # unset CITADEL_JSON_PATH so that it doesn't get trigger again by other steps
+        echo "CITADEL_JSON_PATH=" >> $GITHUB_ENV
+        IFS=', ' read -ra file_paths_array <<< "$file_paths"
+        for file_path in "${file_paths_array[@]}"; do 
+          echo "Processing File $file_path"
+          cat $file_path
+          curl -vvvX POST '${{ env.CITADEL_URL }}' --silent --fail --show-error -d @$file_path -H 'Content-Type: application/json' -H "Connection: close"  
           sleep ${{ env.CITADEL_JSON_LIST_SLEEP_SECONDS || 60  }}   # If env not passed, Sleeping for 60 seconds (default)
         done
 
     # Blackduck section    
     - name: Blackduck Scan
-      if: ${{ always() && env.BlackDuck_Project_Name }}
+      if: ${{ env.BlackDuck_Project_Name }}
       id: blackduck-scan
       uses: addnab/docker-run-action@v3
       with:
         image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:8
-        options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir 
+        options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
         run: |
-          java -jar /synopsys-detect.jar  \
+          java -jar /synopsys-detect.jar \
            --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
            --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
            --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
@@ -289,10 +302,9 @@ runs:
       id: unit_test_url
       shell: bash
       run: |
-        cat $RUNNER_TEMP/links.txt
         if [ -f $RUNNER_TEMP/links.txt ]; then
           value=$(cat $RUNNER_TEMP/links.txt)
-          echo "$value"  >> $GITHUB_OUTPUT
+          echo "$value" >> $GITHUB_OUTPUT
         else
           echo "url=" >> $GITHUB_OUTPUT
         fi   
@@ -302,10 +314,9 @@ runs:
       id: blackduck_test_url
       shell: bash
       run: |
-        cat blackduck_url.txt
         if [ -f blackduck_url.txt ]; then
           value=$(cat blackduck_url.txt)
-          echo "$value"  >> $GITHUB_OUTPUT
+          echo "$value" >> $GITHUB_OUTPUT
         else
           echo "url=" >> $GITHUB_OUTPUT
         fi      
@@ -425,7 +436,7 @@ runs:
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"$blackduck_result\", \"short\": true },"
+        template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
 
