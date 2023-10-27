@@ -1,3 +1,19 @@
+## 1.6.0 🐝 - 2023-10-10
+
+### What's Changed
+- The Release Automation Process is designed to streamline the release management workflow for our product. It automates various tasks related to labeling PRs, generating release notes, updating documentation, and notifying relevant stakeholders.. [(Pull Request 109)](https://github.com/lumada-common-services/gh-composite-actions/pull/109)
+
+- Added  Integration test step Documentation to Readme file.. [(Pull Request 101)](https://github.com/lumada-common-services/gh-composite-actions/pull/101)
+
+- Added note about GITHUB_TOKEN parameter in Unit Test step. The unit test step requires the GitHub App installation access token (GITHUB_TOKEN) to be passed in order to function correctly.. [(Pull Request 107)](https://github.com/lumada-common-services/gh-composite-actions/pull/107)
+
+
+#### 🐛 Bug Fixes
+- Hyperlink for the unit test is not generating for the pull request workflow
+. [(Pull Request 110)](https://github.com/lumada-common-services/gh-composite-actions/pull/110)
+
+
+
 ## 1.5.0 🐝 - 2023-09-27
 
 ### What's Changed
