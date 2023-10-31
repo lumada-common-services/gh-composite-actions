@@ -17,7 +17,7 @@ runs:
 
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
+            echo "citadel_scan=x" >> $RUNNER_TEMP/icons.properties
             echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
           fi
 
@@ -143,7 +143,7 @@ runs:
 
     - name: Upload to the citadel host
       if: ${{ env.CITADEL_JSON_PATH }}
-      id: citadel 
+      id: citadel-scan 
       shell: bash
       run: |        
         file_paths="${{ env.CITADEL_JSON_PATH }}"
@@ -156,33 +156,42 @@ runs:
           curl -vvvX POST '${{ env.CITADEL_URL }}' --silent --fail --show-error -d @$file_path -H 'Content-Type: application/json' -H "Connection: close"  
           sleep ${{ env.CITADEL_JSON_LIST_SLEEP_SECONDS || 60  }}   # If env not passed, Sleeping for 60 seconds (default)
         done
-        
-    # Blackduck section
-    - name: Blackduck Scan
-      if: ${{ env.BlackDuck_Project_Name }}
-      id: blackduck-scan
-      uses: addnab/docker-run-action@v3
-      with:
-        image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:8
-        options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
-        run: |
-          java -jar /synopsys-detect.jar \
-           --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
-           --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
-           --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
-           --detect.accuracy.required=NONE \
-           --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
-           --blackduck.url="${{ env.BlackDuck_Url }}" \
-           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
 
-    - name: Blackduck scan tracking
+    - name: Citadel scan tracking    
       shell: bash
-      if: ${{ always() && env.BlackDuck_Project_Name }}
+      if: ${{ always() && env.TRIGGER_CITADEL_SCAN }}
       run: |
         icon="boom"
-        [[ "${{ steps.blackduck-scan.outcome }}" == "success" ]] && icon="white_check_mark"
+        [[ "${{ steps.citadel-scan.outcome }}" == "success" ]] && icon="white_check_mark"
 
-        sed -i "s/blackduck_scan=x/blackduck_scan=${icon}/g" $RUNNER_TEMP/icons.properties
+        sed -i "s/citadel_scan=x/citadel_scan=${icon}/g" $RUNNER_TEMP/icons.properties
+        
+    # Blackduck section
+    # - name: Blackduck Scan
+    #   if: ${{ env.BlackDuck_Project_Name }}
+    #   id: blackduck-scan
+    #   uses: addnab/docker-run-action@v3
+    #   with:
+    #     image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:8
+    #     options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
+    #     run: |
+    #       java -jar /synopsys-detect.jar \
+    #        --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
+    #        --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
+    #        --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
+    #        --detect.accuracy.required=NONE \
+    #        --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
+    #        --blackduck.url="${{ env.BlackDuck_Url }}" \
+    #        --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
+
+    # - name: Blackduck scan tracking
+    #   shell: bash
+    #   if: ${{ always() && env.BlackDuck_Project_Name }}
+    #   run: |
+    #     icon="boom"
+    #     [[ "${{ steps.blackduck-scan.outcome }}" == "success" ]] && icon="white_check_mark"
+
+    #     sed -i "s/blackduck_scan=x/blackduck_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
     - name: OWASP Scan
       if: ${{ env.owasp_Project }}
@@ -334,13 +343,8 @@ runs:
             echo "| Sonar Scan | :${{ steps.all_icons.outputs.sonar_scan }}: |" >> $GITHUB_STEP_SUMMARY
         fi
              
-        if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
-          if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
-            blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
-            echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
-          else
-            echo "| Blackduck Scan | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
-          fi
+        if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then     
+          echo "| Citadel Scan | :${{ steps.all_icons.outputs.citadel_scan }}: |" >> $GITHUB_STEP_SUMMARY
           echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
         fi
 
@@ -364,8 +368,7 @@ runs:
       run: |
         details=""
         commit=""
-        blackduck_result=""
-        blackduck_message=""
+        citadel_result=""
         branch="${GITHUB_REF#refs/heads/}"
 
         if [ "${{ steps.all_icons.outputs.unit_test }}" != "x" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
@@ -389,13 +392,8 @@ runs:
             else
               commit="$(echo "''$commit" | tr '\n' ' ' | sed 's/ \+/ /g' | cut -c1-27)...''"      
             fi
-
-            blackduck_result="Blackduck"
-            if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
-              blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
-            fi
-
-            blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
+            citadel_result="Citadel"
+            citadel_message=":arrow_right: Result  :${{ steps.all_icons.outputs.citadel_scan }}:"
 
         elif [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             details="<${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}| Details>"
@@ -427,9 +425,9 @@ runs:
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
+        template="$template{ \"value\": \"${citadel_result}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
+        template="$template{ \"value\": \"${citadel_message}\", \"short\": true }"
 
         echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
 
@@ -456,13 +454,10 @@ runs:
 
     - name: Teams Notification
       if: ${{ env.report && env.teams_Webhook_Url  }}
-      uses: hv-actions/teams-notify-action@1.0.0
+      uses: hv-actions/teams-notify-action@2.0.0
       with:
         steps_json: '${{ env.steps_json }}'
         teams_Webhook_Url: '${{ env.teams_Webhook_Url }}'
         sonar_Host_Url: '${{ env.SONAR_HOST_URL }}'
         sonar_Project_Key: '${{env.SONAR_PROJECT_KEY}}'
-        blackDuck_Server_Url: '${{env.BLACKDUCK_SERVER_URL}}'
-        blackDuck_ProjId: '${{env.BLACKDUCK_PROJ_ID}}'
-        blackDuck_VersionId: '${{env.BLACKDUCK_VERSION_ID}}'
         unit_test_url: '${{ steps.unit_test_url.outputs.url }}'
