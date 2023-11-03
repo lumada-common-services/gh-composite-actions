@@ -2,7 +2,9 @@ name: Release Drafter
 on:
   push:
     branches: [master]
-    
+  # when release is done release.md file is updated by automatic commit github action so to avoid trigger of release-drafter added paths-ignore
+    paths-ignore: ['docs/release.md']
+
   # pull_request event is required only for autolabeler
   pull_request:
     branches: [master]
