@@ -46,7 +46,9 @@ List of Composite Actions:
    
 4. Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
 
-5. Blackduck Scan: Please refer to the link how we defined the composite action for [blackduck scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471291264/Software+Composition+Analysis+Blackduck);
+5. Citadel Scan: Please refer to the link how we defined the composite action for [Citadel scan](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30890459190/Honeycomb+and+Citadel+integration)
+
+<!-- Blackduck Scan: Please refer to the link how we defined the composite action for [blackduck scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471291264/Software+Composition+Analysis+Blackduck); -->
 
 6. OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
 
@@ -92,32 +94,21 @@ You can call a Composite Action from a Workflow just like any other Action.
 
 main workflow:
 ```
-- name: Blackduck Scan
+- name: Sonarqube scan
+  id: Sonarqube
   uses: lumada-common-services/gh-composite-actions@develop
-  env:  
-    BlackDuck_Project_Version: "${{ env.BLACKDUCK_PROJ_VERSION }}"
-    BlackDuck_Project_Name: "${{ env.BLACKDUCK_PROJ_NAME }}"
-    BlackDuck_Api_Token: "${{ secrets.ORION_BLACKDUCK_TOKEN }}"
-    BlackDuck_Url: "${{ env.BLACKDUCK_SERVER_URL }}"
+  env:
+    sonar_utility: sonar-scanner
+    sonar_commands: '("-Dsonar.projectBaseDir=./gradle -Dsonar.projectKey=${{env.SONAR_PROJECT_KEY}} -Dsonar.host.url=${{env.SONAR_HOST_URL}} -Dsonar.token=${{env.SONAR_LOGIN}}")'
+
 ```
 
 that correspond to in the composite action:
 
 ```
-# Blackduck section
-- name: Blackduck Scan
-  if: ${{ env.BlackDuck_Project_Name }}
-  id: blackduck-scan
-  uses: addnab/docker-run-action@v3
-  with:
-    image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:8
-    options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
-    run: |
-      java -jar /synopsys-detect.jar \
-      --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
-      --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
-      --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
-      --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
-      --blackduck.url="${{ env.BlackDuck_Url }}" \
-      --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
+# sonar section
+- name: Sonar Scan
+  if: ${{ env.sonar_commands }}
+  id: sonar-scan
+  uses: lumada-common-services/gh-composite-actions@sonar-action
 ```
