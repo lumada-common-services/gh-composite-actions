@@ -1,3 +1,18 @@
+
+## 1.7.0 🐝 - 2023-10-27
+
+###  What's Changed 
+
+#### 🚀 Features
+
+- Enhanced citadel integration step. [(Pull Request 111)](https://github.com/lumada-common-services/gh-composite-actions/pull/111)
+
+
+#### 🐛 Bug Fixes
+
+- Enhanced branch protection in the gh-composite-action repository for improved release automation. [(Pull Request 114)](https://github.com/lumada-common-services/gh-composite-actions/pull/114)
+
+
 ## 1.6.0 🐝 - 2023-10-10
 
 ### What's Changed

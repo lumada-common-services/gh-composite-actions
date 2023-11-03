@@ -20,7 +20,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: master
           token: ${{ secrets.HV_ADMIN_GITHUB_TOKEN}} 
 
       - name: Update release.md file
@@ -45,7 +45,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.release.target_commitish }}
+          ref: master
       
       - name: Update Confluence Page
         uses: cupcakearmy/confluence-markdown-sync@v1
