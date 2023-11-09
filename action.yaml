@@ -147,7 +147,7 @@ runs:
               noScenarios="no scenarios"
               readarray -t test_scenarios <<< "$(jq -r 'try(.["'"$eligible_module"'"].scenarios[]) // "'"${noScenarios}"'"' ${{ inputs.test_scenario_json }})"
         
-              base_cmd=(echo "i'mAlwaysHere")
+              base_cmd=(mvn clean verify -DskipUnitTests=true -Drelease -Dpentaho-ee-dsc.version=10.0.0.0-237 -Dmaven.test.redirectTestOutputToFile=false -Dpdi-plugin-test -B -amd -pl  -Duse-existing-docker-network=$(docker network ls --filter name=github_network* -q))
         
               if [ "${test_scenarios}" == "${noScenarios}" ]; then
                 # run the test command
