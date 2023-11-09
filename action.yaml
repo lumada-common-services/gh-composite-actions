@@ -130,22 +130,22 @@ runs:
       shell: bash
       run: |
         # make sure the json test scenario file is valid
-        if ! jq -e . >/dev/null 2>&1 <<< cat "${inputs.test_scenario_json}"; then
-          echo "Failed to successfully parse the plugin test scenarios JSON: ${inputs.test_scenario_json}."
+        if ! jq -e . >/dev/null 2>&1 <<< cat "${{ inputs.test_scenario_json }}"; then
+          echo "Failed to successfully parse the plugin test scenarios JSON: ${{ inputs.test_scenario_json }}."
           echo "Exiting."
           exit 1
         fi
         
         # get the list of plugin code modules that have opted in to plugin integration testing
-        readarray -t eligible_modules <<< "$(jq -r keys[] ${inputs.test_scenario_json})"
+        readarray -t eligible_modules <<< "$(jq -r keys[] ${{ inputs.test_scenario_json }})"
         
         for eligible_module in "${eligible_modules[@]}"; do
         
-          case ${inputs.changed_modules} in
+          case ${{ inputs.changed_modules }} in
             *$eligible_module* )
               echo -e "\nRunning tests for ${eligible_module}"
               noScenarios="no scenarios"
-              readarray -t test_scenarios <<< "$(jq -r 'try(.["'"$eligible_module"'"].scenarios[]) // "'"${noScenarios}"'"' ${inputs.test_scenario_json})"
+              readarray -t test_scenarios <<< "$(jq -r 'try(.["'"$eligible_module"'"].scenarios[]) // "'"${noScenarios}"'"' ${{ inputs.test_scenario_json }})"
         
               base_cmd=(echo "i'mAlwaysHere")
         
