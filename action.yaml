@@ -3,6 +3,10 @@ description: "Composite Action Template"
 inputs:
   command:
     description: "A command line statement"
+  changed_modules:
+    description: "Comma-separated list of modules that have been edited"
+  test_scenario_json:
+    description: "For PDI plugin integration tests, path to the json file containing test scenarios for each plugin"
 
 runs:
   using: "composite"
@@ -112,7 +116,56 @@ runs:
           # Passing report url to "$RUNNER_TEMP/links.txt" file
           echo "url=$html_url" > $RUNNER_TEMP/links.txt
 
-      shell: bash    
+      shell: bash
+
+      # PDI plugin integration test section
+    - name: Configure vm.max_map_count required by Elasticsearch
+      if: ${{ env.run_plugin_integration_tests }}
+      shell: bash
+      run: |
+        echo "vm.max_map_count=262144" >> /etc/sysctl.conf
+
+    - name: Run plugin integration tests
+      if: ${{ env.run_plugin_integration_tests && inputs.test_scenario_json && inputs.changed_modules }}
+      shell: bash
+      run: |
+        # make sure the json test scenario file is valid
+        if ! jq -e . >/dev/null 2>&1 <<< cat "${inputs.test_scenario_json}"; then
+          echo "Failed to successfully parse the plugin test scenarios JSON: ${inputs.test_scenario_json}."
+          echo "Exiting."
+          exit 1
+        fi
+        
+        # get the list of plugin code modules that have opted in to plugin integration testing
+        readarray -t eligible_modules <<< "$(jq -r keys[] ${inputs.test_scenario_json})"
+        
+        for eligible_module in "${eligible_modules[@]}"; do
+        
+          case ${inputs.changed_modules} in
+            *$eligible_module* )
+              echo -e "\nRunning tests for ${eligible_module}"
+              noScenarios="no scenarios"
+              readarray -t test_scenarios <<< "$(jq -r 'try(.["'"$eligible_module"'"].scenarios[]) // "'"${noScenarios}"'"' ${inputs.test_scenario_json})"
+        
+              base_cmd=(echo "i'mAlwaysHere")
+        
+              if [ "${test_scenarios}" == "${noScenarios}" ]; then
+                # run the test command
+                "${base_cmd[@]}"
+              else
+                for scenario in "${test_scenarios[@]}"; do
+                  echo "Adding test scenario to base command: ${scenario}"
+                  unset cmd
+                  cmd=(${base_cmd[@]})
+                  cmd+=("${scenario}")
+
+                  # run the test command
+                  "${cmd[@]}"
+                done
+              fi
+              ;;
+          esac
+        done
 
       # Sonar section
     - name: Sonar Scan
