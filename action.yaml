@@ -150,8 +150,7 @@ runs:
               base_cmd=(mvn clean verify -DskipUnitTests=true -Drelease -Dpentaho-ee-dsc.version="${{ env.BASE_VERSION }}" -Dmaven.test.redirectTestOutputToFile=false -Dpdi-plugin-test -B -amd -pl "$eligible_module" -Duse-existing-docker-network=$(docker network ls --filter name=github_network* -q))
         
               if [ "${test_scenarios}" == "${noScenarios}" ]; then
-                echo -e "\nRunning test command:"
-                echo "${base_cmd}"
+                echo -e "\nRunning test command:" "${base_cmd[@]}"
                 "${base_cmd[@]}"
               else
                 for scenario in "${test_scenarios[@]}"; do
