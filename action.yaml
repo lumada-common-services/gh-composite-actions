@@ -141,7 +141,7 @@ runs:
         
         for eligible_module in "${eligible_modules[@]}"; do
         
-          case ${{ inputs.changed_modules }} in
+          case "${{ inputs.changed_modules }}" in
             *$eligible_module* )
               echo -e "\nRunning tests for ${eligible_module}"
               noScenarios="no scenarios"
