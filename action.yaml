@@ -129,7 +129,7 @@ runs:
       if: ${{ env.run_plugin_integration_tests && inputs.test_scenario_json && inputs.changed_modules }}
       shell: bash
       run: |
-        # make sure the json test scenario file is valid
+        # make sure the test scenario file is valid json
         if ! jq -e . >/dev/null 2>&1 <<< cat "${{ inputs.test_scenario_json }}"; then
           echo "Failed to successfully parse the plugin test scenarios JSON: ${{ inputs.test_scenario_json }}."
           echo "Exiting."
@@ -143,22 +143,27 @@ runs:
         
           case "${{ inputs.changed_modules }}" in
             *$eligible_module* )
-              echo -e "\nRunning tests for ${eligible_module}"
-              noScenarios="no scenarios"
-              readarray -t test_scenarios <<< "$(jq -r 'try(.["'"$eligible_module"'"].scenarios[]) // "'"${noScenarios}"'"' ${{ inputs.test_scenario_json }})"
-        
+              echo -e "\nPlugin module ${eligible_module} has changed; running integration tests for it"
+
+              # ["'" "'"] is required because eligible_module names could contain hyphens
+              has_non_default_plugin_test_scenarios="$(jq '.["'"$eligible_module"'"] | has("scenarios")' ${{ inputs.test_scenario_json }})"
+
               base_cmd=(mvn clean verify -Drelease -Dpentaho-ee-dsc.version="${{ env.BASE_VERSION }}" -Dmaven.test.redirectTestOutputToFile=false -Dpdi-plugin-test -B -amd -pl "$eligible_module" -Duse-existing-docker-network=$(docker network ls --filter name=github_network* -q))
         
-              if [ "${test_scenarios}" == "${noScenarios}" ]; then
-                echo -e "\nRunning test command:" "${base_cmd[@]}"
+              if [ "$has_non_default_plugin_test_scenarios" = false ]; then
+                echo -e "\nRunning default test command: ${base_cmd[0]}"
                 "${base_cmd[@]}"
               else
-                for scenario in "${test_scenarios[@]}"; do
-                  echo "Adding test scenario to base command: ${scenario}"
+                number_of_scenarios="$(jq '.["'"$eligible_module"'"].scenarios | length' ${{ inputs.test_scenario_json }})"
+                echo "Plugin ${eligible_module} has ${number_of_scenarios} unique test scenarios"
+              
+                for ((i = 0; i < number_of_scenarios; i++)); do
                   unset cmd
-                  cmd=(${base_cmd[@]})
-                  cmd+=("${scenario}")
-
+                  cmd=("${base_cmd[@]}")
+                  number_of_params_in_scenario="$(jq '.["'"$eligible_module"'"].scenarios['"${i}"'] | length' ${{ inputs.test_scenario_json }})"
+                  for ((j = 0; j < number_of_params_in_scenario; j++)); do
+                    cmd+=("$(jq -r '.["'"$eligible_module"'"].scenarios['"${i}"']['"${j}"']' ${{ inputs.test_scenario_json }})")
+                  done
                   echo -e "\nRunning test command:" "${cmd[@]}"
                   "${cmd[@]}"
                 done
