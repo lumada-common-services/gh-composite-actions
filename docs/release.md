@@ -1,3 +1,11 @@
+## 1.7.2 🐝 - 2023-11-21
+
+### What's Changed
+
+#### 🧰 Maintenance
+
+- Updated Synopsys Detect scanner to v9 to support npm 9 [(Pull Request 125)](https://github.com/lumada-common-services/gh-composite-actions/pull/125)
+
 ## 1.7.1 🐝 - 2023-11-03
 
 ### What's Changed
