@@ -5,7 +5,7 @@ on:
 
 env: 
   file_path_md: ./docs/release.md                                # path to .md file
-  confluence_page_id: '30835966301'                              # The confluence page id where to write the output
+  confluence_page_id: '30835966301'                              # The confluence page ID where to write the output
   sub_domain_name: 'hv-eng'                                      # confluence domain
   confluence_page_title: 'Github Composite Actions Releases'     # Title of confluence page
   slack_channel_name: honeycomb                                  # slack channel name
@@ -23,9 +23,9 @@ jobs:
           ref: master
           token: ${{ secrets.HV_ADMIN_GITHUB_TOKEN}} 
       
-      - run: chmod +x tag.sh 
+      - run: chmod +x .github/tag.sh 
 
-      - name: Runing tag update script
+      - name: Running stable tag update script
         run: .github/tag.sh "master" "stable"
         shell: bash
 
