@@ -12,8 +12,26 @@ env:
   user_for_confluence: honeycomb@hitachivantara.com              # user for API token of Confluence
   
 jobs:
+  update_stable_tag:
+    runs-on: [k8s]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          token: ${{ secrets.HV_ADMIN_GITHUB_TOKEN}} 
+      
+      - run: chmod +x tag.sh 
+
+      - name: Runing tag update script
+        run: .github/tag.sh "master" "stable"
+        shell: bash
+
   update_release_md:
     runs-on: [k8s]
+    needs: update_stable_tag
     permissions:
       contents: write
     steps:

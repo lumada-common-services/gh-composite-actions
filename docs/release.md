@@ -6,7 +6,7 @@
 
 - Include Citadel step tracking in GitHub summaries, Slack, and Teams. Additionally, based on team discussions, remove the Blackduck step from the merge workflow tracking. [(Pull Request 118)](https://github.com/lumada-common-services/gh-composite-actions/pull/118)   
   
-- Fixed Issue You are not currently on a branch . [(Pull Request 117)](https://github.com/lumada-common-services/gh-composite-actions/pull/117)   
+- Fixed Issue You are not currently on a branch. [(Pull Request 117)](https://github.com/lumada-common-services/gh-composite-actions/pull/117)   
   
 
 ## 1.7.0 🐝 - 2023-10-27
@@ -25,23 +25,22 @@
 
 ### What's Changed
 
-- The Release Automation Process is designed to streamline the release management workflow for our product. It automates various tasks related to labeling PRs, generating release notes, updating documentation, and notifying relevant stakeholders.. [(Pull Request 109)](https://github.com/lumada-common-services/gh-composite-actions/pull/109)   
+- The Release Automation Process is designed to streamline the release management workflow for our product. It automates various tasks related to labeling PRs, generating release notes, updating documentation, and notifying relevant stakeholders. [(Pull Request 109)](https://github.com/lumada-common-services/gh-composite-actions/pull/109)   
   
-- Added  Integration test step Documentation to Readme file.. [(Pull Request 101)](https://github.com/lumada-common-services/gh-composite-actions/pull/101)   
+- Added  Integration test step Documentation to Readme file. [(Pull Request 101)](https://github.com/lumada-common-services/gh-composite-actions/pull/101)   
   
-- Added note about GITHUB_TOKEN parameter in Unit Test step. The unit test step requires the GitHub App installation access token (GITHUB_TOKEN) to be passed in order to function correctly.. [(Pull Request 107)](https://github.com/lumada-common-services/gh-composite-actions/pull/107)   
+- Added note about GITHUB_TOKEN parameter in Unit Test step. The unit test step requires the GitHub App installation access token (GITHUB_TOKEN) to be passed in order to function correctly. [(Pull Request 107)](https://github.com/lumada-common-services/gh-composite-actions/pull/107)   
   
 
 #### 🐛 Bug Fixes
 
-- Hyperlink for the unit test is not generating for the pull request workflow   
-  . [(Pull Request 110)](https://github.com/lumada-common-services/gh-composite-actions/pull/110)
+- Hyperlink for the unit test is not generating for the pull request workflow. [(Pull Request 110)](https://github.com/lumada-common-services/gh-composite-actions/pull/110)
 
 ## 1.5.0 🐝 - 2023-09-27
 
 ### What's Changed
 
-- Added Teams Notify action to send messages to a Microsoft Teams channel to help users keep track of all the defined steps in a workflow, along with additional workflow details. Additionally, 'Blackduck Fix' adding an additional parameter `detect.accuracy.required=NONE` . [(Pull Request 104)](https://github.com/lumada-common-services/gh-composite-actions/pull/104)
+- Added Teams Notify action to send messages to a Microsoft Teams channel to help users keep track of all the defined steps in a workflow, along with additional workflow details. Additionally, 'Blackduck Fix' adding an additional parameter `detect.accuracy.required=NONE`. [(Pull Request 104)](https://github.com/lumada-common-services/gh-composite-actions/pull/104)
 
 ## 1.4.1 🐝 - 2023-08-29
 
@@ -66,8 +65,7 @@
 
 ### What's Changed
 
-- Add kind integration code to gh-composite-action   
-  . [(Pull Request 82)](https://github.com/lumada-common-services/gh-composite-actions/pull/82)
+- Add kind integration code to gh-composite-action. [(Pull Request 82)](https://github.com/lumada-common-services/gh-composite-actions/pull/82)
 
 ## 1.0.1 🐝 - 2023-03-16
 
