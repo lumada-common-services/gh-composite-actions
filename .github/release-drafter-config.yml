@@ -36,7 +36,7 @@ autolabeler:
       - '/cleanup/i'
 
 change-template: |
-  - $BODY. [(Pull Request $NUMBER)]($URL)
+  - $BODY [(Pull Request $NUMBER)]($URL)
 
 template: |
   #  What's Changed 

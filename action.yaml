@@ -173,7 +173,7 @@ runs:
       id: blackduck-scan
       uses: addnab/docker-run-action@v3
       with:
-        image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:8
+        image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:9
         options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
         run: |
           java -jar /synopsys-detect.jar \
