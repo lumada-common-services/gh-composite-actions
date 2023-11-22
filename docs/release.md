@@ -1,3 +1,11 @@
+## 1.7.3 🐝 - 2023-11-22
+
+### What's Changed
+
+#### 🐛 Bug Fixes
+
+- Added some extra validation, so it will not fail the UNIT_TEST step even if it does not find any reports; instead, it will set an error message. [(Pull Request 127)](https://github.com/lumada-common-services/gh-composite-actions/pull/127)
+
 ## 1.7.2 🐝 - 2023-11-21
 
 ### What's Changed
