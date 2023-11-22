@@ -54,6 +54,17 @@ runs:
 
         fi
 
+    - name: Check test_report_path exists or not
+      if: ${{ env.cmd_type == 'UNIT_TEST' &&  env.test_report_path !='' && env.reporter !='' }}   
+      run: |
+        test_report_path="${{ env.test_report_path}}"    
+        if find . -type f -path "$test_report_path" -print -quit | grep -q .; then
+          echo -e "\e[32msuccess\e[0m: Test report files found"
+        else
+          echo "::error::No test report files were found"
+        fi
+      shell: bash
+
     - name: Test Report
       uses: dorny/test-reporter@v1
       id : test-result
@@ -64,6 +75,7 @@ runs:
         reporter: ${{ env.reporter }}                 # Format of test results. 
         only-summary: 'true' 
         fail-on-error: ${{ env.fail-on-error || false }}     # Set action as failed if test report contains any failed test
+        fail-on-empty: ${{ env.fail-on-empty || false }}     # Set action as failed if no test report files were found
 
     - name: Copy test report to target folder
       if: ${{ always() && env.copy-to-target-path !='' && env.cmd_type == 'UNIT_TEST' }}
@@ -81,38 +93,15 @@ runs:
     - name: Fetch Unit Test Report Url 
       if: ${{ always() && env.cmd_type == 'UNIT_TEST' }}
       id: unit-test-report
-      env:
-        GITHUB_TOKEN: ${{ env.GITHUB_TOKEN }}
-      run: |
-          # Call the GitHub API to get check runs associated with the push event
-          echo "Branch name - ${{ github.head_ref || github.ref_name }}"
-          response=$(curl -H "Authorization: Bearer $GITHUB_TOKEN" -H "Accept: application/vnd.github.v3+json" \
-                    "https://api.github.com/repos/${GITHUB_REPOSITORY}/commits/${{ github.head_ref || github.ref_name }}/check-runs")
-          # Job Name to search  
-          search_name="${{github.job}}-Unit Test"     
-
-          # Search for the starting line number of the JSON object with the specified "name" value.
-          # If grep or cut commands don't find a match (exit with non-zero status),
-          # the 'true' command ensures an overall success status (exit status 0),
-          # preventing the entire line from failing regardless of match result.
-          start_line=$(echo "$response" | grep -n '"name": "'"$search_name"'"' | cut -d ':' -f 1 || true) 
-
-          if [ -n "$start_line" ]; then
-
-              # Search for the ending line number of the JSON object
-              end_line=$(echo "$response" | awk -v start="$start_line" 'NR >= start && /}/ { print NR; exit }')
-
-              # Extract the JSON object lines
-              extracted_object=$(echo "$response" | sed -n "$start_line","$end_line"p)
-
-              html_url=$(echo "$extracted_object" | grep -o '"html_url": "[^"]*' | awk -F '"html_url": "' '{print $2}' | sed 's/",//')
-          else
-              html_url=""
-          fi
-          
-          # Passing report url to "$RUNNER_TEMP/links.txt" file
-          echo "url=$html_url" > $RUNNER_TEMP/links.txt
-
+      run: |                  
+        REPORT_LINK="${{ steps.test-result.outputs.url_html }}"
+        if [ -z "$REPORT_LINK" ]; then
+          echo "::error::Unit Test Report is not Generated"
+        else
+          echo -e "\e[32msuccess\e[0m Unit Test Report Generated: $REPORT_LINK"
+        fi
+        # Passing report url to "$RUNNER_TEMP/links.txt" file
+        echo "url=$REPORT_LINK" > $RUNNER_TEMP/links.txt
       shell: bash    
 
       # Sonar section

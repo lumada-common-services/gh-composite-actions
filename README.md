@@ -28,7 +28,7 @@ List of Composite Actions:
             test_report_path: '**/target/*/*.xml'
             copy-to-target-path: './test_report'
             fail-on-error: 'false'
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            fail-on-empty: 'false'
       ```
       Note:
 
@@ -38,9 +38,9 @@ List of Composite Actions:
 
       3. copy-to-target-path: Destination folder path where the reports need to be copied from their default location.
 
-      4. fail-on-error: It's boolean-type parameter that determines whether the workflow should be marked as failed if there are any test cases that have failed.
+      4. fail-on-error: It's boolean-type parameter that determines whether the workflow should be marked as failed if there are any test cases that have failed. The default value for this parameter is set to `false`.
   
-      5. GITHUB_TOKEN: The unit test step requires the GitHub App installation access token (GITHUB_TOKEN) to be passed in order to function correctly.
+      5. fail-on-empty: It's boolean-type parameter that determines whether the workflow should be marked as failed if no report is found. It will fail the build after not finding reports. The default value for this parameter is set to `false`.
 
 3. Integration Test: Please refer to the link how we defined the composite action for [Integration Test](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30781997882/KIND+Kubernetes+in+Docker);
    
