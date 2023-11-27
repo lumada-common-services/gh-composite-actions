@@ -1,3 +1,11 @@
+## 1.7.4 🐝 - 2023-11-27
+
+### What's Changed
+
+#### 🐛 Bug Fixes
+
+- Update the composite action to display a 'boom 💥' symbol in the unit test step if the unit test command is successful but there are failed test cases [(Pull Request 129)](https://github.com/lumada-common-services/gh-composite-actions/pull/129)
+
 ## 1.7.3 🐝 - 2023-11-22
 
 ### What's Changed
@@ -20,9 +28,9 @@
 
 #### 🐛 Bug Fixes
 
-- Include Citadel step tracking in GitHub summaries, Slack, and Teams. Additionally, based on team discussions, remove the Blackduck step from the merge workflow tracking. [(Pull Request 118)](https://github.com/lumada-common-services/gh-composite-actions/pull/118)   
+- Include Citadel step tracking in GitHub summaries, Slack, and Teams. Additionally, based on team discussions, remove the Blackduck step from the merge workflow tracking. [(Pull Request 118)](https://github.com/lumada-common-services/gh-composite-actions/pull/118)
   
-- Fixed Issue You are not currently on a branch. [(Pull Request 117)](https://github.com/lumada-common-services/gh-composite-actions/pull/117)   
+- Fixed Issue You are not currently on a branch. [(Pull Request 117)](https://github.com/lumada-common-services/gh-composite-actions/pull/117)
   
 
 ## 1.7.0 🐝 - 2023-10-27
@@ -41,11 +49,11 @@
 
 ### What's Changed
 
-- The Release Automation Process is designed to streamline the release management workflow for our product. It automates various tasks related to labeling PRs, generating release notes, updating documentation, and notifying relevant stakeholders. [(Pull Request 109)](https://github.com/lumada-common-services/gh-composite-actions/pull/109)   
+- The Release Automation Process is designed to streamline the release management workflow for our product. It automates various tasks related to labeling PRs, generating release notes, updating documentation, and notifying relevant stakeholders. [(Pull Request 109)](https://github.com/lumada-common-services/gh-composite-actions/pull/109)
   
-- Added  Integration test step Documentation to Readme file. [(Pull Request 101)](https://github.com/lumada-common-services/gh-composite-actions/pull/101)   
+- Added  Integration test step Documentation to Readme file. [(Pull Request 101)](https://github.com/lumada-common-services/gh-composite-actions/pull/101)
   
-- Added note about GITHUB_TOKEN parameter in Unit Test step. The unit test step requires the GitHub App installation access token (GITHUB_TOKEN) to be passed in order to function correctly. [(Pull Request 107)](https://github.com/lumada-common-services/gh-composite-actions/pull/107)   
+- Added note about GITHUB_TOKEN parameter in Unit Test step. The unit test step requires the GitHub App installation access token (GITHUB_TOKEN) to be passed in order to function correctly. [(Pull Request 107)](https://github.com/lumada-common-services/gh-composite-actions/pull/107)
   
 
 #### 🐛 Bug Fixes
@@ -68,7 +76,7 @@
 
 ### What's Changed
 
-- Updated a unit test report generation step that displays the test results on the Github summary and sends notifications on Slack.   
+- Updated a unit test report generation step that displays the test results on the Github summary and sends notifications on Slack.
   Also, fix issues for incorrect Sonar summary links when manually triggered and wrong summary data when pull_request_target is the event that triggered the workflow. [(Pull Request 95)](https://github.com/lumada-common-services/gh-composite-actions/pull/95)
 
 ## 1.3.1 🐝 - 2023-07-31
