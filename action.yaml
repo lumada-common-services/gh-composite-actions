@@ -54,15 +54,25 @@ runs:
 
         fi
 
-    - name: Check test_report_path exists or not
-      if: ${{ env.cmd_type == 'UNIT_TEST' &&  env.test_report_path !='' && env.reporter !='' }}   
+    - name: Check test_report_path exists or not. Additionally, verify if the required parameters have been passed to generate the unit test report.
+      if: ${{ env.cmd_type == 'UNIT_TEST' }}   
       run: |
-        test_report_path="${{ env.test_report_path}}"    
-        if find . -type f -path "$test_report_path" -print -quit | grep -q .; then
-          echo -e "\e[32msuccess\e[0m: Test report files found"
+        test_report_path="${{ env.test_report_path}}"
+        reporter="${{ env.reporter}}"
+        if [ -z "$test_report_path" ] && [ -z "$reporter" ]; then
+          echo "::warning::Test report will not be generated as both test_report_path and reporter values are empty!"    
+        elif [ -z "$test_report_path" ]; then
+          echo "::warning::Empty value passed for test_report_path. Test report will not be generated!"
+        elif [ -z "$reporter" ]; then
+          echo "::warning::Empty value passed for reporter. Test report will not be generated!"
         else
-          echo "::error::No test report files were found"
+          if find . -type f -path "$test_report_path" -print -quit | grep -q .; then
+            echo -e "\e[32mSuccess\e[0m: Test report files found"
+          else
+            echo "::error::No test report files were found. The 'test_report_path' may be incorrect"
+          fi
         fi
+
       shell: bash
 
     - name: Test Report
@@ -76,6 +86,26 @@ runs:
         only-summary: 'true' 
         fail-on-error: ${{ env.fail-on-error || false }}     # Set action as failed if test report contains any failed test
         fail-on-empty: ${{ env.fail-on-empty || false }}     # Set action as failed if no test report files were found
+    
+    - name: Check if UNIT_TEST commands were successfully executed 
+      if: ${{ env.cmd_type == 'UNIT_TEST' &&  env.test_report_path !='' && env.reporter !='' }}
+      id: unit_test_exceution
+      run: |
+        exec=$(cat $RUNNER_TEMP/icons.properties)
+        for exe in $exec
+        do
+          echo "$exe" >> $GITHUB_OUTPUT
+        done
+      shell: bash
+
+    - name: Marking UNIT_TEST Step as failed if there are test failures
+      if: ${{ env.cmd_type == 'UNIT_TEST' &&  env.test_report_path !='' && env.reporter !='' }}
+      run: |
+        icon="boom"
+        if [ "${{ steps.unit_test_exceution.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.test-result.outputs.conclusion }}" == "failure" ] && [ "${{ steps.test-result.outputs.url_html }}" != "" ]; then
+          sed -i "s/unit_test=white_check_mark/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties
+        fi    
+      shell: bash
 
     - name: Copy test report to target folder
       if: ${{ always() && env.copy-to-target-path !='' && env.cmd_type == 'UNIT_TEST' }}
@@ -314,7 +344,7 @@ runs:
         echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
         echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
         
-        if [ "${{ steps.all_icons.outputs.unit_test }}" != "x" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
+        if [ "${{ steps.all_icons.outputs.unit_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
           echo "| [Unit Test](${{ steps.unit_test_url.outputs.url }}) | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
         else
           echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
@@ -369,7 +399,7 @@ runs:
         citadel_result=""
         branch="${GITHUB_REF#refs/heads/}"
 
-        if [ "${{ steps.all_icons.outputs.unit_test }}" != "x" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
+        if [ "${{ steps.all_icons.outputs.unit_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
           unit_test="<${{ steps.unit_test_url.outputs.url }}|Unit Test>"
         else
           unit_test="Unit Test"
