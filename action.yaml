@@ -88,7 +88,7 @@ runs:
         fail-on-empty: ${{ env.fail-on-empty || false }}     # Set action as failed if no test report files were found
     
     - name: Check if UNIT_TEST commands were successfully executed 
-      if: ${{ env.cmd_type == 'UNIT_TEST' &&  env.test_report_path !='' && env.reporter !='' }}
+      if: ${{ !cancelled() && env.cmd_type == 'UNIT_TEST' }}
       id: unit_test_exceution
       run: |
         exec=$(cat $RUNNER_TEMP/icons.properties)
@@ -99,7 +99,7 @@ runs:
       shell: bash
 
     - name: Marking UNIT_TEST Step as failed if there are test failures
-      if: ${{ env.cmd_type == 'UNIT_TEST' &&  env.test_report_path !='' && env.reporter !='' }}
+      if: ${{ !cancelled() && env.cmd_type == 'UNIT_TEST' }}
       run: |
         icon="boom"
         if [ "${{ steps.unit_test_exceution.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.test-result.outputs.conclusion }}" == "failure" ] && [ "${{ steps.test-result.outputs.url_html }}" != "" ]; then
