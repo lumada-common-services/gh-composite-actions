@@ -1,3 +1,11 @@
+## 1.7.5 🐝 - 2023-11-28
+
+### What's Changed
+
+#### 🐛 Bug Fixes
+
+- Update the conditions to display the correct summary link and symbol when we are passing `fail-on-error = true`. [(Pull Request 131)](https://github.com/lumada-common-services/gh-composite-actions/pull/131)
+
 ## 1.7.4 🐝 - 2023-11-27
 
 ### What's Changed
