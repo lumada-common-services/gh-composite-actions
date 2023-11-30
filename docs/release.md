@@ -1,3 +1,11 @@
+## 1.8.0 🐝 - 2023-11-30
+
+### What's Changed
+
+#### 🚀 Features
+
+- Added the INTEGRATION_TEST command type to the composite action for tracking in the reporting step. This integration step will only be tracked if it is run. [(Pull Request 133)](https://github.com/lumada-common-services/gh-composite-actions/pull/133)
+
 ## 1.7.5 🐝 - 2023-11-28
 
 ### What's Changed
