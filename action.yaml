@@ -309,7 +309,7 @@ runs:
     
     - name: FrogBot
       if: ${{ env.JF_URL }}    
-      uses: jfrog/frogbot@v2.19.4
+      uses: jfrog/frogbot@v2.8.8
       env:
         JF_URL: ${{ env.JF_URL }}
         JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
