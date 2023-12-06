@@ -304,7 +304,7 @@ runs:
     
     - name: File
       if: ${{ env.JF_CHANGED_PATHS && env.JF_URL }}
-      run: ls
+      run: ls -alR
       shell: bash  
     
     - name: FrogBot
