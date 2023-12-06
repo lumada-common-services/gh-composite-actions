@@ -302,6 +302,11 @@ runs:
         cat .frogbot/frogbot-config.yml
       shell: bash  
     
+    - name: File
+      if: ${{ env.JF_CHANGED_PATHS && env.JF_URL }}
+      run: ls
+      shell: bash  
+    
     - name: FrogBot
       if: ${{ env.JF_URL }}    
       uses: jfrog/frogbot@v2.8.8
