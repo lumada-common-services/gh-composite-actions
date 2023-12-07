@@ -314,7 +314,7 @@ runs:
         JF_URL: ${{ env.JF_URL }}
         JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
         JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
-        # JF_WORKING_DIR: ${{ env.JF_WORKING_DIR }}
+        JF_WORKING_DIR: .
         JF_FAIL: "FALSE"
 
     - name: Creating Kind Cluster 
