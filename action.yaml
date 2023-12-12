@@ -52,10 +52,11 @@ runs:
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
           sed -i "s/integration_test=x/integration_test=${icon}/g" $RUNNER_TEMP/icons.properties
 
-        elif [ "${{ env.cmd_type }}" == "" ]; then
+        elif [ "${{ env.cmd_type }}" != "" ]; then
 
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
+          # cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
+          cmd=$(echo "${{ env.cmd_type  }}")
           echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
 
         fi
