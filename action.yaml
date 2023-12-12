@@ -309,13 +309,15 @@ runs:
     
     - name: FrogBot
       if: ${{ env.JF_URL }}    
-      uses: jfrog/frogbot@v2.10.0
+      uses: jfrog/frogbot@v2
       env:
         JF_URL: ${{ env.JF_URL }}
         JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
         JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
         # JF_WORKING_DIR: .
         JF_FAIL: "FALSE"
+      with:
+        version: 2.10.0 
 
     - name: Creating Kind Cluster 
       id: cluster-creation
