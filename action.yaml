@@ -55,8 +55,7 @@ runs:
         elif [ "${{ env.cmd_type }}" ]; then
 
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          # cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
-          #cmd="${{ env.cmd_type  }}"
+          cmd="${{ env.cmd_type  }}"
           echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
 
         fi
