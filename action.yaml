@@ -171,7 +171,7 @@ runs:
       if: ${{ env.TRIGGER_CITADEL_SCAN }}
       shell: bash
       run: |
-        pip3 install pyyaml==6.0.1
+        # pip3 install pyyaml==6.0.1
 
         python3 ${GITHUB_ACTION_PATH}/citadel/citadel.py \
           "${GITHUB_WORKSPACE}/citadel-config.yaml" "${{ env.PROJECT_PATH }}" "$GITHUB_WORKFLOW_REF" "$RUNNER_TEMP"
