@@ -56,8 +56,8 @@ runs:
 
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
           # cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
-          cmd=$(echo "${{ env.cmd_type  }}")
-          echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
+          #cmd=$(echo "${{ env.cmd_type  }}")
+          echo "${icon}=${{ env.cmd_type  }}" >> $RUNNER_TEMP/commands.properties
 
         fi
 
