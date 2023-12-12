@@ -317,7 +317,7 @@ runs:
         # JF_WORKING_DIR: .
         JF_FAIL: "FALSE"
       with:
-        version: 2.10.0 
+        version: 2.8.8 
 
     - name: Creating Kind Cluster 
       id: cluster-creation
