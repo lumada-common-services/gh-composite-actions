@@ -6,6 +6,10 @@ inputs:
 runs:
   using: "composite"
   steps: 
+    - name: Output 
+      shell: bash
+      run: echo "${{ toJson(steps) }}" 
+         
     - name: Setup Steps Tracking
       shell: bash
       run: |
