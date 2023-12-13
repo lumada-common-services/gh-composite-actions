@@ -557,4 +557,4 @@ runs:
 
     - name: Output 
       shell: bash
-      run: echo "${{ env.json }}"    
+      run: echo "${{ toJson(steps) }}"    
