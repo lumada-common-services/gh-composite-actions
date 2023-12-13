@@ -3,7 +3,6 @@ description: "Composite Action Template"
 inputs:
   command:
     description: "A command line statement"
-
 runs:
   using: "composite"
   steps: 
@@ -555,3 +554,7 @@ runs:
         sonar_Host_Url: '${{ env.SONAR_HOST_URL }}'
         sonar_Project_Key: '${{env.SONAR_PROJECT_KEY}}'
         unit_test_url: '${{ steps.unit_test_url.outputs.url }}'
+
+    - name: Output 
+      shell: bash
+      run: echo "${{ env.json }}"    
