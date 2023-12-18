@@ -42,6 +42,7 @@ runs:
 
         if [ "${{ env.cmd_type }}" == "BUILD" ]; then
           var="${{ env.cmd_type }}"
+          echo "$var"
           if [ "${{ steps.run-command.outcome }}" == "success" ];then
             icon="white_check_mark"
             echo "${var,,}=${icon}" >> $RUNNER_TEMP/icons.properties
