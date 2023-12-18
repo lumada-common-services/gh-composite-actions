@@ -6,27 +6,27 @@ inputs:
 runs:
   using: "composite"
   steps: 
-    - name: Output 
-      shell: bash
-      run: echo "${{ toJson(steps) }}" 
-         
-    - name: Setup Steps Tracking
-      shell: bash
-      run: |
-        if [ ! -e $RUNNER_TEMP/icons.properties ]; then
-          echo "sonar_scan=x" >> $RUNNER_TEMP/icons.properties
-          echo "build=x" >> $RUNNER_TEMP/icons.properties
-          echo "unit_test=x" >> $RUNNER_TEMP/icons.properties
-          echo "integration_test=x" >> $RUNNER_TEMP/icons.properties
+    # - name: Output 
+    #   shell: bash
+    #   run: echo "${{ toJson(steps) }}" 
+
+    # - name: Setup Steps Tracking
+    #   shell: bash
+    #   run: |
+    #     if [ ! -e $RUNNER_TEMP/icons.properties ]; then
+    #       echo "sonar_scan=x" >> $RUNNER_TEMP/icons.properties
+    #       echo "build=x" >> $RUNNER_TEMP/icons.properties
+    #       echo "unit_test=x" >> $RUNNER_TEMP/icons.properties
+    #       echo "integration_test=x" >> $RUNNER_TEMP/icons.properties
 
 
-          if [ "${{ github.event_name }}" != "pull_request" ]; then
-            # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
-            echo "citadel_scan=x" >> $RUNNER_TEMP/icons.properties
-            echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
-          fi
+    #       if [ "${{ github.event_name }}" != "pull_request" ]; then
+    #         # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
+    #         echo "citadel_scan=x" >> $RUNNER_TEMP/icons.properties
+    #         echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
+    #       fi
 
-        fi
+    #     fi
 
     - name: Commands Execution
       if: ${{ inputs.command }}
@@ -41,9 +41,13 @@ runs:
         icon="boom"
 
         if [ "${{ env.cmd_type }}" == "BUILD" ]; then
-
-           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-           sed -i "s/build=x/build=${icon}/g" $RUNNER_TEMP/icons.properties
+          var="${{ env.cmd_type }}"
+          if [ "${{ steps.run-command.outcome }}" == "success" ];then
+            icon="white_check_mark"
+            echo "${var,,}=${icon}" >> $RUNNER_TEMP/icons.properties
+          else 
+            echo "${var,,}=${icon}" >> $RUNNER_TEMP/icons.properties
+          fi
 
         elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
 
