@@ -48,6 +48,8 @@ runs:
           else 
             echo "${var,,}=${icon}" >> $RUNNER_TEMP/icons.properties
           fi
+          value=$($RUNNER_TEMP/icons.properties)
+          echo "$value"
 
         elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
 
@@ -562,7 +564,3 @@ runs:
     #     sonar_Host_Url: '${{ env.SONAR_HOST_URL }}'
     #     sonar_Project_Key: '${{env.SONAR_PROJECT_KEY}}'
     #     unit_test_url: '${{ steps.unit_test_url.outputs.url }}'
-
-    - name: Output 
-      shell: bash
-      run: echo "${{ toJson(steps) }}"    
