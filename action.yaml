@@ -41,7 +41,7 @@ runs:
       run: |
         icon="boom"
 
-        if [ "${{ env.cmd_type }}" == "BUILD" ]; then
+        if [ "${{ env.cmd_type }}" ]; then
           var="${{ env.cmd_type }}"
           echo "$var"
           if [ "${{ steps.run-command.outcome }}" == "success" ];then
@@ -53,23 +53,23 @@ runs:
           value=$(cat $RUNNER_TEMP/icons.properties)
           echo "$value"
 
-        elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
+        # elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
 
-          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties
+        #   [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+        #   sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties
 
-        elif [ "${{ env.cmd_type }}" == "INTEGRATION_TEST" ]; then
+        # elif [ "${{ env.cmd_type }}" == "INTEGRATION_TEST" ]; then
 
-          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          sed -i "s/integration_test=x/integration_test=${icon}/g" $RUNNER_TEMP/icons.properties
+        #   [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+        #   sed -i "s/integration_test=x/integration_test=${icon}/g" $RUNNER_TEMP/icons.properties
 
-        elif [ "${{ env.cmd_type }}" ]; then
+        # elif [ "${{ env.cmd_type }}" ]; then
 
-          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          cmd="${{ env.cmd_type  }}"
-          echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
+        #   [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+        #   cmd="${{ env.cmd_type  }}"
+        #   echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
 
-        fi
+        # fi
 
     - name: Check test_report_path exists or not. Additionally, verify if the required parameters have been passed to generate the unit test report.
       if: ${{ env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' }}   
@@ -521,7 +521,7 @@ runs:
           template="$template{ \"value\": \"${integration_test_meesage}\", \"short\": true },"
           template="$template{ \"value\": \" \", \"short\": true },"
         fi
-
+        
         template="$template{ \"value\": \"$sonar_result\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
