@@ -15,18 +15,6 @@ runs:
       run: |
         if [ ! -e $RUNNER_TEMP/icons.properties ]; then
           echo "Creating file for step Tracking...."
-          # echo "sonar_scan=x" >> $RUNNER_TEMP/icons.properties
-          # echo "build=x" >> $RUNNER_TEMP/icons.properties
-          # echo "unit_test=x" >> $RUNNER_TEMP/icons.properties
-          # echo "integration_test=x" >> $RUNNER_TEMP/icons.properties
-
-
-          # if [ "${{ github.event_name }}" != "pull_request" ]; then
-          #   # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
-          #   echo "citadel_scan=x" >> $RUNNER_TEMP/icons.properties
-          #   echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
-          # fi
-
         fi
 
     - name: Commands Execution
@@ -44,32 +32,18 @@ runs:
         if [ "${{ env.cmd_type }}" ]; then
           var="${{ env.cmd_type }}"
           echo "$var"
-          if [ "${{ steps.run-command.outcome }}" == "success" ];then
-            icon="white_check_mark"
-            echo "${var,,}=${icon}" >> $RUNNER_TEMP/icons.properties
+
+          icon="white_check_mark"
+
+          if [ "${{ steps.run-command.outcome }}" == "success" ]; then
+              echo "${var,,}=${icon}" >> "$RUNNER_TEMP/icons.properties"
           else 
-            echo "${var,,}=${icon}" >> $RUNNER_TEMP/icons.properties
+              echo "${var,,}=${icon}" >> "$RUNNER_TEMP/icons.properties"
           fi
-          value=$(cat $RUNNER_TEMP/icons.properties)
-          echo "$value"
 
-        # elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
-
-        #   [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-        #   sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties
-
-        # elif [ "${{ env.cmd_type }}" == "INTEGRATION_TEST" ]; then
-
-        #   [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-        #   sed -i "s/integration_test=x/integration_test=${icon}/g" $RUNNER_TEMP/icons.properties
-
-        # elif [ "${{ env.cmd_type }}" ]; then
-
-        #   [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-        #   cmd="${{ env.cmd_type  }}"
-        #   echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
-
-        # fi
+          # Optimized way to get the final value directly
+          cat "$RUNNER_TEMP/icons.properties"
+        fi
 
     - name: Check test_report_path exists or not. Additionally, verify if the required parameters have been passed to generate the unit test report.
       if: ${{ env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' }}   
