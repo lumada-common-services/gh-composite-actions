@@ -50,7 +50,7 @@ runs:
           else 
             echo "${var,,}=${icon}" >> $RUNNER_TEMP/icons.properties
           fi
-          value=$($RUNNER_TEMP/icons.properties)
+          value=$(cat $RUNNER_TEMP/icons.properties)
           echo "$value"
 
         elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
