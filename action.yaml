@@ -10,23 +10,24 @@ runs:
     #   shell: bash
     #   run: echo "${{ toJson(steps) }}" 
 
-    # - name: Setup Steps Tracking
-    #   shell: bash
-    #   run: |
-    #     if [ ! -e $RUNNER_TEMP/icons.properties ]; then
-    #       echo "sonar_scan=x" >> $RUNNER_TEMP/icons.properties
-    #       echo "build=x" >> $RUNNER_TEMP/icons.properties
-    #       echo "unit_test=x" >> $RUNNER_TEMP/icons.properties
-    #       echo "integration_test=x" >> $RUNNER_TEMP/icons.properties
+    - name: Setup Steps Tracking
+      shell: bash
+      run: |
+        if [ ! -e $RUNNER_TEMP/icons.properties ]; then
+          echo "Creating file for step Tracking...."
+          # echo "sonar_scan=x" >> $RUNNER_TEMP/icons.properties
+          # echo "build=x" >> $RUNNER_TEMP/icons.properties
+          # echo "unit_test=x" >> $RUNNER_TEMP/icons.properties
+          # echo "integration_test=x" >> $RUNNER_TEMP/icons.properties
 
 
-    #       if [ "${{ github.event_name }}" != "pull_request" ]; then
-    #         # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
-    #         echo "citadel_scan=x" >> $RUNNER_TEMP/icons.properties
-    #         echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
-    #       fi
+          # if [ "${{ github.event_name }}" != "pull_request" ]; then
+          #   # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
+          #   echo "citadel_scan=x" >> $RUNNER_TEMP/icons.properties
+          #   echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
+          # fi
 
-    #     fi
+        fi
 
     - name: Commands Execution
       if: ${{ inputs.command }}
