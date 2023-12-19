@@ -1,4 +1,4 @@
-FROM sonarsource/sonar-scanner-cli:4.7
+FROM one.hitachivantara.com/docker/sonarsource/sonar-scanner-cli:4.7
 
 COPY run_sonar.sh /run_sonar.sh
 
