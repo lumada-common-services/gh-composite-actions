@@ -209,7 +209,10 @@ runs:
       id: blackduck-scan
       uses: addnab/docker-run-action@v3
       with:
-        image: docker.repo.orl.eng.hitachivantara.com/blackducksoftware/detect:9
+        username: ${{ env.BLACKDUCK_DOCKER_USERNAME }}
+        password: ${{ env.BLACKDUCK_DOCKER_PASSWORD }}
+        registry: one.hitachivantara.com
+        image: one.hitachivantara.com/docker/blackducksoftware/detect:9
         options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
         run: |
           java -jar /synopsys-detect.jar \
@@ -284,7 +287,7 @@ runs:
     - name: Publish Artifacts to Registry
       if: ${{ env.artifacts_manifest_file }}
       continue-on-error: false
-      uses: lumada-common-services/registry-publication@v1.1.1
+      uses: lumada-common-services/registry-publication@stable
       with:
         ARTIFACTS_CONFIG_FILE: ${{ env.artifacts_manifest_file }}
         ARTIFACTORY_APIKEY: ${{ env.artifactory_api_key }}
@@ -548,7 +551,7 @@ runs:
 
     - name: Teams Notification
       if: ${{ env.report && env.teams_Webhook_Url  }}
-      uses: hv-actions/teams-notify-action@2.0.0
+      uses: hv-actions/teams-notify-action@stable
       with:
         steps_json: '${{ env.steps_json }}'
         teams_Webhook_Url: '${{ env.teams_Webhook_Url }}'
