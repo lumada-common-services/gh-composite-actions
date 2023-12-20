@@ -1,3 +1,11 @@
+## 1.8.1 🐝 - 2023-12-20
+
+### What's Changed
+
+#### 🚀 Enhancement
+
+- Replacing all references pointing to Orlando's Artifactory with one.hitachivantara.com. [(Pull Request 135)](https://github.com/lumada-common-services/gh-composite-actions/pull/135)
+
 ## 1.8.0 🐝 - 2023-11-30
 
 ### What's Changed
