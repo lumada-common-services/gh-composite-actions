@@ -21,6 +21,7 @@ runs:
             # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
             echo "citadel_scan=x" >> $RUNNER_TEMP/icons.properties
             echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
+            echo "deploy=x" >> $RUNNER_TEMP/icons.properties
           fi
 
         fi
@@ -52,6 +53,11 @@ runs:
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
           sed -i "s/integration_test=x/integration_test=${icon}/g" $RUNNER_TEMP/icons.properties
 
+        elif [ "${{ env.cmd_type }}" == "DEPLOY" ]; then
+
+          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+          sed -i "s/deploy=x/deploy=${icon}/g" $RUNNER_TEMP/icons.properties
+        
         elif [ "${{ env.cmd_type }}" == "" ]; then
 
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
@@ -60,6 +66,11 @@ runs:
 
         fi
 
+        if [ -n "${{ env.DEPLOY_DESC }}" ]; then
+          deploy_info=$(echo "${{ env.DEPLOY_DESC }}")
+          echo "$deploy_info" >> $RUNNER_TEMP/deploy.txt
+        fi
+                
     - name: Check test_report_path exists or not. Additionally, verify if the required parameters have been passed to generate the unit test report.
       if: ${{ env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' }}   
       run: |
@@ -367,7 +378,7 @@ runs:
         else
           echo "url=" >> $GITHUB_OUTPUT
         fi      
-           
+
     - name: Report Summary Tracking
       if: ${{ env.report }}
       shell: bash
@@ -413,8 +424,14 @@ runs:
           # fi     
           echo "| Citadel Scan | :${{ steps.all_icons.outputs.citadel_scan }}: |" >> $GITHUB_STEP_SUMMARY
           echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
-        fi
 
+          DEPLOY=Deploy
+          if [ -f "$RUNNER_TEMP/deploy.txt" ]; then
+            DEPLOY="${DEPLOY} $(cat $RUNNER_TEMP/deploy.txt)"
+          fi
+          echo "| ${DEPLOY} | :${{ steps.all_icons.outputs.deploy }}: |" >> $GITHUB_STEP_SUMMARY
+          
+        fi
 
         # display all commands
         if [ -f "$RUNNER_TEMP/commands.properties" ]; then
@@ -480,6 +497,13 @@ runs:
             citadel_result="Citadel"
             citadel_message=":arrow_right: Result  :${{ steps.all_icons.outputs.citadel_scan }}:"
 
+            DEPLOY=Deploy
+            if [ -f "$RUNNER_TEMP/deploy.txt" ]; then
+              DEPLOY="${DEPLOY} $(cat $RUNNER_TEMP/deploy.txt)"
+            fi
+            deploy_result="$DEPLOY"
+            deploy_message=":arrow_right: Result  :${{ steps.all_icons.outputs.deploy }}:"
+
         elif [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             details="<${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}| Details>"
 
@@ -521,7 +545,14 @@ runs:
         
         template="$template{ \"value\": \"${citadel_result}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"${citadel_message}\", \"short\": true }"
+        template="$template{ \"value\": \"${citadel_message}\", \"short\": true }",
+        template="$template{ \"value\": \" \", \"short\": true },"
+
+        template="$template{ \"value\": \"${deploy_result}\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
+        template="$template{ \"value\": \"${deploy_message}\", \"short\": true }"
+        deploy="<${{ env.DEPLOY_DESC }}|deploy Test>"
+
         # template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
         # template="$template{ \"value\": \" \", \"short\": true },"
         # template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
