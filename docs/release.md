@@ -1,3 +1,11 @@
+## 1.9.0 🐝 - 2024-01-30
+
+### What's Changed
+
+#### 🚀 Features
+
+- Updated the composite action by adding deployment step tracking to reporting. Define the DEPLOY_DESC environment variable to include additional descriptions along with the "Deploy" keyword in the reporting. [(Pull Request 137)](https://github.com/lumada-common-services/gh-composite-actions/pull/137)
+
 ## 1.8.1 🐝 - 2023-12-20
 
 ### What's Changed
