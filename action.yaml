@@ -58,6 +58,12 @@ runs:
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
           sed -i "s/deploy=x/deploy=${icon}/g" $RUNNER_TEMP/icons.properties
         
+        elif [ "${{ env.cmd_type }}" == "BUILD_UNIT_TEST" ]; then
+
+          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+          sed -i "s/build=x/build=${icon}/g" $RUNNER_TEMP/icons.properties
+          sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties
+  
         elif [ "${{ env.cmd_type }}" == "" ]; then
 
           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
@@ -72,7 +78,7 @@ runs:
         fi
                 
     - name: Check test_report_path exists or not. Additionally, verify if the required parameters have been passed to generate the unit test report.
-      if: ${{ env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' }}   
+      if: ${{ env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' || env.cmd_type == 'BUILD_UNIT_TEST' }}   
       run: |
         test_report_path="${{ env.test_report_path}}"
         reporter="${{ env.reporter}}"
@@ -95,7 +101,7 @@ runs:
     - name: Test Report
       uses: dorny/test-reporter@v1
       id : test-result
-      if: ${{ (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') &&  env.test_report_path !='' && env.reporter !='' }}                   
+      if: ${{ (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' || env.cmd_type == 'BUILD_UNIT_TEST') &&  env.test_report_path !='' && env.reporter !='' }}                   
       with:
         name: ${{ github.job }}-${{ env.cmd_type }}                          
         path: ${{ env.test_report_path}}              # '**/target/**/*.xml'   
@@ -105,7 +111,7 @@ runs:
         fail-on-empty: ${{ env.fail-on-empty || false }}     # Set action as failed if no test report files were found
     
     - name: Check if UNIT_TEST/INTEGRATION_TEST commands were successfully executed 
-      if: ${{ !cancelled() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') }}
+      if: ${{ !cancelled() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' || env.cmd_type == 'BUILD_UNIT_TEST') }}
       id: test_commands_execution
       run: |
         exec=$(cat $RUNNER_TEMP/icons.properties)
@@ -116,7 +122,7 @@ runs:
       shell: bash
 
     - name: Marking UNIT_TEST/INTEGRATION_TEST Step as failed if there are test failures
-      if: ${{ !cancelled() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') }}
+      if: ${{ !cancelled() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST'|| env.cmd_type == 'BUILD_UNIT_TEST') }}
       run: |
         icon="boom"
         if [ "${{ env.cmd_type }}" == "UNIT_TEST" ] && [ "${{ steps.test_commands_execution.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.test-result.outputs.conclusion }}" == "failure" ] && [ "${{ steps.test-result.outputs.url_html }}" != "" ]; then
@@ -129,7 +135,7 @@ runs:
 
 
     - name: Copy test report to target folder
-      if: ${{ always() && env.copy-to-target-path !='' && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') }}
+      if: ${{ always() && env.copy-to-target-path !='' && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' || env.cmd_type == 'BUILD_UNIT_TEST') }}
       run: |
         # checking destination folder exist or not.
         if [ ! -d "${{env.copy-to-target-path}}" ]; then
@@ -141,7 +147,7 @@ runs:
       shell: bash
 
     - name: Fetch Test Report Url for Unit Test and Integration step
-      if: ${{ always() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') }}
+      if: ${{ always() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' || env.cmd_type == 'BUILD_UNIT_TEST') }}
       id: test-report
       run: |                  
         REPORT_LINK="${{ steps.test-result.outputs.url_html }}"
@@ -152,7 +158,7 @@ runs:
         fi
         # Determine the appropriate file based on cmd_type
         FILE_PATH="$RUNNER_TEMP/"
-        if [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
+        if [ "${{ env.cmd_type }}" == "UNIT_TEST" ] || [ "${{ env.cmd_type }}" == "BUILD_UNIT_TEST" ]; then
           FILE_PATH+="unit_test_links.txt"
         elif [ "${{ env.cmd_type }}" == "INTEGRATION_TEST" ]; then
           FILE_PATH+="integration_test_links.txt"
