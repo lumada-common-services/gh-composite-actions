@@ -24,36 +24,85 @@ List of Composite Actions:
               mvn verify -B -Daudit -amd -Dmaven.test.failure.ignore=true 
           env:
             cmd_type: UNIT_TEST 
-            reporter: 'java-junit'
-            test_report_path: '**/target/*/*.xml'
-            copy-to-target-path: './test_report'
-            fail-on-error: 'false'
-            fail-on-empty: 'false'
+            unit_test_reporter: 'java-junit'
+            unit_test_report_path: '**/target/*/*.xml'
+            unit_test_copy_to_target_path: './test_report'
+            unit_test_fail_on_error: 'false'
+            unit_test_fail_on_empty: 'false'
       ```
       Note:
 
-      1. reporter: Supported options for the format of test results:(dart-json,dotnet-trx,flutter-json,java-junit,jest-junit,mocha-json).
+      1. unit_test_reporter: Supported options for the format of test results:(dart-json,dotnet-trx,flutter-json,java-junit,jest-junit,mocha-json).
 
-      2. test_report_path: Folder path where the complete test reports are automatically generated upon the execution of test cases.
+      2. unit_test_report_path: Folder path where the complete test reports are automatically generated upon the execution of test cases.
 
-      3. copy-to-target-path: Destination folder path where the reports need to be copied from their default location.
+      3. unit_test_copy_to_target_path: Destination folder path where the reports need to be copied from their default location.
 
-      4. fail-on-error: It's boolean-type parameter that determines whether the workflow should be marked as failed if there are any test cases that have failed. The default value for this parameter is set to `false`.
+      4. unit_test_fail_on_error: It's boolean-type parameter that determines whether the workflow should be marked as failed if there are any test cases that have failed. The default value for this parameter is set to `false`.
   
-      5. fail-on-empty: It's boolean-type parameter that determines whether the workflow should be marked as failed if no report is found. It will fail the build after not finding reports. The default value for this parameter is set to `false`.
+      5. unit_test_fail_on_empty: It's boolean-type parameter that determines whether the workflow should be marked as failed if no report is found. It will fail the build after not finding reports. The default value for this parameter is set to `false`.
 
 3. Integration Test: Please refer to the link how we defined the composite action for [Integration Test](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30781997882/KIND+Kubernetes+in+Docker);
-   
-4. Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
 
-5. Citadel Scan: Please refer to the link how we defined the composite action for [Citadel scan](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30890459190/Honeycomb+and+Citadel+integration)
+      ```
+      eg.
+        - name: Integration Test Maven
+          uses: lumada-common-services/gh-composite-actions@develop
+          with:
+            command: |
+              mvn verify -DrunITs -Dit.test=EditorBeanIT 
+          env:
+            cmd_type: INTEGRATION_TEST 
+            int_test_reporter: 'java-junit'
+            int_test_report_path: '**/integration/target/*/*.xml'
+            int_test_copy_to_target_path: './test_report'
+            int_test_fail_on_error: 'false'
+            int_test_fail_on_empty: 'false'
+      ```
+   
+4. Generic Test: This composite action is designed to run any test step other than unit test and integration test. It introduces the new cmd_type `TEST` to the composite action for tracking any generic test step. Additionally, it utilizes the `TEST_DESC` environment variable to include additional descriptions along with the 'Test' keyword in the reporting. This generic test step will only be tracked if it is executed.
+      
+      ```
+      eg.
+
+        - name: Test
+          uses: lumada-common-services/gh-composite-actions@develop
+          with:
+            command: |
+              mvn test -Dkarma.file.config=karma.conf.js
+          env:
+            cmd_type: TEST    
+            test_reporter: 'java-junit'
+            test_report_path: '**/karma/target/surefire-reports/*.xml' 
+            TEST_DESC: '- karma'
+            test_copy_to_target_path: './karma_test_report'
+
+      ```
+5. Deploy: This composite action is to execute Deploy commands. It introduces the new cmd_type `DEPLOY` to the composite action for tracking any generic deploy step. Additionally, it includes the `DEPLOY_DESC` environment variable to include additional descriptions along with the 'Deploy' keyword in the reporting.
+      
+      ```
+      eg.
+
+        - name: Deploy
+          uses: lumada-common-services/gh-composite-actions@develop
+          with:
+            command: |
+              kubectl apply -f dotnet/deployment.yaml --namespace honeycomb-demo-deploy --kubeconfig $RUNNER_TEMP/config        
+          env:
+            cmd_type: DEPLOY
+            DEPLOY_DESC: to jarjar Cluster
+
+      ```
+6. Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
+
+7. Citadel Scan: Please refer to the link how we defined the composite action for [Citadel scan](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30890459190/Honeycomb+and+Citadel+integration)
 
 <!-- Blackduck Scan: Please refer to the link how we defined the composite action for [blackduck scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30471291264/Software+Composition+Analysis+Blackduck); -->
 
-6. OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
+8. OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
 
-7. Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
-8. Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
+9. Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
+10. Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
       ```
       eg.
         - name: FrogBot
@@ -70,9 +119,9 @@ List of Composite Actions:
 
       2. When using Frogbot scan with `changed_modules`, the bootstrap image must have both Python and the PYYAML package installed. And we need to use these env variable `JF_CHANGED_PATHS: "${{ steps.change_detection.outputs.changed_modules }}"` to scan only for changed_modules.
 
-9. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
+11. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
 
-9. Reporting: Aims to send messages to a Microsoft Teams channel and/or a Slack channel to help users keep track of all the defined steps in a workflow, along with additional workflow details. A summary table will also be added to the job's summary after the execution of the job, consisting of the same details.
+12. Reporting: Aims to send messages to a Microsoft Teams channel and/or a Slack channel to help users keep track of all the defined steps in a workflow, along with additional workflow details. A summary table will also be added to the job's summary after the execution of the job, consisting of the same details.
 
       ```
       - name: Reporting
