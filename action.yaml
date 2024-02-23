@@ -362,22 +362,16 @@ runs:
     - name: Blackduck Scan
       if: ${{ env.BlackDuck_Project_Name }}
       id: blackduck-scan
-      uses: addnab/docker-run-action@v3
-      with:
-        username: ${{ env.BLACKDUCK_DOCKER_USERNAME }}
-        password: ${{ env.BLACKDUCK_DOCKER_PASSWORD }}
-        registry: one.hitachivantara.com
-        image: one.hitachivantara.com/docker/blackducksoftware/detect:9
-        options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
-        run: |
-          java -jar /synopsys-detect.jar \
+      run: |
+          echo ${{ env.BLACKDUCK_DOCKER_PASSWORD }} | docker login one.hitachivantara.com -u ${{ env.BLACKDUCK_DOCKER_USERNAME }} --password-stdin && \
+          docker run -v "/var/run/docker.sock":"/var/run/docker.sock" --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir one.hitachivantara.com/docker/blackducksoftware/detect:9 -c "java -jar /synopsys-detect.jar \
            --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
            --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
            --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
            --detect.accuracy.required=NONE \
            --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
            --blackduck.url="${{ env.BlackDuck_Url }}" \
-           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
+           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}"
 
     # - name: Blackduck scan tracking
     #   shell: bash
