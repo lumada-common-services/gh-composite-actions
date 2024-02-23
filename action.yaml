@@ -358,8 +358,6 @@ runs:
 
         sed -i "s/citadel_scan=x/citadel_scan=${icon}/g" $RUNNER_TEMP/icons.properties
     
-    - uses: docker-practice/actions-setup-docker@master 
-
     # Blackduck section
     - name: Blackduck Scan
       shell: bash
