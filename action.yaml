@@ -359,11 +359,10 @@ runs:
         sed -i "s/citadel_scan=x/citadel_scan=${icon}/g" $RUNNER_TEMP/icons.properties
     
     - uses: docker-practice/actions-setup-docker@master
-      timeout-minutes: 12
       shell: bash
       run: |
         set -x
-        docker version   
+        docker version  
 
     # Blackduck section
     - name: Blackduck Scan
