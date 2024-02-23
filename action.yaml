@@ -360,6 +360,7 @@ runs:
         
     # Blackduck section
     - name: Blackduck Scan
+      shell: bash
       if: ${{ env.BlackDuck_Project_Name }}
       id: blackduck-scan
       run: |
