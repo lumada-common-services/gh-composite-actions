@@ -15,7 +15,7 @@ runs:
           echo "build=x" >> $RUNNER_TEMP/icons.properties
           echo "unit_test=x" >> $RUNNER_TEMP/icons.properties
           echo "integration_test=x" >> $RUNNER_TEMP/icons.properties
-
+          echo "generic_test=x" >> $RUNNER_TEMP/icons.properties
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
             # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
@@ -38,74 +38,149 @@ runs:
       run: |
         icon="boom"
 
-        if [ "${{ env.cmd_type }}" == "BUILD" ]; then
+        IFS=',' read -ra cmd_types <<< "${{ env.cmd_type }}"
+        for type in "${cmd_types[@]}"; do
 
-           [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-           sed -i "s/build=x/build=${icon}/g" $RUNNER_TEMP/icons.properties
+          if [ "$type" == "BUILD" ]; then
 
-        elif [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
+            [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+            sed -i "s/build=x/build=${icon}/g" $RUNNER_TEMP/icons.properties
 
-          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties
+          elif [ "$type" == "UNIT_TEST" ]; then
 
-        elif [ "${{ env.cmd_type }}" == "INTEGRATION_TEST" ]; then
+            [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+            sed -i "s/unit_test=x/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties
 
-          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          sed -i "s/integration_test=x/integration_test=${icon}/g" $RUNNER_TEMP/icons.properties
+          elif [ "$type" == "INTEGRATION_TEST" ]; then
 
-        elif [ "${{ env.cmd_type }}" == "DEPLOY" ]; then
+            [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+            sed -i "s/integration_test=x/integration_test=${icon}/g" $RUNNER_TEMP/icons.properties
 
-          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          sed -i "s/deploy=x/deploy=${icon}/g" $RUNNER_TEMP/icons.properties
-        
-        elif [ "${{ env.cmd_type }}" == "" ]; then
+          elif [ "$type" == "DEPLOY" ]; then
 
-          [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
-          cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
-          echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
+            [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+            sed -i "s/deploy=x/deploy=${icon}/g" $RUNNER_TEMP/icons.properties
 
-        fi
+          elif [ "$type" == "TEST" ]; then
 
+            [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+            sed -i "s/generic_test=x/generic_test=${icon}/g" $RUNNER_TEMP/icons.properties
+          
+          elif [ "$type" == "" ]; then
+
+            [[ "${{ steps.run-command.outcome }}" == "success" ]] && icon="white_check_mark"
+            cmd=$(echo "${{ inputs.command }}" | sed -e 's/|/\\|/')
+            echo "${icon}=${cmd}" >> $RUNNER_TEMP/commands.properties
+
+          fi
+        done
+
+        # Description Tracking for Deploy and Generic Test Step
         if [ -n "${{ env.DEPLOY_DESC }}" ]; then
           deploy_info=$(echo "${{ env.DEPLOY_DESC }}")
           echo "$deploy_info" >> $RUNNER_TEMP/deploy.txt
         fi
+
+        if [ -n "${{ env.TEST_DESC }}" ]; then
+          test_info=$(echo "${{ env.TEST_DESC }}")
+          echo "$test_info" >> $RUNNER_TEMP/test.txt
+        fi
                 
     - name: Check test_report_path exists or not. Additionally, verify if the required parameters have been passed to generate the unit test report.
-      if: ${{ env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST' }}   
+      if: ${{ contains(env.cmd_type, 'UNIT_TEST') || contains(env.cmd_type, 'INTEGRATION_TEST') || contains(env.cmd_type, 'TEST') }}   
       run: |
-        test_report_path="${{ env.test_report_path}}"
-        reporter="${{ env.reporter}}"
-        if [ -z "$test_report_path" ] && [ -z "$reporter" ]; then
-          echo "::warning::Test report will not be generated for ${{ env.cmd_type }}, as both test_report_path and reporter values are empty!"    
-        elif [ -z "$test_report_path" ]; then
-          echo "::warning::Empty value passed for test_report_path. Test report will not be generated for ${{ env.cmd_type }}!"
-        elif [ -z "$reporter" ]; then
-          echo "::warning::Empty value passed for reporter. Test report will not be generated for ${{ env.cmd_type }}!"
-        else
-          if find . -type f -path "$test_report_path" -print -quit | grep -q .; then
-            echo -e "\e[32mSuccess\e[0m: Test report files found"
-          else
-            echo "::error::No test report files were found. The 'test_report_path' may be incorrect for ${{ env.cmd_type }}"
-          fi
-        fi
+        
+        # function to check empty variables and file existence
+        check_empty() {
+            local report_path=$1
+            local reporter=$2
+            local test_type=$3
 
+            # Add "int_" prefix if test type is "INTEGRATION_TEST" to generate warning messages according to the test type
+            if [ "$test_type" == "INTEGRATION_TEST" ]; then
+                prefix="int_"
+            elif [ "$test_type" == "UNIT_TEST" ]; then
+                prefix="unit_"
+            elif [ "$test_type" == "TEST" ]; then
+                prefix=""
+            fi
+
+            if [ -z "$report_path" ] && [ -z "$reporter" ]; then
+                echo "::warning::Test report will not be generated for $test_type, as both the variables '${prefix}test_report_path' and '${prefix}test_reporter' have empty values!" 
+            elif [ -z "$report_path" ]; then
+                echo "::warning::Empty value passed for variable '${prefix}test_report_path'. Test report will not be generated for $test_type!"
+            elif [ -z "$reporter" ]; then
+                echo "::warning::Empty value passed for variable '${prefix}reporter'. Test report will not be generated for $test_type!"
+            else
+                # Check for the existence of report files
+                if find . -type f -path "$report_path" -print -quit | grep -q .; then
+                    echo -e "\e[32mSuccess\e[0m: $test_type report files found"
+                else
+                    echo "::error::No $test_type report files were found. The value of the variable '${prefix}test_report_path' may be incorrect for $test_type!"
+                fi
+            fi
+        }
+
+        # Calling a function for each cmd_type.
+        IFS=',' read -ra cmd_types <<< "${{ env.cmd_type }}"
+        for type in "${cmd_types[@]}"; do
+            if [ "$type" == "UNIT_TEST" ]; then
+              unit_test_report_path="${{ env.unit_test_report_path }}"
+              unit_test_reporter="${{ env.unit_test_reporter }}"
+              check_empty "$unit_test_report_path" "$unit_test_reporter" "$type"
+           
+            elif [ "$type" == "INTEGRATION_TEST" ]; then
+              int_test_report_path="${{ env.int_test_report_path }}"
+              int_test_reporter="${{ env.int_test_reporter }}"
+              check_empty "$int_test_report_path" "$int_test_reporter" "$type"
+
+            elif [ "$type" == "TEST" ]; then
+              test_report_path="${{ env.test_report_path }}"
+              test_reporter="${{ env.test_reporter }}"
+              check_empty "$test_report_path" "$test_reporter" "$type"
+            fi
+        done 
+        
       shell: bash
 
-    - name: Test Report
+    - name: Unit Test Report
+      uses: dorny/test-reporter@v1
+      id : unit-test-result
+      if: ${{ contains(env.cmd_type, 'UNIT_TEST') &&  env.unit_test_report_path !='' && env.unit_test_reporter !='' }}                   
+      with:
+        name: ${{ github.job }}-UNIT_TEST                          
+        path: ${{ env.unit_test_report_path}}              # '**/target/**/*.xml'   
+        reporter: ${{ env.unit_test_reporter }}                 # Format of test results. 
+        only-summary: 'true' 
+        fail-on-error: ${{ env.unit_test_fail_on_error || false }}     # Set action as failed if test report contains any failed test
+        fail-on-empty: ${{ env.unit_test_fail_on_empty || false }}     # Set action as failed if no test report files were found
+
+    - name: Integration Test Report
+      uses: dorny/test-reporter@v1
+      id : int-test-result
+      if: ${{ contains(env.cmd_type, 'INTEGRATION_TEST') &&  env.int_test_report_path !='' && env.int_test_reporter !='' }}                   
+      with:
+        name: ${{ github.job }}-INTEGRATION_TEST                          
+        path: ${{ env.int_test_report_path}}              # '**/target/**/*.xml'   
+        reporter: ${{ env.int_test_reporter }}                 # Format of test results. 
+        only-summary: 'true' 
+        fail-on-error: ${{ env.int_test_fail_on_error || false }}     # Set action as failed if test report contains any failed test
+        fail-on-empty: ${{ env.int_test_fail_on_empty || false }}     # Set action as failed if no test report files were found
+    
+    - name: Generic Test Report
       uses: dorny/test-reporter@v1
       id : test-result
-      if: ${{ (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') &&  env.test_report_path !='' && env.reporter !='' }}                   
+      if: ${{ contains(env.cmd_type, 'TEST') &&  env.test_report_path !='' && env.test_reporter !='' }}                   
       with:
-        name: ${{ github.job }}-${{ env.cmd_type }}                          
+        name: ${{ github.job }}-TEST                          
         path: ${{ env.test_report_path}}              # '**/target/**/*.xml'   
-        reporter: ${{ env.reporter }}                 # Format of test results. 
+        reporter: ${{ env.test_reporter }}                 # Format of test results. 
         only-summary: 'true' 
-        fail-on-error: ${{ env.fail-on-error || false }}     # Set action as failed if test report contains any failed test
-        fail-on-empty: ${{ env.fail-on-empty || false }}     # Set action as failed if no test report files were found
+        fail-on-error: ${{ env.test_fail_on_error || false }}     # Set action as failed if test report contains any failed test
+        fail-on-empty: ${{ env.test_fail_on_empty || false }}     # Set action as failed if no test report files were found
     
-    - name: Check if UNIT_TEST/INTEGRATION_TEST commands were successfully executed 
-      if: ${{ !cancelled() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') }}
+    - name: Check if UNIT_TEST/INTEGRATION_TEST/GENERIC_TEST commands were successfully executed 
+      if: ${{ !cancelled() && (contains(env.cmd_type, 'UNIT_TEST') || contains(env.cmd_type, 'INTEGRATION_TEST') || contains(env.cmd_type, 'TEST')) }}
       id: test_commands_execution
       run: |
         exec=$(cat $RUNNER_TEMP/icons.properties)
@@ -116,51 +191,117 @@ runs:
       shell: bash
 
     - name: Marking UNIT_TEST/INTEGRATION_TEST Step as failed if there are test failures
-      if: ${{ !cancelled() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') }}
+      if: ${{ !cancelled() && (contains(env.cmd_type, 'UNIT_TEST') || contains(env.cmd_type, 'INTEGRATION_TEST') || contains(env.cmd_type, 'TEST')) }}
       run: |
         icon="boom"
-        if [ "${{ env.cmd_type }}" == "UNIT_TEST" ] && [ "${{ steps.test_commands_execution.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.test-result.outputs.conclusion }}" == "failure" ] && [ "${{ steps.test-result.outputs.url_html }}" != "" ]; then
+        if [ "${{ contains(env.cmd_type, 'UNIT_TEST') }}" ] && [ "${{ steps.test_commands_execution.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.unit-test-result.outputs.conclusion }}" == "failure" ] && [ "${{ steps.unit-test-result.outputs.url_html }}" != "" ]; then
           sed -i "s/unit_test=white_check_mark/unit_test=${icon}/g" $RUNNER_TEMP/icons.properties
         fi
-        if [ "${{ env.cmd_type }}" == "INTEGRATION_TEST" ] && [ "${{ steps.test_commands_execution.outputs.integration_test }}" == "white_check_mark" ] && [ "${{ steps.test-result.outputs.conclusion }}" == "failure" ] && [ "${{ steps.test-result.outputs.url_html }}" != "" ]; then
+        if [ "${{ contains(env.cmd_type, 'INTEGRATION_TEST') }}" ] && [ "${{ steps.test_commands_execution.outputs.integration_test }}" == "white_check_mark" ] && [ "${{ steps.int-test-result.outputs.conclusion }}" == "failure" ] && [ "${{ steps.int-test-result.outputs.url_html }}" != "" ]; then
           sed -i "s/integration_test=white_check_mark/integration_test=${icon}/g" $RUNNER_TEMP/icons.properties
-        fi     
+        fi 
+        if [ "${{ contains(env.cmd_type, 'TEST') }}" ] && [ "${{ steps.test_commands_execution.outputs.test }}" == "white_check_mark" ] && [ "${{ steps.test-result.outputs.conclusion }}" == "failure" ] && [ "${{ steps.test-result.outputs.url_html }}" != "" ]; then
+          sed -i "s/test=white_check_mark/test=${icon}/g" $RUNNER_TEMP/icons.properties
+        fi      
       shell: bash
 
-
     - name: Copy test report to target folder
-      if: ${{ always() && env.copy-to-target-path !='' && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') }}
+      if: ${{ always() && ((env.unit_test_copy_to_target_path != '' && contains(env.cmd_type, 'UNIT_TEST')) || (env.int_test_copy_to_target_path != '' && contains(env.cmd_type, 'INTEGRATION_TEST')) || (env.test_copy_to_target_path != '' && contains(env.cmd_type, 'TEST'))) }}
       run: |
-        # checking destination folder exist or not.
-        if [ ! -d "${{env.copy-to-target-path}}" ]; then
-          echo -e "\e[31mError\e[0m: Destination folder does not exist!"
-        else
-          echo "Copy report files to target folder......"
-          cp ${{ env.test_report_path}} ${{env.copy-to-target-path}}
-        fi
+
+        # Function to copy test report files to target folder
+        check_empty() {
+            local report_path=$1
+            local target_path=$2
+            local test_type=$3
+
+            # Add prefix to generate warning messages according to the test type
+            if [ "$test_type" == "INTEGRATION_TEST" ]; then
+                prefix="Integration"
+            elif [ "$test_type" == "UNIT_TEST" ]; then
+                prefix="Unit"
+            elif [ "$test_type" == "TEST" ]; then
+                prefix=""
+            fi
+
+            if [ ! -d "$target_path" ]; then
+              echo "::error::Cannot copy files, as Destination folder does not exist for ${prefix} Test step!"
+            elif ! find . -type f -path "$report_path" -print -quit | grep -q .; then
+              echo "::error::Cannot copy files, as ${prefix} test report files were not found.!"
+            else
+              echo "Copy ${prefix} Test report files to target folder......"
+              find . -path "$report_path" -exec cp -v {} $target_path \;
+              echo -e "\e[32mSuccess\e[0m: All ${prefix} Test Report files successfully copied to the destination folder."
+            fi
+        }
+
+        # Writing the Test Report Link to the file
+        IFS=',' read -ra cmd_types <<< "${{ env.cmd_type }}"
+        for type in "${cmd_types[@]}"; do
+        
+          # checking destination folder exist or not for Unit step, Integration step & Generic test Step.
+          if [ "$type" == "UNIT_TEST" ] && [ "${{ env.unit_test_copy_to_target_path }}" != "" ]; then
+            unit_test_report_path="${{ env.unit_test_report_path }}"
+            unit_test_copy_to_target_path="${{ env.unit_test_copy_to_target_path }}"
+            check_empty "$unit_test_report_path" "$unit_test_copy_to_target_path" "$type"
+            
+          elif [ "$type" == "INTEGRATION_TEST" ] && [ "${{ env.int_test_copy_to_target_path }}" != "" ]; then
+            int_test_report_path="${{ env.int_test_report_path }}"
+            int_test_copy_to_target_path="${{ env.int_test_copy_to_target_path }}"
+            check_empty "$int_test_report_path" "$int_test_copy_to_target_path" "$type"    
+         
+          elif [ "$type" == "TEST" ] && [ "${{ env.test_copy_to_target_path }}" != "" ]; then
+            test_report_path="${{ env.test_report_path }}"
+            test_copy_to_target_path="${{ env.test_copy_to_target_path }}"
+            check_empty "$test_report_path" "$test_copy_to_target_path" "$type"    
+          fi
+
+        done
+
       shell: bash
 
     - name: Fetch Test Report Url for Unit Test and Integration step
-      if: ${{ always() && (env.cmd_type == 'UNIT_TEST' || env.cmd_type == 'INTEGRATION_TEST') }}
+      if: ${{ always() && (contains(env.cmd_type, 'UNIT_TEST') || contains(env.cmd_type, 'INTEGRATION_TEST') || contains(env.cmd_type, 'TEST')) }}
       id: test-report
       run: |                  
-        REPORT_LINK="${{ steps.test-result.outputs.url_html }}"
-        if [ -z "$REPORT_LINK" ]; then
-          echo "::error::Test Report is not Generated"
-        else
-          echo -e "\e[32msuccess\e[0m Test Report Generated: $REPORT_LINK"
-        fi
-        # Determine the appropriate file based on cmd_type
-        FILE_PATH="$RUNNER_TEMP/"
-        if [ "${{ env.cmd_type }}" == "UNIT_TEST" ]; then
-          FILE_PATH+="unit_test_links.txt"
-        elif [ "${{ env.cmd_type }}" == "INTEGRATION_TEST" ]; then
-          FILE_PATH+="integration_test_links.txt"
-        fi
-        # Passing report url to the determined file
-        echo "url=$REPORT_LINK" > $FILE_PATH
-      shell: bash
+        UNIT_TEST_REPORT_LINK="${{ steps.unit-test-result.outputs.url_html }}"
+        INT_TEST_REPORT_LINK="${{ steps.int-test-result.outputs.url_html }}"
+        TEST_REPORT_LINK="${{ steps.test-result.outputs.url_html }}"
 
+        # Writing the Test Report Link to the file
+        IFS=',' read -ra cmd_types <<< "${{ env.cmd_type }}"
+        for type in "${cmd_types[@]}"; do
+        
+          if [ "$type" == "UNIT_TEST" ]; then
+            if [ -z "$UNIT_TEST_REPORT_LINK" ]; then
+              echo "::error:: Unit Test Report is not Generated"
+            else
+              echo -e "\e[32msuccess\e[0m Unit Test Report Generated: $UNIT_TEST_REPORT_LINK"
+              UNIT_TEST_FILE_PATH="$RUNNER_TEMP/unit_test_links.txt"
+              echo "url=$UNIT_TEST_REPORT_LINK" > $UNIT_TEST_FILE_PATH
+            fi
+  
+          elif [ "$type" == "INTEGRATION_TEST" ]; then
+            if [ -z "$INT_TEST_REPORT_LINK" ]; then
+              echo "::error::Integration Test Report is not Generated"
+            else
+              echo -e "\e[32msuccess\e[0m Integration Test Report Generated: $INT_TEST_REPORT_LINK"
+              INT_TEST_FILE_PATH="$RUNNER_TEMP/integration_test_links.txt"
+              echo "url=$INT_TEST_REPORT_LINK" > $INT_TEST_FILE_PATH
+            fi
+
+          elif [ "$type" == "TEST" ]; then
+            if [ -z "$TEST_REPORT_LINK" ]; then
+              echo "::error::Test Report is not Generated"
+            else
+              echo -e "\e[32msuccess\e[0m Test Report Generated: $TEST_REPORT_LINK"
+              TEST_FILE_PATH="$RUNNER_TEMP/test_links.txt"
+              echo "url=$TEST_REPORT_LINK" > $TEST_FILE_PATH
+            fi
+          fi
+        done
+      
+      shell: bash
 
       # Sonar section
     - name: Sonar Scan
@@ -377,7 +518,19 @@ runs:
           echo "$value" >> $GITHUB_OUTPUT
         else
           echo "url=" >> $GITHUB_OUTPUT
-        fi      
+        fi 
+
+    - name: Read generic test report url
+      if: ${{ env.report }}
+      id: generic_test_url
+      shell: bash
+      run: |
+        if [ -f $RUNNER_TEMP/test_links.txt ]; then
+          value=$(cat $RUNNER_TEMP/test_links.txt)
+          echo "$value" >> $GITHUB_OUTPUT
+        else
+          echo "url=" >> $GITHUB_OUTPUT
+        fi        
 
     - name: Report Summary Tracking
       if: ${{ env.report }}
@@ -386,13 +539,15 @@ runs:
         echo "| <div style="max-width:60%">Step/Command</div> | Status |" >> $GITHUB_STEP_SUMMARY
         echo "|:---------|:-------:|" >> $GITHUB_STEP_SUMMARY
         echo "| Build | :${{ steps.all_icons.outputs.build }}: |" >> $GITHUB_STEP_SUMMARY
-        
+
+        #Unit Test
         if [ "${{ steps.all_icons.outputs.unit_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
           echo "| [Unit Test](${{ steps.unit_test_url.outputs.url }}) | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
         else
           echo "| Unit Test | :${{ steps.all_icons.outputs.unit_test }}: |" >> $GITHUB_STEP_SUMMARY
         fi
-
+        
+        #Integration Test
         if [ "${{ steps.all_icons.outputs.integration_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.integration_test }}" == "white_check_mark" ]; then
             if [ "${{ steps.integration_test_url.outputs.url }}" != "" ]; then
                 echo "| [Integration Test](${{ steps.integration_test_url.outputs.url }}) | :${{ steps.all_icons.outputs.integration_test }}: |" >> $GITHUB_STEP_SUMMARY
@@ -401,6 +556,19 @@ runs:
             fi
         fi
 
+        #Generic Test
+        if [ "${{ steps.all_icons.outputs.generic_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.generic_test }}" == "white_check_mark" ]; then
+            TEST=Test
+            if [ -f "$RUNNER_TEMP/test.txt" ]; then
+              TEST="${TEST} $(cat $RUNNER_TEMP/test.txt)"
+            fi
+
+            if [ "${{ steps.generic_test_url.outputs.url }}" != "" ]; then
+                echo "| [${TEST}](${{ steps.generic_test_url.outputs.url }}) | :${{ steps.all_icons.outputs.generic_test }}: |" >> $GITHUB_STEP_SUMMARY
+            else
+                echo "| ${TEST} | :${{ steps.all_icons.outputs.generic_test }}: |" >> $GITHUB_STEP_SUMMARY
+            fi
+        fi
 
         sonar_result="${{ env.SONAR_HOST_URL }}/dashboard?id=${{ env.SONAR_PROJECT_KEY }}&"
 
@@ -457,19 +625,35 @@ runs:
         citadel_result=""
         branch="${GITHUB_REF#refs/heads/}"
 
+        #Unit Test
         if [ "${{ steps.all_icons.outputs.unit_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.unit_test }}" == "white_check_mark" ] && [ "${{ steps.unit_test_url.outputs.url }}" != "" ]; then
           unit_test="<${{ steps.unit_test_url.outputs.url }}|Unit Test>"
         else
           unit_test="Unit Test"
         fi
-
+        
+        #Integration Test
         if [ "${{ steps.all_icons.outputs.integration_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.integration_test }}" == "white_check_mark" ]; then
             if [ "${{ steps.integration_test_url.outputs.url }}" != "" ]; then
-              integration_test="<${{ steps.integration_test_url.outputs.url }})|Integration Test>" 
+              integration_test="<${{ steps.integration_test_url.outputs.url }}|Integration Test>" 
             else
               integration_test="Integration Test"
             fi
-            integration_test_meesage=":arrow_right: Result  :${{ steps.all_icons.outputs.integration_test }}:"
+            integration_test_message=":arrow_right: Result  :${{ steps.all_icons.outputs.integration_test }}:"
+        fi
+
+        #Generic Test
+        if [ "${{ steps.all_icons.outputs.generic_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.generic_test }}" == "white_check_mark" ]; then
+            TEST=Test
+            if [ -f "$RUNNER_TEMP/test.txt" ]; then
+              TEST="${TEST} $(cat $RUNNER_TEMP/test.txt)"
+            fi
+            if [ "${{ steps.generic_test_url.outputs.url }}" != "" ]; then
+              generic_test="<${{ steps.generic_test_url.outputs.url }}|$TEST>" 
+            else
+              generic_test="$TEST"
+            fi
+            generic_test_message=":arrow_right: Result  :${{ steps.all_icons.outputs.generic_test }}:"
         fi
 
         if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
@@ -534,7 +718,14 @@ runs:
         if [ "${{ steps.all_icons.outputs.integration_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.integration_test }}" == "white_check_mark" ]; then
           template="$template{ \"value\": \"$integration_test\", \"short\": true },"
           template="$template{ \"value\": \" \", \"short\": true },"
-          template="$template{ \"value\": \"${integration_test_meesage}\", \"short\": true },"
+          template="$template{ \"value\": \"${integration_test_message}\", \"short\": true },"
+          template="$template{ \"value\": \" \", \"short\": true },"
+        fi
+
+        if [ "${{ steps.all_icons.outputs.generic_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.generic_test }}" == "white_check_mark" ]; then
+          template="$template{ \"value\": \"$generic_test\", \"short\": true },"
+          template="$template{ \"value\": \" \", \"short\": true },"
+          template="$template{ \"value\": \"${generic_test_message}\", \"short\": true },"
           template="$template{ \"value\": \" \", \"short\": true },"
         fi
 
