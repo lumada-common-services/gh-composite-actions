@@ -1,3 +1,12 @@
+## 2.0.0 🐝 - 2024-02-27
+
+### What's Changed
+
+#### 🚀 Features
+
+- Updated the composite action to track steps (BUILD, UNIT_TEST, INTEGRATION_TEST, TEST, DEPLOY) using comma-separated values. Now, we can track one or multiple cmd_type in a single step. For e.g., `cmd_type: BUILD,UNIT_TEST,DEPLOY`.
+- Added the new cmd_type 'TEST' to the composite action for tracking any generic test step. Also added the new 'TEST_DESC' environment variable to include additional descriptions along with the 'Test' keyword in the reporting. This generic test step will only be tracked if it is run. [(Pull Request 141)](https://github.com/lumada-common-services/gh-composite-actions/pull/141)
+
 ## 1.9.0 🐝 - 2024-01-30
 
 ### What's Changed
