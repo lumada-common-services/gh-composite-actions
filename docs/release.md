@@ -1,3 +1,11 @@
+## 2.0.1 🐝 - 2024-02-28
+
+### What's Changed
+
+#### 🐛 Bug Fixes
+
+- Updated hv-actions/slack-action to use `stable` tag. [(Pull Request 142)](https://github.com/lumada-common-services/gh-composite-actions/pull/142)
+
 ## 2.0.0 🐝 - 2024-02-27
 
 ### What's Changed
