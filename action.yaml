@@ -752,7 +752,7 @@ runs:
 
     - name: Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
-      uses: hv-actions/slack-action@v3
+      uses: hv-actions/slack-action@stable
       env:
         SLACK_TOKEN: ${{ env.Slack_Token }}
       with:
