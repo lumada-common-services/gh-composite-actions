@@ -1,3 +1,12 @@
+## 2.1.0 🐝 - 2024-03-04
+
+### What's Changed
+
+#### 🚀 Features
+
+- Update the Citadel scan script to fetch plugin names from the manifest file and determine the artifact zip URL for those plugins.
+  The script will only update the values if the Citadel config YAML file contains the specific placeholder mentioned below for each particular key. For more information, refer to [this.](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30890459190/Honeycomb+and+Citadel+integration#Updating-values-in-the-config-file)   [(Pull Request 143)](https://github.com/lumada-common-services/gh-composite-actions/pull/143)
+
 ## 2.0.1 🐝 - 2024-02-28
 
 ### What's Changed
