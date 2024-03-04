@@ -326,7 +326,10 @@ runs:
         pip3 install pyyaml==6.0.1
 
         python3 ${GITHUB_ACTION_PATH}/citadel/citadel.py \
-          "${GITHUB_WORKSPACE}/citadel-config.yaml" "${{ env.PROJECT_PATH }}" "$GITHUB_WORKFLOW_REF" "$RUNNER_TEMP"
+          "${GITHUB_WORKSPACE}/citadel-config.yaml" "${{ env.PROJECT_PATH }}" "$GITHUB_WORKFLOW_REF" "$RUNNER_TEMP" \
+          "${{ env.CODEDX_BRANCH }}" "${{ github.repository_owner }}" "${{ github.event.repository.name }},${{ github.ref_name }}" "${{ env.REPO_PATHS_INCLUDES }}" "${{ env.ARTIFACT_URLS }}" \
+          "${{ env.BUILD_NAME }}" "${{ env.BUILD_NUMBER }}" "${{ env.BUILD_VERSION }}" "${{ env.ARTIFACTORY_USER }}" "${{ env.ARTIFACTORY_API_KEY }}" "${{ env.ARTIFACTORY_BASE_URL }}" "${{ env.JF_CLI_RT_NAME }}" \
+          "${{ env.LOGGING_LEVEL }}" "${{ env.MANIFEST_PATH}}"
         
         echo "CITADEL_JSON_PATH=$RUNNER_TEMP/citadel.json" >> $GITHUB_ENV
 
