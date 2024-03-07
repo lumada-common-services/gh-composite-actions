@@ -106,11 +106,11 @@ runs:
             fi
 
             if [ -z "$report_path" ] && [ -z "$reporter" ]; then
-                echo "::warning::Test report will not be generated for $test_type, as both the variables '${prefix}test_report_path' and '${prefix}test_reporter' have empty values!" 
+                echo "::warning::Test report link will not be generated for $test_type, as both the variables '${prefix}test_report_path' and '${prefix}test_reporter' have empty values!" 
             elif [ -z "$report_path" ]; then
-                echo "::warning::Empty value passed for variable '${prefix}test_report_path'. Test report will not be generated for $test_type!"
+                echo "::warning::Empty value passed for variable '${prefix}test_report_path'. Test report link will not be generated for $test_type!"
             elif [ -z "$reporter" ]; then
-                echo "::warning::Empty value passed for variable '${prefix}reporter'. Test report will not be generated for $test_type!"
+                echo "::warning::Empty value passed for variable '${prefix}test_reporter'. Test report link will not be generated for $test_type!"
             else
                 # Check for the existence of report files
                 if find . -type f -path "$report_path" -print -quit | grep -q .; then
