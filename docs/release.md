@@ -1,3 +1,11 @@
+## 2.1.1 🐝 - 2024-03-11
+
+### What's Changed
+
+#### 🐛 Bug Fixes
+
+- Fixed the variable name value for the test reporter, as it was showing an incorrect variable name. It should show the variable name in the warning message as `unit_test_reporter`, not `unit_reporter`. [(Pull Request 144)](https://github.com/lumada-common-services/gh-composite-actions/pull/144)
+
 ## 2.1.0 🐝 - 2024-03-04
 
 ### What's Changed
