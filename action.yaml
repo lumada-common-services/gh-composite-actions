@@ -4,6 +4,7 @@ inputs:
   command:
     description: "A command line statement"
 
+
 runs:
   using: "composite"
   steps: 
