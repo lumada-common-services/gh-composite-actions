@@ -464,6 +464,7 @@ runs:
         JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
         JF_WORKING_DIR: ${{ env.JF_WORKING_DIR }}
         JF_FAIL: "FALSE"
+        JF_PATH_EXCLUSIONS: '*.git*;*node_modules*;*target*;*venv*;*test*;*resources-filtered*'
 
     - name: Creating Kind Cluster 
       id: cluster-creation
