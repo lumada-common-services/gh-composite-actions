@@ -707,7 +707,7 @@ runs:
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \"Build                    :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"${details}\", \"short\": true },"
-        template="$template{ \"value\": \"$unit_test              :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
+        template="$template{ \"value\": \"$unit_test             :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
      
          
@@ -725,10 +725,10 @@ runs:
 
         template="$template{ \"value\": \"${commit}\", \"short\": true },"
       
-        template="$template{ \"value\": \"${citadel_result}         :${{ steps.all_icons.outputs.citadel_scan }}:\", \"short\": true },"
+        template="$template{ \"value\": \"${citadel_result}           :${{ steps.all_icons.outputs.citadel_scan }}:\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
         
-        template="$template{ \"value\": \"${deploy_result}         :${{ steps.all_icons.outputs.deploy }}:\", \"short\": true }"
+        template="$template{ \"value\": \"${deploy_result}            :${{ steps.all_icons.outputs.deploy }}:\", \"short\": true }"
          
         # template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
         # template="$template{ \"value\": \" \", \"short\": true },"
