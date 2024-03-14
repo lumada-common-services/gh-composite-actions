@@ -708,7 +708,7 @@ runs:
         template="$template{ \"value\": \"Build\  :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"${details}\", \"short\": true },"
         template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
-        template="$template{ \"value\": \"$unit_test  :${{ steps.all_icons.outputs.unit_test }}:\n\\", \"short\": true },"
+        template="$template{ \"value\": \"$unit_test  :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"${commit}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
          
