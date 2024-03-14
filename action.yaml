@@ -722,9 +722,9 @@ runs:
         fi
 
         template="$template{ \"value\": \"$sonar_result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
+        
         template="$template{ \"value\": \"${commit}\", \"short\": true },"
-        template="$template{ \"value\": \" \", \"short\": true },"
-         
+      
         template="$template{ \"value\": \"${citadel_result}  :${{ steps.all_icons.outputs.citadel_scan }}:\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
         
