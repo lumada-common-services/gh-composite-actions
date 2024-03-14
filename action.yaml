@@ -642,7 +642,6 @@ runs:
             else
               integration_test="Integration Test"
             fi
-            integration_test_message=":arrow_right: Result  :${{ steps.all_icons.outputs.integration_test }}:"
         fi
 
         #Generic Test
@@ -656,7 +655,6 @@ runs:
             else
               generic_test="$TEST"
             fi
-            generic_test_message=":arrow_right: Result  :${{ steps.all_icons.outputs.generic_test }}:"
         fi
 
         if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
@@ -682,15 +680,13 @@ runs:
             # blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
 
             citadel_result="Citadel"
-            citadel_message=":arrow_right: Result  :${{ steps.all_icons.outputs.citadel_scan }}:"
-
+       
             DEPLOY=Deploy
             if [ -f "$RUNNER_TEMP/deploy.txt" ]; then
               DEPLOY="${DEPLOY} $(cat $RUNNER_TEMP/deploy.txt)"
             fi
             deploy_result="$DEPLOY"
-            deploy_message=":arrow_right: Result  :${{ steps.all_icons.outputs.deploy }}:"
-
+          
         elif [ "${{ github.event_name }}" == "pull_request" ] || [ "${{ github.event_name }}" == "pull_request_target" ]; then
             details="<${{ github.server_url }}/${{ github.repository }}/pull/${{ github.event.pull_request.number }}| Details>"
 
@@ -709,44 +705,31 @@ runs:
         workflow_url="<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.event_name }}>"
         template="{ \"value\": \"Event: $workflow_url\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"Build\", \"short\": true },"
+        template="$template{ \"value\": \"Build\  :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"${details}\", \"short\": true },"
-        template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
-        template="$template{ \"value\": \"$unit_test\", \"short\": true },"
+        template="$template{ \"value\": \"$unit_test  :${{ steps.all_icons.outputs.unit_test }}:\n\\", \"short\": true },"
         template="$template{ \"value\": \"${commit}\", \"short\": true },"
-        template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
          
         if [ "${{ steps.all_icons.outputs.integration_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.integration_test }}" == "white_check_mark" ]; then
-          template="$template{ \"value\": \"$integration_test\", \"short\": true },"
-          template="$template{ \"value\": \" \", \"short\": true },"
-          template="$template{ \"value\": \"${integration_test_message}\", \"short\": true },"
+          template="$template{ \"value\": \"$integration_test  :${{ steps.all_icons.outputs.integration_test }}:\", \"short\": true },"
           template="$template{ \"value\": \" \", \"short\": true },"
         fi
 
         if [ "${{ steps.all_icons.outputs.generic_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.generic_test }}" == "white_check_mark" ]; then
-          template="$template{ \"value\": \"$generic_test\", \"short\": true },"
-          template="$template{ \"value\": \" \", \"short\": true },"
-          template="$template{ \"value\": \"${generic_test_message}\", \"short\": true },"
+          template="$template{ \"value\": \"$generic_test  :${{ steps.all_icons.outputs.generic_test }}:\", \"short\": true },"
           template="$template{ \"value\": \" \", \"short\": true },"
         fi
 
-        template="$template{ \"value\": \"$sonar_result\", \"short\": true },"
+        template="$template{ \"value\": \"$sonar_result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \":arrow_right: Result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
+         
+        template="$template{ \"value\": \"${citadel_result}  :${{ steps.all_icons.outputs.citadel_scan }}:\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
         
-        template="$template{ \"value\": \"${citadel_result}\", \"short\": true },"
-        template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"${citadel_message}\", \"short\": true }",
-        template="$template{ \"value\": \" \", \"short\": true },"
-
-        template="$template{ \"value\": \"${deploy_result}\", \"short\": true },"
-        template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"${deploy_message}\", \"short\": true }"
-        deploy="<${{ env.DEPLOY_DESC }}|deploy Test>"
-
+        template="$template{ \"value\": \"${deploy_result}  :${{ steps.all_icons.outputs.deploy }}:\", \"short\": true }"
+         
         # template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
         # template="$template{ \"value\": \" \", \"short\": true },"
         # template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
