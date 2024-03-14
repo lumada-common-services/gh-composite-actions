@@ -707,10 +707,9 @@ runs:
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \"Build  :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"${details}\", \"short\": true },"
-         template="$template{ \"value\": \"$unit_test  :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
+        template="$template{ \"value\": \"$unit_test  :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
         template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
-        template="$template{ \"value\": \"${commit}\", \"short\": true },"
-        template="$template{ \"value\": \" \", \"short\": true },"
+     
          
         if [ "${{ steps.all_icons.outputs.integration_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.integration_test }}" == "white_check_mark" ]; then
           template="$template{ \"value\": \"$integration_test  :${{ steps.all_icons.outputs.integration_test }}:\", \"short\": true },"
@@ -723,6 +722,8 @@ runs:
         fi
 
         template="$template{ \"value\": \"$sonar_result  :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
+        template="$template{ \"value\": \" \", \"short\": true },"
+        template="$template{ \"value\": \"${commit}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
          
         template="$template{ \"value\": \"${citadel_result}  :${{ steps.all_icons.outputs.citadel_scan }}:\", \"short\": true },"
