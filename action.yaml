@@ -733,6 +733,39 @@ runs:
         # template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
         # template="$template{ \"value\": \" \", \"short\": true },"
         # template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
+        
+        json_data='[${template}]'
+
+        max_symbol_key_length() {
+            local max=0
+            while IFS= read -r line; do
+                local key=$(echo "$line" | grep -o '"value": ".*"' | cut -d '"' -f 4)
+                if [[ "$key" =~ :[a-zA-Z_]+:$ ]]; then
+                    local len=${#key}
+                    if (( len > max )); then
+                        max=$len
+                    fi
+                fi
+            done < <(echo "$json_data")
+            echo "$max"
+        }
+
+        # Calculate the maximum length for symbol keys
+        max_symbol_length=$(max_symbol_key_length)
+
+        # Loop through JSON data and align symbol values
+        updated_data=$(echo "$json_data" | while IFS= read -r line; do
+            value=$(echo "$line" | grep -o '"value": ".*"' | cut -d '"' -f 4)
+            if [[ "$value" =~ :[a-zA-Z_]+:$ ]]; then
+                key=$(echo "$line" | grep -o '"value": ".*"' | cut -d '"' -f 4)
+                padding=$((max_symbol_length - ${#key}))
+                printf "%s" "$line" | sed -E "s/\"value\": \"(.*):(.+):\"/\"value\": \"\1$(printf '%-*s' "$padding"):\2:\"/"
+            else
+                echo "$line"
+            fi
+        done)
+
+        echo "$updated_data"
 
         echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
 
