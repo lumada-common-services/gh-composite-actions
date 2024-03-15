@@ -734,7 +734,7 @@ runs:
         # template="$template{ \"value\": \" \", \"short\": true },"
         # template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
         
-        json_data='[${template}]'
+        json_data=${template}
 
         max_symbol_key_length() {
             local max=0
