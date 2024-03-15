@@ -783,8 +783,8 @@ runs:
         done)
 
         echo "$updated_data"
-
-        echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
+        echo "slack-attach-fields=$updated_data" >> $GITHUB_OUTPUT
+        # echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
 
     - name: Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
@@ -798,9 +798,9 @@ runs:
               "status": "${{ job.status }}",
               "attachments": [
                 {
-                  "fields": [
+                  "fields": 
                     ${{ steps.slack-template.outputs.slack-attach-fields }}
-                  ],
+                  ,
                   "footer": "by ${{ github.actor }}",
                   "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
                 }
