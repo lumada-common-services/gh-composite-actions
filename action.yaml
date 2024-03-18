@@ -799,9 +799,8 @@ runs:
               "attachments": [
                 {
                   "fields": [
-                    { "value": "Event: <https://github.com/lumada-common-services/hon7475|push>", "short": true },
-                    { "value": " ", "short": true },
-                    { "value": "Build             :white_check_mark:", "short": true },{ "value": " ", "short": true },
+                    { "value": "Event: <https://github.com/lumada-common-services/hon7475|push>", "short": true },{ "value": " ", "short": true },
+                    { "value": "Build             :white_check_mark:", "short": true },
                     { "value": "Unit Test         :white_check_mark:", "short": true },{ "value": " ", "short": true },
                     { "value": "Integration Test  :white_check_mark:", "short": true },{ "value": " ", "short": true },
                     { "value": "Test              :white_check_mark:", "short": true },{ "value": " ", "short": true },
