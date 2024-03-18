@@ -805,7 +805,7 @@ runs:
                     { "value": ":white_check_mark:  Integration Test", "short": true },{ "value": " ", "short": true },
                     { "value": ":x:  Test", "short": true },{ "value": " ", "short": true },
                     { "value": "SonarQube              :x:", "short": true },{ "value": " ", "short": true },
-                    { "value": "Citadel   :x:", "short": true },{ "value": " ", "short": true },
+                    { "value": "Citadel    :x:", "short": true },{ "value": " ", "short": true },
                     { "value": "Deploy    :white_check_mark:", "short": true }
                   ],
                   "footer": "by ${{ github.actor }}",
