@@ -799,21 +799,14 @@ runs:
               "attachments": [
                 {
                   "fields": [
-                    { "value": "Event: <https://github.com/lumada-common-services/hon7475|push>", "short": true },
-                    { "value": "&emsp;", "short": true },
-                    { "value": "Build :white_check_mark:", "short": true },
-                    { "value": "&emsp;", "short": true },
-                    { "value": "Unit Test        :white_check_mark:", "short": true },
-                    { "value": "&emsp;", "short": true },
-                    { "value": "Integration Test :white_check_mark:", "short": true },
-                    { "value": "&emsp;", "short": true },
-                    { "value": "Test             :x:", "short": true },
-                    { "value": "&emsp;", "short": true },
-                    { "value": "SonarQube        :x:", "short": true },
-                    { "value": "&emsp;", "short": true },
-                    { "value": "Citadel          :x:", "short": true },
-                    { "value": "&emsp;", "short": true },
-                    { "value": "Deploy           :white_check_mark:", "short": true }
+                    { "value": "Event: <https://github.com/lumada-common-services/hon7475|push>", "short": true },{ "value": " ", "short": true },
+                    { "value": "Build :white_check_mark:  ", "short": true },{ "value": " ", "short": true },
+                    { "value": "Unit Test        :white_check_mark:  ", "short": true },{ "value": " ", "short": true },
+                    { "value": "Integration Test&nbsp;:white_check_mark:", "short": true },{ "value": " ", "short": true },
+                    { "value": "Test             :x:", "short": true },{ "value": " ", "short": true },
+                    { "value": "SonarQube        :x:", "short": true },{ "value": " ", "short": true },
+                    { "value": "Citadel&amp;nbsp;:x:", "short": true },{ "value": " ", "short": true },
+                    { "value": "Deploy&amp;nbsp;:white_check_mark:", "short": true }
                   ],
                   "footer": "by ${{ github.actor }}",
                   "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
