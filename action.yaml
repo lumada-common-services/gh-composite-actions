@@ -831,7 +831,7 @@ runs:
                     "elements": [
                       {
                         "type": "mrkdwn",
-                        "text": "https://github.com/AdityaHitachi.png?size=20 by AdityaHitachi"
+                        "text": "https://github.com/${{github.actor}}.png?size=20 by ${{ github.actor }}"
                       }
                     ]
                   }
