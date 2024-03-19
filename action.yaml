@@ -834,8 +834,8 @@ runs:
                           "text": "https://github.com/AdityaHitachi.png?size=20 by AdityaHitachi"
                         }
                       ]
-                    }
-                  ],
+                    }],
+                  "fields": [],
                   "footer": "by ${{ github.actor }}",
                   "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
                 }
