@@ -795,8 +795,10 @@ runs:
           raw-input: >
             {
               "channel": "${{ env.Slack_Channel }}",
+              "status": "${{ job.status }}",
               "attachments": [
                 {
+                  "fields": [],
                   "footer": "by ${{ github.actor }}",
                   "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
                 }
