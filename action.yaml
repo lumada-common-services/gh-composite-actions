@@ -800,13 +800,13 @@ runs:
                 {
                   "fields": [
                     { "value": "Event: <https://github.com/lumada-common-services/hon7475|push>", "short": true },{ "value": " ", "short": true },
-                    { "value": "Build", "short": false },{ "value": ":white_check_mark:", "short": false },
-                    { "value": "Unit Test", "short": true },{ "value": ":white_check_mark:", "short": true },
-                    { "value": "Integration Test", "short": true },{ "value": ":white_check_mark:", "short": true },
-                    { "value": "Test", "short": true },{ "value": "dd :x:", "short": true },
-                    { "value": "SonarQube", "short": true },{ "value": " :x:", "short": true },
-                    { "value": "Citadel", "short": true },{ "value": " :x:", "short": true },
-                    { "value": "Deploy", "short": true },{ "value": ":x:", "short": true }
+                    { "value": "Build", "short": false },{ "value": " :white_check_mark: ", "short": false },
+                    { "value": "Unit Test", "short": false },{ "value": " :white_check_mark: ", "short": false },
+                    { "value": "Integration Test", "short": true },{ "value": " :white_check_mark: ", "short": true },
+                    { "value": "Test", "short": true },{ "value": " :x: ", "short": true },
+                    { "value": "SonarQube", "short": true },{ "value": " :x: ", "short": true },
+                    { "value": "Citadel", "short": true },{ "value": " :x: ", "short": true },
+                    { "value": "Deploy", "short": true },{ "value": " :x: ", "short": true }
                   ],
                   "footer": "by ${{ github.actor }}",
                   "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
