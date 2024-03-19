@@ -829,6 +829,7 @@ runs:
                   "footer": "by ${{ github.actor }}",
                   "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
                 }
+              ]
             }
 
     - name: Teams Notification
