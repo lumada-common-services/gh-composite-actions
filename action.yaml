@@ -800,9 +800,9 @@ runs:
                 {
                   "fields": [
                     { "value": "Event: <https://github.com/lumada-common-services/hon7475|push>", "short": true },{ "value": " ", "short": true },
-                    { "value": "Build", "short": false },{ "value": " :white_check_mark: ", "short": false },
+                    { "value": "Build", "short": true },{ "value": " :white_check_mark: ", "short": true },
                     { "value": " ", "short": true },{ "value": "  ", "short": true },
-                    { "value": "Unit Test", "short": false },{ "value": " :white_check_mark: ", "short": false },
+                    { "value": "Unit Test", "short": true },{ "value": " :white_check_mark: ", "short": true },
                     { "value": "Integration Test", "short": true },{ "value": " :white_check_mark: ", "short": true },
                     { "value": "Test", "short": true },{ "value": " :x: ", "short": true },
                     { "value": "SonarQube", "short": true },{ "value": " :x: ", "short": true },
