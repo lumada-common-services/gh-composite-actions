@@ -798,7 +798,16 @@ runs:
               "status": "${{ job.status }}",
               "attachments": [
                 {
-                  "fields": [],
+                  "fields": [
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Steps* "
+                    },
+                    {
+                      "type": "mrkdwn",
+                      "text": "*Status*"
+                    }
+                  ],
                   "footer": "by ${{ github.actor }}",
                   "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
                 }
