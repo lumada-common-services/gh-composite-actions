@@ -802,19 +802,19 @@ runs:
                     { "value": "Event: <https://github.com/lumada-common-services/hon7475|push>", "short": true },
                     { "value": " ", "short": true },
 
-                    { "value": "Build               ", "short": true }, // Pad with spaces
+                    { "value": "Build               ", "short": true }, 
                     { "value": ":", "short": true },
                     { "value": " ", "short": true },
-                    { "value": "✅", "short": true }, // Use checkmark symbol
+                    { "value": "✅", "short": true }, 
 
-                    { "value": " ", "short": true },  // Optional non-breaking space
+                    { "value": " ", "short": true }, 
 
-                    { "value": "Unit Test           ", "short": true }, // Pad with spaces
+                    { "value": "Unit Test           ", "short": true }, 
                     { "value": ":", "short": true },
                     { "value": " ", "short": true },
-                    { "value": "✅", "short": true }, // Use checkmark symbol
+                    { "value": "✅", "short": true },
 
-                    { "value": " ", "short": true },  // Optional non-breaking space
+                    { "value": " ", "short": true }
 
                   ],
                   "footer": "by ${{ github.actor }}",
