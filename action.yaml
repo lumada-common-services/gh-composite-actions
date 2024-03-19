@@ -795,35 +795,6 @@ runs:
           raw-input: >
             {
               "channel": "${{ env.Slack_Channel }}",
-              "status": "${{ job.status }}",
-              "blocks": [
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Steps* "
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Status*\n\n"
-                    }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "<https://github.com/lumada-common-services/hon7475|Build> \n\n Unit Test \n\n Citadel \n\n Deploy"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": ":x: \n\n :white_check_mark: \n\n :white_check_mark: \n\n :x:"
-                    }
-                  ]
-                }
-              ],
               "attachments": [
                 {
                   "footer": "by ${{ github.actor }}",
