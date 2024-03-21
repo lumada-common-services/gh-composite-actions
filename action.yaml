@@ -705,86 +705,38 @@ runs:
         workflow_url="<${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}|${{ github.event_name }}>"
         template="{ \"value\": \"Event: $workflow_url\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-        template="$template{ \"value\": \"Build                    :${{ steps.all_icons.outputs.build }}:\n\", \"short\": true },"
+        template="$template{ \"value\": \":${{ steps.all_icons.outputs.build }}:  Build\", \"short\": true },"
         template="$template{ \"value\": \"${details}\", \"short\": true },"
-        template="$template{ \"value\": \"$unit_test             :${{ steps.all_icons.outputs.unit_test }}:\n\", \"short\": true },"
+        template="$template{ \"value\": \":${{ steps.all_icons.outputs.unit_test }}:  $unit_test\", \"short\": true },"
         template="$template{ \"value\": \"Branch: ${branch}\", \"short\": true },"
      
          
         if [ "${{ steps.all_icons.outputs.integration_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.integration_test }}" == "white_check_mark" ]; then
-          template="$template{ \"value\": \"$integration_test  :${{ steps.all_icons.outputs.integration_test }}:\", \"short\": true },"
+          template="$template{ \"value\": \":${{ steps.all_icons.outputs.integration_test }}:  $integration_test\", \"short\": true },"
           template="$template{ \"value\": \" \", \"short\": true },"
         fi
 
         if [ "${{ steps.all_icons.outputs.generic_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.generic_test }}" == "white_check_mark" ]; then
-          template="$template{ \"value\": \"$generic_test      :${{ steps.all_icons.outputs.generic_test }}:\", \"short\": true },"
+          template="$template{ \"value\": \"$generic_test  :${{ steps.all_icons.outputs.generic_test }}:\", \"short\": true },"
           template="$template{ \"value\": \" \", \"short\": true },"
         fi
 
-        template="$template{ \"value\": \"$sonar_result         :${{ steps.all_icons.outputs.sonar_scan }}:\", \"short\": true },"
+        template="$template{ \"value\": \":${{ steps.all_icons.outputs.sonar_scan }}:  $sonar_result\", \"short\": true },"
 
         template="$template{ \"value\": \"${commit}\", \"short\": true },"
       
-        template="$template{ \"value\": \"${citadel_result}           :${{ steps.all_icons.outputs.citadel_scan }}:\", \"short\": true },"
+        template="$template{ \"value\": \":${{ steps.all_icons.outputs.citadel_scan }}:  ${citadel_result}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
         
-        template="$template{ \"value\": \"${deploy_result}            :${{ steps.all_icons.outputs.deploy }}:\", \"short\": true }"
+        template="$template{ \"value\": \":${{ steps.all_icons.outputs.deploy }}:  ${deploy_result}\", \"short\": true }"
          
         # template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
         # template="$template{ \"value\": \" \", \"short\": true },"
         # template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
         
-        # Read JSON data from the variable
-        json_data='[
-          { "value": "Event: <https://github.com/lumada-common-services/hon7475|push>", "short": true },
-          { "value": " ", "short": true },
-          { "value": "Build :white_check_mark:", "short": true },
-          { "value": "<https://github.com/lumada-common-services/honeycomb-samples/commit/0d8bec06c| Details>", "short": true },
-          { "value": "Unit Test  :white_check_mark:", "short": true },
-          { "value": "Branch: HNC-545-B", "short": true },
-          { "value": "Integration Test  :white_check_mark:", "short": true },
-          { "value": " ", "short": true },
-          { "value": "Test      :white_check_mark:", "short": true },
-          { "value": " ", "short": true },
-          { "value": "SonarQube     :x:", "short": true },
-          { "value": "''check ...''", "short": true },
-          { "value": "Citadel   :x:", "short": true },
-          { "value": " ", "short": true },
-          { "value": "Deploy  :white_check_mark:", "short": true }
-        ]'
 
-        max_symbol_key_length() {
-            local max=0
-            while IFS= read -r line; do
-                local key=$(echo "$line" | grep -o '"value": ".*"' | cut -d '"' -f 4)
-                if [[ "$key" =~ :[a-zA-Z_]+:$ ]]; then
-                    local len=${#key}
-                    if (( len > max )); then
-                        max=$len
-                    fi
-                fi
-            done < <(echo "$json_data")
-            echo "$max"
-        }
-
-        # Calculate the maximum length for symbol keys
-        max_symbol_length=$(max_symbol_key_length)
-
-        # Loop through JSON data and align symbol values
-        updated_data=$(echo "$json_data" | while IFS= read -r line; do
-            value=$(echo "$line" | grep -o '"value": ".*"' | cut -d '"' -f 4)
-            if [[ "$value" =~ :[a-zA-Z_]+:$ ]]; then
-                key=$(echo "$line" | grep -o '"value": ".*"' | cut -d '"' -f 4)
-                padding=$((max_symbol_length - ${#key}))
-                printf "%s" "$line" | sed -E "s/\"value\": \"(.*):(.+):\"/\"value\": \"\1$(printf '%-*s' "$padding"):\2:\"/"
-            else
-                echo "$line"
-            fi
-        done)
-
-        echo "$updated_data"
-        # echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
-        # # echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
+        echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
+  
 
     - name: Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
@@ -797,24 +749,13 @@ runs:
               "channel": "${{ env.Slack_Channel }}",
               "status": "${{ job.status }}",
               "attachments": [
-                  {
-                    "color": "#f2c744",
-                    "blocks": [
-                      {
-                        "type": "section",
-                        "fields": [
-                          {
-                            "type": "mrkdwn",
-                            "text": "*Steps* "
-                          },
-                          {
-                            "type": "mrkdwn",
-                            "text": "*Status*\n\n"
-                          }
-                        ]
-                      }
-                    ]
-                  }
+                {
+                  "fields": [
+                    ${{ steps.slack-template.outputs.slack-attach-fields }}
+                  ],
+                  "footer": "by ${{ github.actor }}",
+                  "footer_icon": "https://github.com/${{github.actor}}.png?size=20"
+                }
               ]
             }
 
