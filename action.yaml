@@ -745,7 +745,6 @@ runs:
 
         echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
   
-
     - name: Slack Notification
       if: ${{ env.report && env.Slack_Channel }}
       uses: hv-actions/slack-action@stable
