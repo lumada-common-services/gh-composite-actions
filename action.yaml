@@ -723,7 +723,7 @@ runs:
 
         template="$template{ \"value\": \":${{ steps.all_icons.outputs.sonar_scan }}:  $sonar_result\", \"short\": true },"
 
-        if [ "${{ steps.all_icons.outputs.integration_test }}" == "x" ]; then
+        if [ "${{ steps.all_icons.outputs.integration_test }}" == "x" ] && [ "${{ steps.all_icons.outputs.generic_test }}" == "x" ]; then
           template="$template{ \"value\": \"${commit}\", \"short\": true },"
         else
           template="$template{ \"value\": \" \", \"short\": true },"
