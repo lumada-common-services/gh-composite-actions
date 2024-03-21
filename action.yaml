@@ -718,7 +718,10 @@ runs:
 
         if [ "${{ steps.all_icons.outputs.generic_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.generic_test }}" == "white_check_mark" ]; then
           template="$template{ \"value\": \":${{ steps.all_icons.outputs.generic_test }}:  $generic_test\", \"short\": true },"
-          template="$template{ \"value\": \" \", \"short\": true },"   
+          if [ "${{ steps.all_icons.outputs.integration_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.integration_test }}" == "white_check_mark" ]; then
+            template="$template{ \"value\": \" \", \"short\": true },"
+          else
+            template="$template{ \"value\": \"${commit}\", \"short\": true },"  
         fi
 
         template="$template{ \"value\": \":${{ steps.all_icons.outputs.sonar_scan }}:  $sonar_result\", \"short\": true },"
