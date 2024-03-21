@@ -717,7 +717,7 @@ runs:
         fi
 
         if [ "${{ steps.all_icons.outputs.generic_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.generic_test }}" == "white_check_mark" ]; then
-          template="$template{ \"value\": \"$generic_test  :${{ steps.all_icons.outputs.generic_test }}:\", \"short\": true },"
+          template="$template{ \"value\": \":${{ steps.all_icons.outputs.generic_test }}:  $generic_test\", \"short\": true },"
           template="$template{ \"value\": \" \", \"short\": true },"
         fi
 
