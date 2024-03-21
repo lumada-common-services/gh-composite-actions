@@ -718,12 +718,16 @@ runs:
 
         if [ "${{ steps.all_icons.outputs.generic_test }}" == "boom" ] || [ "${{ steps.all_icons.outputs.generic_test }}" == "white_check_mark" ]; then
           template="$template{ \"value\": \":${{ steps.all_icons.outputs.generic_test }}:  $generic_test\", \"short\": true },"
-          template="$template{ \"value\": \" \", \"short\": true },"
+          template="$template{ \"value\": \"${commit}\", \"short\": true },"    
         fi
 
         template="$template{ \"value\": \":${{ steps.all_icons.outputs.sonar_scan }}:  $sonar_result\", \"short\": true },"
 
-        template="$template{ \"value\": \"${commit}\", \"short\": true },"
+        if [ "${{ steps.all_icons.outputs.integration_test }}" == "x" ]; then
+          template="$template{ \"value\": \"${commit}\", \"short\": true },"
+        else
+          template="$template{ \"value\": \"${commit}\", \"short\": true },"
+        fi 
       
         template="$template{ \"value\": \":${{ steps.all_icons.outputs.citadel_scan }}:  ${citadel_result}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
