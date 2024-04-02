@@ -1,3 +1,9 @@
+## 2.1.3 🐝 - 2024-04-02
+
+### What's Changed
+
+- …eady existing tag [(Pull Request 146)](https://github.com/lumada-common-services/gh-composite-actions/pull/146)
+
 ## 2.1.2 🐝 - 2024-04-02
 
 ### What's Changed
