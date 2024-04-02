@@ -1,3 +1,11 @@
+## 2.1.4 🐝 - 2024-04-02
+
+### What's Changed
+
+#### 🐛 Bug Fixes
+
+- [(Pull Request 148)](https://github.com/lumada-common-services/gh-composite-actions/pull/148)
+
 ## 2.1.3 🐝 - 2024-04-02
 
 ### What's Changed
