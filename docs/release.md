@@ -1,3 +1,11 @@
+## 2.1.2 🐝 - 2024-04-02
+
+### What's Changed
+
+#### 🚀 Enhancement
+
+- Updated the Slack message to make it look simpler.  [(Pull Request 147)](https://github.com/lumada-common-services/gh-composite-actions/pull/147)
+
 ## 2.1.1 🐝 - 2024-03-11
 
 ### What's Changed
