@@ -385,13 +385,13 @@ runs:
       shell: bash
       run: |
         git pull origin ${{ github.ref_name }} --rebase --autostash --depth=1
-        
+
         # if there was a change at build time, then commits those changes. Actor would be github-actions[bot]
         if [ -n "$(git status --porcelain)" ]; then
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
 
-          git add ${{ github.workspace }}
+          git add ${GITHUB_WORKSPACE}
           git commit -m "[CI/CD] - :robot: Changes captured in the ${{ env.Tag_version }} tag" --signoff  
         
           if [ "${{ env.push_tag_only }}" == "false" ]; then
