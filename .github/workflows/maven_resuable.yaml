@@ -42,7 +42,7 @@ jobs:
         uses: actions/checkout@v4
 
   maven-validation:
-    if: ${{ inputs.run_snapshot == 'true' }}
+    if: ${{ inputs.run_snapshot == true }}
     name: Maven merge sample(snapshot)
     runs-on: k8s
 
@@ -89,7 +89,7 @@ jobs:
           report: true
   
   maven-validation-second:
-    if: ${{ inputs.run_release_candidate == 'true' }}
+    if: ${{ inputs.run_release_candidate == true }}
     name: Maven merge sample(release)
     runs-on: k8s
 
@@ -118,7 +118,7 @@ jobs:
           unit_test_report_path: '**/maven2/target/surefire-reports/*.xml' 
 
       - name: Sonarqube Scan
-        if: ${{ inputs.run_snapshot == 'false' }}
+        if: ${{ inputs.run_snapshot == false }}
         continue-on-error: true
         uses: lumada-common-services/gh-composite-actions@stable
         env:  
