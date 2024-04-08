@@ -24,6 +24,23 @@ env:
 
 jobs:
 
+  sample-checkout:
+    name: sample Check Out only
+    runs-on: k8s
+
+    container: 
+      image: one.hitachivantara.com/devops-docker-release/hc-samples:20231010.1-maven
+      credentials:
+        username: ${{ secrets.JFROG_JARJAR_SERVICE_USERNAME }}
+        password: ${{ secrets.JFROG_JARJAR_SERVICE_TOKEN }}
+      volumes: 
+        - /home/runner/caches/.m2:/root/.m2
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
   maven-validation:
     if: ${{ inputs.run_snapshot == 'true' }}
     name: Maven merge sample(snapshot)
