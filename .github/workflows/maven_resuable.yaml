@@ -1,0 +1,120 @@
+name: Honeycomb merge workflow
+on:
+  workflow_call:
+    inputs:
+      run_snapshot:
+        required: true
+        type: boolean
+        default: true
+        description: 'should the snapshot build run'
+      run_release_candidate:
+        required: true
+        type: boolean
+        default: false
+        description: 'should the RC build'
+
+env:
+
+  SONAR_PROJECT_KEY: HC_MAVEN
+  SONAR_HOST_URL: "https://sonar.orl.eng.hitachivantara.com"
+  SONAR_LOGIN: ${{secrets.WINGMAN_SONAR_TOKEN}}
+  
+  SLACK_TOKEN: ${{ secrets.SLACK_TOKEN }}
+  SLACK_CHANNEL: yukon-test
+
+jobs:
+
+  maven-validation:
+    if: ${{ inputs.run_snapshot == 'true' }}
+    name: Maven merge sample(snapshot)
+    runs-on: k8s
+
+    container: 
+      image: one.hitachivantara.com/devops-docker-release/hc-samples:20231010.1-maven
+      credentials:
+        username: ${{ secrets.JFROG_JARJAR_SERVICE_USERNAME }}
+        password: ${{ secrets.JFROG_JARJAR_SERVICE_TOKEN }}
+      volumes: 
+        - /home/runner/caches/.m2:/root/.m2
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Build and Unit Test
+        uses: lumada-common-services/gh-composite-actions@stable
+        with:
+          command: |
+            cd maven
+            mvn verify -B -Daudit -amd -Dmaven.test.failure.ignore=true
+        env:
+          cmd_type: BUILD,UNIT_TEST
+          unit_test_reporter: 'java-junit'
+          unit_test_report_path: '**/maven/target/surefire-reports/*.xml' 
+
+      - name: Sonarqube Scan
+        continue-on-error: true
+        uses: lumada-common-services/gh-composite-actions@develop
+        env:  
+         sonar_utility: sonar-scanner
+         sonar_commands: '("-Dsonar.projectBaseDir=./maven -Dsonar.projectKey=${{env.SONAR_PROJECT_KEY}} -Dsonar.host.url=${{env.SONAR_HOST_URL}}  -Dsonar.token=${{env.SONAR_LOGIN}}")'
+
+          
+      - name: Report
+        if: ${{ !cancelled() }}
+        uses: lumada-common-services/gh-composite-actions@stable
+        env:
+          Slack_Token: ${{ secrets.SLACK_TOKEN }}
+          Slack_Channel: ${{ env.SLACK_CHANNEL }}
+          # steps_json: '${{ toJson(steps) }}'
+          # teams_Webhook_Url: '${{ secrets.TEAMS_WEBHOOK_URL }}'
+          report: true
+  
+  maven-validation-second:
+    if: ${{ inputs.run_release_candidate == 'true' }}
+    name: Maven merge sample(release)
+    runs-on: k8s
+
+    container: 
+      image: one.hitachivantara.com/devops-docker-release/hc-samples:20231010.1-maven
+      credentials:
+        username: ${{ secrets.JFROG_JARJAR_SERVICE_USERNAME }}
+        password: ${{ secrets.JFROG_JARJAR_SERVICE_TOKEN }}
+      volumes: 
+        - /home/runner/caches/.m2:/root/.m2
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@v4
+  
+      - name: BUILD and UNIT_TEST
+        uses: lumada-common-services/gh-composite-actions@stable
+        with:
+          command: |        
+            cd maven2
+            mvn verify -B -Daudit -amd -Dmaven.test.failure.ignore=true        
+        env:
+          cmd_type: BUILD,UNIT_TEST
+          unit_test_reporter: 'java-junit'
+          unit_test_report_path: '**/maven2/target/surefire-reports/*.xml' 
+
+      - name: Sonarqube Scan
+        if: ${{ inputs.run_snapshot == 'false' }}
+        continue-on-error: true
+        uses: lumada-common-services/gh-composite-actions@develop
+        env:  
+         sonar_utility: sonar-scanner
+         sonar_commands: '("-Dsonar.projectBaseDir=./maven2 -Dsonar.projectKey=${{env.SONAR_PROJECT_KEY}} -Dsonar.host.url=${{env.SONAR_HOST_URL}}  -Dsonar.token=${{env.SONAR_LOGIN}}")'
+
+            
+      - name: Report
+        if: ${{ !cancelled() }}
+        uses: lumada-common-services/gh-composite-actions@stable
+        env:
+          Slack_Token: ${{ secrets.SLACK_TOKEN }}
+          Slack_Channel: ${{ env.SLACK_CHANNEL }}
+          # steps_json: '${{ toJson(steps) }}'
+          # teams_Webhook_Url: '${{ secrets.TEAMS_WEBHOOK_URL }}'
+          report: true
