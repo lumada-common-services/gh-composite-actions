@@ -12,6 +12,11 @@ on:
         type: boolean
         default: false
         description: 'should the RC build'
+      additional_mvn_directives:
+        required: false
+        type: string
+        description: "Extra additional directives for the Maven command"
+        default: ""
 
 env:
 
@@ -59,6 +64,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Update cmd_type as per the mvn_directives
+        if: env.SET_CMD_TYPE == null
+        run: |
+          if [[ -n "${{ inputs.additional_mvn_directives }}" && "${{ inputs.additional_mvn_directives }}" == *"-DrunITs"* ]]; then
+            echo "SET_CMD_TYPE=BUILD,UNIT_TEST,INTEGRATION_TEST" >> $GITHUB_ENV
+          else
+            echo "SET_CMD_TYPE=BUILD,UNIT_TEST" >> $GITHUB_ENV
+          fi
+        shell: bash
+
       - name: Build and Unit Test
         uses: lumada-common-services/gh-composite-actions@stable
         with:
@@ -66,7 +81,7 @@ jobs:
             cd maven
             mvn verify -B -Daudit -amd -Dmaven.test.failure.ignore=true
         env:
-          cmd_type: BUILD,UNIT_TEST
+          cmd_type: ${{ env.SET_CMD_TYPE }}
           unit_test_reporter: 'java-junit'
           unit_test_report_path: '**/maven/target/surefire-reports/*.xml' 
 
@@ -105,6 +120,16 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v4
+
+      - name: Update cmd_type as per the mvn_directives
+        if: env.SET_CMD_TYPE == null
+        run: |
+          if [[ -n "${{ inputs.additional_mvn_directives }}" && "${{ inputs.additional_mvn_directives }}" == *"-DrunITs"* ]]; then
+            echo "SET_CMD_TYPE=BUILD,UNIT_TEST,INTEGRATION_TEST" >> $GITHUB_ENV
+          else
+            echo "SET_CMD_TYPE=BUILD,UNIT_TEST" >> $GITHUB_ENV
+          fi
+        shell: bash
   
       - name: BUILD and UNIT_TEST
         uses: lumada-common-services/gh-composite-actions@stable
@@ -113,7 +138,7 @@ jobs:
             cd maven2
             mvn verify -B -Daudit -amd -Dmaven.test.failure.ignore=true        
         env:
-          cmd_type: BUILD,UNIT_TEST
+          cmd_type: ${{ env.SET_CMD_TYPE }}
           unit_test_reporter: 'java-junit'
           unit_test_report_path: '**/maven2/target/surefire-reports/*.xml' 
 
