@@ -4,13 +4,15 @@
 
 #### 🐛 Bug Fixes
 
-- [(Pull Request 148)](https://github.com/lumada-common-services/gh-composite-actions/pull/148)
+- Fixing the GitHub workspace variable in the Git tag process. [(Pull Request 148)](https://github.com/lumada-common-services/gh-composite-actions/pull/148)
 
 ## 2.1.3 🐝 - 2024-04-02
 
 ### What's Changed
 
-- …eady existing tag [(Pull Request 146)](https://github.com/lumada-common-services/gh-composite-actions/pull/146)
+#### 🚀 Enhancement
+
+- Create a process for building Pentaho CUST cases. Additionally, recreate an already existing tag. [(Pull Request 146)](https://github.com/lumada-common-services/gh-composite-actions/pull/146)
 
 ## 2.1.2 🐝 - 2024-04-02
 
@@ -34,8 +36,7 @@
 
 #### 🚀 Features
 
-- Update the Citadel scan script to fetch plugin names from the manifest file and determine the artifact zip URL for those plugins.
-  The script will only update the values if the Citadel config YAML file contains the specific placeholder mentioned below for each particular key. For more information, refer to [this.](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30890459190/Honeycomb+and+Citadel+integration#Updating-values-in-the-config-file)   [(Pull Request 143)](https://github.com/lumada-common-services/gh-composite-actions/pull/143)
+  - Update the Citadel scan script to fetch plugin names from the manifest file and determine the artifact zip URL for those plugins. The script will only update the values if the Citadel config YAML file contains the specific placeholder mentioned below for each particular key. For more information, refer to [this.](https://hv-eng.atlassian.net/wiki/spaces/MCI/pages/30890459190/Honeycomb+and+Citadel+integration#Updating-values-in-the-config-file)   [(Pull Request 143)](https://github.com/lumada-common-services/gh-composite-actions/pull/143)
 
 ## 2.0.1 🐝 - 2024-02-28
 
