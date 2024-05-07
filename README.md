@@ -105,19 +105,27 @@ List of Composite Actions:
 10. Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
       ```
       eg.
-        - name: FrogBot
-          uses: jfrog/frogbot@v2.8.4
+        - name: Frogbot
+          if: ${{ env.JF_URL }}
+          run: /opt/frogbot scan-pull-request
+          shell: bash
           env:
-            JF_URL: ${{ secrets.JF_URL }}
-            JF_ACCESS_TOKEN: ${{ secrets.JF_ACCESS_TOKEN }}
-            JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            JF_WORKING_DIR: ./frontend
+            JF_URL: ${{ env.JF_URL }}
+            JF_ACCESS_TOKEN: ${{ env.JF_ACCESS_TOKEN }}
+            JF_GIT_TOKEN: ${{ env.JF_GIT_TOKEN }}
+            JF_GIT_PROVIDER: 'github'
+            JF_PATH_EXCLUSIONS: ${{ env.JF_PATH_EXCLUSIONS }}
+            JF_GIT_OWNER: ${{ env.GIT_REPO_OWNER}}
+            JF_GIT_REPO: ${{ env.GIT_REPO_NAME }}
+            JF_GIT_PULL_REQUEST_ID : ${{ env.PULL_REQUEST_NUMBER }}
+            JF_WORKING_DIR: ${{ env.JF_WORKING_DIR }}
+            JF_FAIL: ${{ env.JF_FAIL }}
       ```
       Note:
 
       1. JF_WORKING_DIR: we need to explicitly mention the WORK_DIR for the scan as mentioned above or else it will scan the entire root directory.
 
-      2. When using Frogbot scan with `changed_modules`, the bootstrap image must have both Python and the PYYAML package installed. And we need to use these env variable `JF_CHANGED_PATHS: "${{ steps.change_detection.outputs.changed_modules }}"` to scan only for changed_modules.
+      2. When using Frogbot scan with `changed_modules`, the bootstrap image must have Python , Jfrog cli and the PYYAML package installed. And we need to use these env variable `JF_CHANGED_PATHS: "${{ steps.change_detection.outputs.changed_modules }}"` to scan only for changed_modules.
 
 11. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
 
