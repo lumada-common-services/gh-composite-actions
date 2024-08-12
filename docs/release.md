@@ -1,3 +1,15 @@
+## 2.1.6 🐝 - 2024-08-12
+
+### What's Changed
+
+#### 🐛 Bug Fixes
+
+- …ate limit." error [(Pull Request 152)](https://github.com/lumada-common-services/gh-composite-actions/pull/152)
+
+#### 🧰 Maintenance
+
+- …ate limit." error [(Pull Request 152)](https://github.com/lumada-common-services/gh-composite-actions/pull/152)
+
 ## 2.1.5 🐝 - 2024-05-07
 
 ### What's Changed
