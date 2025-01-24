@@ -148,7 +148,7 @@ runs:
       id : unit-test-result
       if: ${{ contains(env.cmd_type, 'UNIT_TEST') &&  env.unit_test_report_path !='' && env.unit_test_reporter !='' }}                   
       with:
-        name: ${{ github.job }}-UNIT_TEST                          
+        name: ${{ env.report_prefix}}${{ github.job }}-UNIT_TEST
         path: ${{ env.unit_test_report_path}}              # '**/target/**/*.xml'   
         reporter: ${{ env.unit_test_reporter }}                 # Format of test results. 
         only-summary: 'true' 
@@ -160,7 +160,7 @@ runs:
       id : int-test-result
       if: ${{ contains(env.cmd_type, 'INTEGRATION_TEST') &&  env.int_test_report_path !='' && env.int_test_reporter !='' }}                   
       with:
-        name: ${{ github.job }}-INTEGRATION_TEST                          
+        name: ${{ env.report_prefix}}${{ github.job }}-INTEGRATION_TEST
         path: ${{ env.int_test_report_path}}              # '**/target/**/*.xml'   
         reporter: ${{ env.int_test_reporter }}                 # Format of test results. 
         only-summary: 'true' 
@@ -172,7 +172,7 @@ runs:
       id : test-result
       if: ${{ contains(env.cmd_type, 'TEST') &&  env.test_report_path !='' && env.test_reporter !='' }}                   
       with:
-        name: ${{ github.job }}-TEST                          
+        name: ${{ env.report_prefix}}${{ github.job }}-TEST
         path: ${{ env.test_report_path}}              # '**/target/**/*.xml'   
         reporter: ${{ env.test_reporter }}                 # Format of test results. 
         only-summary: 'true' 
