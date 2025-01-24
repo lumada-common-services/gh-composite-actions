@@ -1,3 +1,14 @@
+## 2.1.7 🐝 - 2025-01-24
+
+### What's Changed
+
+#### 🚀 Features
+
+- [(Pull Request 154)](https://github.com/lumada-common-services/gh-composite-actions/pull/154)
+   
+- …t reports checks [(Pull Request 153)](https://github.com/lumada-common-services/gh-composite-actions/pull/153)
+  
+
 ## 2.1.6 🐝 - 2024-08-12
 
 ### What's Changed
