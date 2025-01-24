@@ -169,3 +169,21 @@ that correspond to in the composite action:
   id: sonar-scan
   uses: lumada-common-services/gh-composite-actions@sonar-action
 ```
+
+<b>Note</b>: When using the steps for testing (`UNIT_TEST`, `INTEGRATION_TEST`, `TEST`), one has the possibility of defining a prefix to help distinguish the reports with results in case the job has a matrix strategy. By setting `report_prefix` with a non-empty value, when calling the step, that will be attached to name that showns up in the summary section. Example:
+```
+      eg.
+        - name: Integration Test Maven
+          uses: lumada-common-services/gh-composite-actions@develop
+          with:
+            command: |
+              mvn verify -DrunITs -Dit.test=EditorBeanIT 
+          env:
+            cmd_type: INTEGRATION_TEST
+            report_prefix: 'my-prefix'
+            int_test_reporter: 'java-junit'
+            int_test_report_path: '**/integration/target/*/*.xml'
+            int_test_copy_to_target_path: './test_report'
+            int_test_fail_on_error: 'false'
+            int_test_fail_on_empty: 'false'
+      ```
