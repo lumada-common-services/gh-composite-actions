@@ -756,7 +756,7 @@ runs:
 
     - name: Teams Notification
       if: ${{ env.report && env.teams_Webhook_Url  }}
-      uses: hv-actions/teams-notify-action@stable
+      uses: hv-actions/teams-notify-action@DEVO-11794
       with:
         steps_json: '${{ env.steps_json }}'
         teams_Webhook_Url: '${{ env.teams_Webhook_Url }}'
