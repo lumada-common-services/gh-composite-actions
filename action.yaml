@@ -112,12 +112,7 @@ runs:
             elif [ -z "$reporter" ]; then
                 echo "::warning::Empty value passed for variable '${prefix}test_reporter'. Test report link will not be generated for $test_type!"
             else
-                # Check for the existence of report files
-                if find . -type f -path "$report_path" -print -quit | grep -q .; then
-                    echo -e "\e[32mSuccess\e[0m: $test_type report files found"
-                else
-                    echo "::error::No $test_type report files were found. The value of the variable '${prefix}test_report_path' may be incorrect for $test_type!"
-                fi
+                echo -e "\e[33mPrerequisites are met! Attempting report(s) collection.\e[0m"
             fi
         }
 
