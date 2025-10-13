@@ -299,19 +299,19 @@ runs:
       shell: bash
 
       # Sonar section
-    - name: Sonar Scan
-      if: ${{ env.sonar_commands }}
-      id: sonar-scan
-      uses: lumada-common-services/gh-composite-actions@sonar-action
-
-    - name: Sonar scan tracking
-      shell: bash
-      if: ${{ always() && env.sonar_commands }}
-      run: |
-        icon="boom"
-        [[ "${{ steps.sonar-scan.outcome }}" == "success" ]] && icon="white_check_mark"
-
-        sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
+#    - name: Sonar Scan
+#      if: ${{ env.sonar_commands }}
+#      id: sonar-scan
+#      uses: lumada-common-services/gh-composite-actions@sonar-action
+#
+#    - name: Sonar scan tracking
+#      shell: bash
+#      if: ${{ always() && env.sonar_commands }}
+#      run: |
+#        icon="boom"
+#        [[ "${{ steps.sonar-scan.outcome }}" == "success" ]] && icon="white_check_mark"
+#
+#        sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
     # Citadel section
     - name: Prepare citadel Json file
