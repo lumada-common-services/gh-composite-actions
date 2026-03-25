@@ -441,6 +441,7 @@ runs:
         JF_GIT_PULL_REQUEST_ID : ${{ env.PULL_REQUEST_NUMBER }}
         JF_WORKING_DIR: ${{ env.JF_WORKING_DIR }}
         JF_FAIL: ${{ env.JF_FAIL || 'TRUE' }}
+        MAVEN_ARGS: ${{ env.MAVEN_ARGS }}
         
     - name: Creating Kind Cluster 
       id: cluster-creation
