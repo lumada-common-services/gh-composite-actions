@@ -139,7 +139,7 @@ runs:
       shell: bash
 
     - name: Unit Test Report
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v3
       id : unit-test-result
       if: ${{ contains(env.cmd_type, 'UNIT_TEST') &&  env.unit_test_report_path !='' && env.unit_test_reporter !='' }}                   
       with:
@@ -151,7 +151,7 @@ runs:
         fail-on-empty: ${{ env.unit_test_fail_on_empty || false }}     # Set action as failed if no test report files were found
 
     - name: Integration Test Report
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v3
       id : int-test-result
       if: ${{ contains(env.cmd_type, 'INTEGRATION_TEST') &&  env.int_test_report_path !='' && env.int_test_reporter !='' }}                   
       with:
@@ -163,7 +163,7 @@ runs:
         fail-on-empty: ${{ env.int_test_fail_on_empty || false }}     # Set action as failed if no test report files were found
     
     - name: Generic Test Report
-      uses: dorny/test-reporter@v1
+      uses: dorny/test-reporter@v3
       id : test-result
       if: ${{ contains(env.cmd_type, 'TEST') &&  env.test_report_path !='' && env.test_reporter !='' }}                   
       with:
