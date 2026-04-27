@@ -49,7 +49,7 @@ jobs:
           path-to-changelog: ${{ env.file_path_md }}
       
       - name: Commit 
-        uses: EndBug/add-and-commit@v9 
+        uses: EndBug/add-and-commit@v10 
         with:
           add: ${{ env.file_path_md }} --force
           message: "[CI/CD] - :robot: Update release notes."
