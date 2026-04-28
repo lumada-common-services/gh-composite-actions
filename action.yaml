@@ -173,6 +173,7 @@ runs:
         only-summary: 'true' 
         fail-on-error: ${{ env.test_fail_on_error || false }}     # Set action as failed if test report contains any failed test
         fail-on-empty: ${{ env.test_fail_on_empty || false }}     # Set action as failed if no test report files were found
+        use-actions-summary: 'false'
     
     - name: Check if UNIT_TEST/INTEGRATION_TEST/GENERIC_TEST commands were successfully executed 
       if: ${{ !cancelled() && (contains(env.cmd_type, 'UNIT_TEST') || contains(env.cmd_type, 'INTEGRATION_TEST') || contains(env.cmd_type, 'TEST')) }}
