@@ -149,6 +149,7 @@ runs:
         only-summary: 'true' 
         fail-on-error: ${{ env.unit_test_fail_on_error || false }}     # Set action as failed if test report contains any failed test
         fail-on-empty: ${{ env.unit_test_fail_on_empty || false }}     # Set action as failed if no test report files were found
+        use-actions-summary: 'false'
 
     - name: Integration Test Report
       uses: dorny/test-reporter@v3
@@ -161,6 +162,7 @@ runs:
         only-summary: 'true' 
         fail-on-error: ${{ env.int_test_fail_on_error || false }}     # Set action as failed if test report contains any failed test
         fail-on-empty: ${{ env.int_test_fail_on_empty || false }}     # Set action as failed if no test report files were found
+        use-actions-summary: 'false'
     
     - name: Generic Test Report
       uses: dorny/test-reporter@v3
