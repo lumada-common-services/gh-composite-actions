@@ -18,7 +18,6 @@ runs:
           echo "generic_test=x" >> $RUNNER_TEMP/icons.properties
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
             echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
             echo "deploy=x" >> $RUNNER_TEMP/icons.properties
           fi
@@ -315,27 +314,6 @@ runs:
 
         sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
-    # Blackduck section
-    - name: Blackduck Scan
-      if: ${{ env.BlackDuck_Project_Name }}
-      id: blackduck-scan
-      uses: hv-actions/docker-run-action@v3.1
-      with:
-        username: ${{ env.BLACKDUCK_DOCKER_USERNAME }}
-        password: ${{ env.BLACKDUCK_DOCKER_PASSWORD }}
-        registry: one.hitachivantara.com
-        image: one.hitachivantara.com/docker/blackducksoftware/detect:9
-        options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
-        run: |
-          java -jar /synopsys-detect.jar \
-           --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
-           --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
-           --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
-           --detect.accuracy.required=NONE \
-           --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
-           --blackduck.url="${{ env.BlackDuck_Url }}" \
-           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
-
     - name: Create Tag
       if: ${{ env.Tag_version }}
       id: git-tag
@@ -522,12 +500,6 @@ runs:
         fi
              
         if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
-          # if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
-          #   blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
-          #   echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
-          # else
-          #   echo "| Blackduck Scan | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
-          # fi     
           echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
 
           DEPLOY=Deploy
@@ -557,8 +529,6 @@ runs:
       run: |
         details=""
         commit=""
-        # blackduck_result=""
-        # blackduck_message=""
         branch="${GITHUB_REF#refs/heads/}"
 
         #Build
@@ -671,10 +641,6 @@ runs:
         template="$template{ \"value\": \" \", \"short\": true },"
         template="$template{ \"value\": \"$deploy_status_icon  ${deploy_result}\", \"short\": true }"
       
-        # template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
-        # template="$template{ \"value\": \" \", \"short\": true },"
-        # template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
-
         echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
 
     - name: Slack Notification
