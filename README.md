@@ -95,10 +95,8 @@ List of Composite Actions:
       ```
 6. Sonarqube Scan: Please refer to the link how we defined the composite action for [sonar scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30584439068/Static+Code+Analysis+SonarQube+Scan);
 
-7. OWASP Scan: Please refer the to link how we defined the composite action for [owasp scan](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30577266601/Software+Composition+Analysis+OWASP+dependency+check);
-
-9. Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
-10. Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
+7. Publish Artifacts to Registry: Please refer the to link how we defined the composite action for [Publish Artifacts to Registry](https://hv-eng.atlassian.net/wiki/spaces/LSH/pages/30508254316/Manifest+Defined+Package+Deployment);                                                                                     
+8. Frogbot: It will scan for the vulnerable dependencies and report if any issues in the PR   [Frogbot](https://hv-eng.atlassian.net/wiki/spaces/LFCP/pages/30698047820/Git+Repository+scanning+with+JFRrog+Xray+for+security+vulnerabilities);                                                   
       ```
       eg.
         - name: Frogbot
@@ -123,9 +121,9 @@ List of Composite Actions:
 
       2. When using Frogbot scan with `changed_modules`, the bootstrap image must have Python , Jfrog cli and the PYYAML package installed. And we need to use these env variable `JF_CHANGED_PATHS: "${{ steps.change_detection.outputs.changed_modules }}"` to scan only for changed_modules.
 
-11. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
+9. Tag: Commit the changes available in the workspace and tag the code as per the latest commit id. You have also the possibility of pushing to a tag only, by setting `push_tag_only` to `true`.
 
-12. Reporting: Aims to send messages to a Microsoft Teams channel and/or a Slack channel to help users keep track of all the defined steps in a workflow, along with additional workflow details. A summary table will also be added to the job's summary after the execution of the job, consisting of the same details.
+10. Reporting: Aims to send messages to a Microsoft Teams channel and/or a Slack channel to help users keep track of all the defined steps in a workflow, along with additional workflow details. A summary table will also be added to the job's summary after the execution of the job, consisting of the same details.
 
       ```
       - name: Reporting
