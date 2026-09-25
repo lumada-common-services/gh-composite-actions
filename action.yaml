@@ -18,8 +18,6 @@ runs:
           echo "generic_test=x" >> $RUNNER_TEMP/icons.properties
 
           if [ "${{ github.event_name }}" != "pull_request" ]; then
-            # echo "blackduck_scan=x" >> $RUNNER_TEMP/icons.properties
-            echo "citadel_scan=x" >> $RUNNER_TEMP/icons.properties
             echo "create_tag=x" >> $RUNNER_TEMP/icons.properties
             echo "deploy=x" >> $RUNNER_TEMP/icons.properties
           fi
@@ -316,67 +314,6 @@ runs:
 
         sed -i "s/sonar_scan=x/sonar_scan=${icon}/g" $RUNNER_TEMP/icons.properties
 
-    # Citadel section
-    - name: Prepare citadel Json file
-      if: ${{ env.TRIGGER_CITADEL_SCAN }}
-      shell: bash
-      run: |
-        pip3 install pyyaml==6.0.1
-
-        python3 ${GITHUB_ACTION_PATH}/citadel/citadel.py \
-          "${GITHUB_WORKSPACE}/citadel-config.yaml" "${{ env.PROJECT_PATH }}" "$GITHUB_WORKFLOW_REF" "$RUNNER_TEMP" \
-          "${{ env.CODEDX_BRANCH }}" "${{ github.repository_owner }}" "${{ github.event.repository.name }},${{ github.ref_name }}" "${{ env.REPO_PATHS_INCLUDES }}" "${{ env.ARTIFACT_URLS }}" \
-          "${{ env.BUILD_NAME }}" "${{ env.BUILD_NUMBER }}" "${{ env.BUILD_VERSION }}" "${{ env.ARTIFACTORY_USER }}" "${{ env.ARTIFACTORY_API_KEY }}" "${{ env.ARTIFACTORY_BASE_URL }}" "${{ env.JF_CLI_RT_NAME }}" \
-          "${{ env.LOGGING_LEVEL }}" "${{ env.MANIFEST_PATH}}"
-        
-        echo "CITADEL_JSON_PATH=$RUNNER_TEMP/citadel.json" >> $GITHUB_ENV
-
-    - name: Upload to the citadel host
-      if: ${{ env.CITADEL_JSON_PATH }}
-      id: citadel-scan 
-      shell: bash
-      run: |        
-        file_paths="${{ env.CITADEL_JSON_PATH }}"
-        # unset CITADEL_JSON_PATH so that it doesn't get trigger again by other steps
-        echo "CITADEL_JSON_PATH=" >> $GITHUB_ENV
-        IFS=', ' read -ra file_paths_array <<< "$file_paths"
-        for file_path in "${file_paths_array[@]}"; do 
-          echo "Processing File $file_path"
-          cat $file_path
-          curl -vvvX POST '${{ env.CITADEL_URL }}' --silent --fail --show-error -d @$file_path -H 'Content-Type: application/json' -H "Connection: close"  
-          sleep ${{ env.CITADEL_JSON_LIST_SLEEP_SECONDS || 60  }}   # If env not passed, Sleeping for 60 seconds (default)
-        done
-
-    - name: Citadel scan tracking    
-      shell: bash
-      if: ${{ always() && env.TRIGGER_CITADEL_SCAN }}
-      run: |
-        icon="boom"
-        [[ "${{ steps.citadel-scan.outcome }}" == "success" ]] && icon="white_check_mark"
-
-        sed -i "s/citadel_scan=x/citadel_scan=${icon}/g" $RUNNER_TEMP/icons.properties
-        
-    # Blackduck section
-    - name: Blackduck Scan
-      if: ${{ env.BlackDuck_Project_Name }}
-      id: blackduck-scan
-      uses: hv-actions/docker-run-action@v3.1
-      with:
-        username: ${{ env.BLACKDUCK_DOCKER_USERNAME }}
-        password: ${{ env.BLACKDUCK_DOCKER_PASSWORD }}
-        registry: one.hitachivantara.com
-        image: one.hitachivantara.com/docker/blackducksoftware/detect:9
-        options: --entrypoint "/bin/bash" -v ${{ github.workspace }}:/workdir
-        run: |
-          java -jar /synopsys-detect.jar \
-           --detect.source.path=${{ env.BlackDuck_Source_Path || '/workdir' }} \
-           --detect.project.version.name="${{ env.BlackDuck_Project_Version }}" \
-           --detect.project.name="${{ env.BlackDuck_Project_Name }}" \
-           --detect.accuracy.required=NONE \
-           --blackduck.api.token="${{ env.BlackDuck_Api_Token }}" \
-           --blackduck.url="${{ env.BlackDuck_Url }}" \
-           --detect.blackduck.signature.scanner.snippet.matching="NONE" ${{ env.ADDITIONAL_ARGS }}
-
     - name: Create Tag
       if: ${{ env.Tag_version }}
       id: git-tag
@@ -563,13 +500,6 @@ runs:
         fi
              
         if [ "${{ github.event_name }}" != "pull_request" ] && [ "${{ github.event_name }}" != "pull_request_target" ]; then
-          # if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
-          #   blackduck_result="${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components"
-          #   echo "| [Blackduck Scan]($blackduck_result) | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
-          # else
-          #   echo "| Blackduck Scan | :${{ steps.all_icons.outputs.blackduck_scan }}: |" >> $GITHUB_STEP_SUMMARY
-          # fi     
-          echo "| Citadel Scan | :${{ steps.all_icons.outputs.citadel_scan }}: |" >> $GITHUB_STEP_SUMMARY
           echo "| Created Tag | :${{ steps.all_icons.outputs.create_tag }}: |" >> $GITHUB_STEP_SUMMARY
 
           DEPLOY=Deploy
@@ -599,9 +529,6 @@ runs:
       run: |
         details=""
         commit=""
-        # blackduck_result=""
-        # blackduck_message=""
-        citadel_result=""
         branch="${GITHUB_REF#refs/heads/}"
 
         #Build
@@ -656,17 +583,6 @@ runs:
             else
               commit="$(echo "''$commit" | tr '\n' ' ' | sed 's/ \+/ /g' | cut -c1-27)...''"      
             fi
-
-            # Blackduck Scan
-            # blackduck_result="Blackduck"
-            # if [ "${{ steps.all_icons.outputs.blackduck_scan }}" != "x" ]  && [ "${{ env.BLACKDUCK_SERVER_URL }}" != "" ]; then
-            #   blackduck_result="<${{ env.BLACKDUCK_SERVER_URL }}/api/projects/${{ env.BLACKDUCK_PROJ_ID }}/versions/${{ env.BLACKDUCK_VERSION_ID }}/components|${blackduck_result}>"
-            # fi
-            # blackduck_message=":arrow_right: Result  :${{ steps.all_icons.outputs.blackduck_scan }}:"
-            
-            # Citadel Scan
-            citadel_result="Citadel"
-            citadel_status_icon=":${{ steps.all_icons.outputs.citadel_scan }}:"
             
             # Deploy
             DEPLOY=Deploy
@@ -722,15 +638,9 @@ runs:
           template="$template{ \"value\": \" \", \"short\": true },"
         fi
        
-        template="$template{ \"value\": \"$citadel_status_icon  ${citadel_result}\", \"short\": true },"
         template="$template{ \"value\": \" \", \"short\": true },"
-      
         template="$template{ \"value\": \"$deploy_status_icon  ${deploy_result}\", \"short\": true }"
       
-        # template="$template{ \"value\": \"${blackduck_result}\", \"short\": true },"
-        # template="$template{ \"value\": \" \", \"short\": true },"
-        # template="$template{ \"value\": \"${blackduck_message}\", \"short\": true }"
-
         echo "slack-attach-fields=${template}" >> $GITHUB_OUTPUT
 
     - name: Slack Notification
